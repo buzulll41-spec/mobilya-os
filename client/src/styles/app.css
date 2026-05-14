@@ -34,6 +34,8 @@
   font-family: var(--mos-font);
   font-size: 14px;
   line-height: 1.5;
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 .mos[data-sidebar-collapsed='true'] {
@@ -1727,6 +1729,7 @@
   width: min(100%, 420px);
   max-width: 100%;
   height: 100%;
+  max-height: 100dvh;
   background: var(--mos-surface);
   border-left: 1px solid var(--mos-line);
   box-shadow: -12px 0 40px rgba(15, 23, 42, 0.12);
@@ -1799,7 +1802,9 @@
 
 .mos-drawer-body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0.75rem 1.1rem 1.25rem;
   display: flex;
   flex-direction: column;

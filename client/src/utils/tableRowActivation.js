@@ -9,7 +9,6 @@ export function tableRowActivationProps(row, onSelect) {
   return {
     className: 'mos-tr-click',
     tabIndex: 0,
-    role: 'button',
     onClick: () => onSelect(row),
     onKeyDown: (e) => {
       if (e.key === 'Enter' || e.key === ' ') {

@@ -87,8 +87,12 @@ export default function App() {
 
   /** @param {Omit<Order, 'id' | 'orderDate'>} draft */
   async function handleSaveOrder(draft) {
-    await createOrder(draft)
-    closeOrderModal()
+    try {
+      await createOrder(draft)
+      closeOrderModal()
+    } catch {
+      /* Hata OrdersProvider → OrdersErrorBanner; modal açık kalsın */
+    }
   }
 
   const todayLabel = `Bugün · ${formatShortDate(DEMO_TODAY)}`
