@@ -1,0 +1,339 @@
+/* Yönetici Merkezi — sabah kokpiti */
+
+.mos-erp-ops--executive-center {
+  gap: 0.85rem;
+}
+
+.mos-exec-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .mos-exec-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.mos-exec-urgent {
+  border: 1px solid #fecaca;
+  background: linear-gradient(180deg, #fff5f5 0%, #fff 100%);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+}
+
+.mos-exec-urgent__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #991b1b;
+}
+
+.mos-exec-urgent__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mos-exec-urgent__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+}
+
+.mos-exec-urgent__item--critical {
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.mos-exec-urgent__item--warning {
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.mos-exec-score {
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  gap: 0.75rem;
+  border: 1px solid var(--mos-border, #e2e6ed);
+  border-radius: 10px;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+.mos-exec-score__general {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  border-right: 1px solid var(--mos-border, #e2e6ed);
+  padding-right: 0.75rem;
+}
+
+.mos-exec-score__general-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.mos-exec-score__general-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mos-exec-score__general-value.is-success {
+  color: #15803d;
+}
+
+.mos-exec-score__general-value.is-warning {
+  color: #b45309;
+}
+
+.mos-exec-score__general-value.is-critical {
+  color: #b91c1c;
+}
+
+.mos-exec-score__max {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.mos-exec-score__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mos-exec-score__item {
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.mos-exec-score__item.is-success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.mos-exec-score__item.is-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.mos-exec-score__item.is-critical {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.mos-exec-score__item-label {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.mos-exec-score__item-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.mos-exec-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.mos-exec-trends__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.mos-exec-trend {
+  border: 1px solid var(--mos-border, #e2e6ed);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  background: #fff;
+  min-width: 0;
+}
+
+.mos-exec-trend__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.45rem;
+}
+
+.mos-exec-trend__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mos-exec-trend__total {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.mos-exec-trend__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  height: 72px;
+}
+
+.mos-exec-trend__bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+}
+
+.mos-exec-trend__bar {
+  width: 100%;
+  max-width: 28px;
+  border-radius: 4px 4px 0 0;
+  margin-top: auto;
+  transition: height 0.2s ease;
+}
+
+.mos-exec-trend--sales .mos-exec-trend__bar {
+  background: #22c55e;
+}
+
+.mos-exec-trend--orders .mos-exec-trend__bar {
+  background: #3b82f6;
+}
+
+.mos-exec-trend--collect .mos-exec-trend__bar {
+  background: #f59e0b;
+}
+
+.mos-exec-trend--ship .mos-exec-trend__bar {
+  background: #8b5cf6;
+}
+
+.mos-exec-trend__label {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.mos-exec-today__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.mos-exec-task-col {
+  border: 1px solid var(--mos-border, #e2e6ed);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  background: #fff;
+  min-width: 0;
+}
+
+.mos-exec-task-col__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mos-exec-task-col__empty {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.mos-exec-task-col__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mos-exec-task-col__row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 0.35rem 0.45rem;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.mos-exec-task-col__row strong {
+  font-size: 0.74rem;
+  color: #0f172a;
+}
+
+.mos-exec-task-col__row span {
+  color: #64748b;
+}
+
+.mos-exec-task-col__meta {
+  font-size: 0.65rem !important;
+}
+
+@media (max-width: 1100px) {
+  .mos-exec-score {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-exec-score__general {
+    border-right: none;
+    border-bottom: 1px solid var(--mos-border, #e2e6ed);
+    padding-right: 0;
+    padding-bottom: 0.65rem;
+  }
+
+  .mos-exec-trends__grid,
+  .mos-exec-today__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .mos-exec-score__grid,
+  .mos-exec-trends__grid,
+  .mos-exec-today__grid {
+    grid-template-columns: 1fr;
+  }
+}

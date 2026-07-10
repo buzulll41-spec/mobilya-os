@@ -1,0 +1,282 @@
+.mos-supplier-ledger-center__table .mos-erp-tbl-row {
+  cursor: pointer;
+}
+
+.mos-supplier-ledger-center__table-wrap {
+  max-height: min(48vh, 24rem);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Cari sekmesi: KPI üstte, liste + detay sayfa scroll ile uzar */
+.mos-supply-incoming--cari {
+  height: auto;
+  min-height: calc(100svh - 6.5rem);
+  overflow: visible;
+}
+
+.mos-supplier-ledger-center .mos-erp-ops__workspace {
+  flex: none;
+  min-height: auto;
+}
+
+.mos-supplier-ledger-center .mos-erp-ops__main {
+  min-height: auto;
+  overflow: visible;
+}
+
+.mos-supplier-ledger-center .mos-erp-ops__subpanel {
+  max-height: none;
+  min-height: 0;
+  overflow: visible;
+  flex: none;
+}
+
+.mos-supplier-ledger-detail .mos-erp-tab-body {
+  min-height: 0;
+  overflow: visible;
+}
+
+.mos-supplier-ledger-detail .mos-erp-tbl-wrap {
+  max-height: none;
+  overflow: visible;
+}
+
+.mos-supplier-ledger-detail__risk {
+  margin-bottom: 12px;
+}
+
+.mos-supplier-ledger-center .mos-erp-summary--cols-4,
+.mos-supplier-ledger-detail .mos-erp-summary--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mos-supplier-ledger-center .mos-erp-summary--cols-4,
+  .mos-supplier-ledger-detail .mos-erp-summary--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.mos-supplier-ledger-detail__pending-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 0.8125rem;
+  color: #334155;
+}
+
+.mos-supplier-ledger-detail__pending-totals strong {
+  color: #0f172a;
+}
+
+.mos-supplier-ledger-detail__customer-risk {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mos-supplier-ledger-detail__customer-risk-title {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.mos-supplier-ledger-detail__customer-risk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.mos-supplier-ledger-detail__customer-risk-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.mos-supplier-ledger-detail__customer-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.mos-supplier-ledger-detail__customer-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #c2410c;
+}
+
+.mos-supplier-ledger-center__risk-cell.is-success {
+  color: var(--mos-erp-success, #15803d);
+  font-weight: 700;
+}
+
+.mos-supplier-ledger-center__risk-cell.is-warning {
+  color: var(--mos-erp-warning, #c2410c);
+  font-weight: 700;
+}
+
+.mos-supplier-ledger-center__risk-cell.is-critical {
+  color: var(--mos-erp-critical, #b91c1c);
+  font-weight: 700;
+}
+
+.mos-supplier-ledger-report__value.is-success {
+  color: var(--mos-erp-success, #15803d);
+}
+
+.mos-supplier-ledger-report__value.is-warning {
+  color: var(--mos-erp-warning, #c2410c);
+}
+
+.mos-supplier-ledger-report__value.is-critical {
+  color: var(--mos-erp-critical, #b91c1c);
+}
+
+.mos-supplier-ledger-reports {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mos-supplier-ledger-report {
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--mos-surface, #fff);
+}
+
+.mos-supplier-ledger-report.is-critical {
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.mos-supplier-ledger-report__title {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.mos-supplier-ledger-report__empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--mos-text-muted, #94a3b8);
+}
+
+.mos-supplier-ledger-report__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mos-supplier-ledger-report__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  border-bottom: 1px solid var(--mos-border, #f1f5f9);
+}
+
+.mos-supplier-ledger-report__row:last-child {
+  border-bottom: none;
+}
+
+.mos-supplier-ledger-report__row:hover {
+  color: var(--mos-accent, #2563eb);
+}
+
+.mos-supplier-ledger-report__label {
+  font-size: 0.8125rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mos-supplier-ledger-report__value {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mos-supplier-ledger-report__sub {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--mos-text-muted, #94a3b8);
+}
+
+.mos-supplier-ledger-type-code {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.mos-supplier-ledger-type-label {
+  display: block;
+  font-size: 0.8125rem;
+}
+
+.mos-nav-item[data-indent='true'] .mos-nav-item-label {
+  padding-left: 12px;
+  font-size: 0.875rem;
+}
+
+.mos-nav-item[data-indent='true'] .mos-nav-item-icon {
+  opacity: 0.75;
+}
+
+.mos-supply-incoming__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--mos-border, #e2e8f0);
+  padding-bottom: 0;
+}
+
+.mos-supply-incoming__tab {
+  border: none;
+  background: none;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mos-text-muted, #64748b);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.mos-supply-incoming__tab.is-active {
+  color: var(--mos-accent, #2563eb);
+  border-bottom-color: var(--mos-accent, #2563eb);
+}
+
+.mos-supplier-ledger-center__embedded-meta {
+  margin: 0 0 12px;
+}

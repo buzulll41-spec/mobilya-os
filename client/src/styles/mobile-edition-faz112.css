@@ -1,0 +1,591 @@
+/**
+
+ * FAZ 112 — Mobile Edition UX katmanı.
+
+ * Yalnızca phone/tablet; desktop davranışı korunur.
+
+ */
+
+
+
+/* ——— 5 sekme alt navigasyon ——— */
+
+.mos-mobile-tabbar--faz112 .mos-mobile-tabbar__item {
+
+  flex: 1 1 0;
+
+  min-width: 0;
+
+}
+
+
+
+.mos-mobile-tabbar--faz112 .mos-mobile-tabbar__icon {
+
+  background: transparent;
+
+  font-size: 1.15rem;
+
+  width: 2rem;
+
+  height: 2rem;
+
+}
+
+
+
+.mos-mobile-tabbar--faz112 .mos-mobile-tabbar__btn {
+
+  min-height: 3.5rem;
+
+  font-size: 0.58rem;
+
+}
+
+
+
+.mos-mobile-tabbar--faz112 .mos-mobile-tabbar__label {
+
+  max-width: 100%;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+}
+
+
+
+/* ——— FAB ——— */
+
+.mos-mobile-fab {
+
+  display: none;
+
+  position: fixed;
+
+  right: max(1rem, env(safe-area-inset-right));
+
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+
+  z-index: 41;
+
+  width: 56px;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: linear-gradient(145deg, #863bff 0%, #6d28d9 100%);
+
+  color: #fff;
+
+  box-shadow: 0 8px 24px rgb(109 40 217 / 35%);
+
+  cursor: pointer;
+
+}
+
+
+
+.mos-mobile-fab__icon {
+
+  font-size: 1.85rem;
+
+  font-weight: 300;
+
+  line-height: 1;
+
+}
+
+
+
+@media (max-width: 767px) {
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-fab {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-action-bar {
+
+    display: none !important;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+
+  }
+
+}
+
+
+
+/* ——— Pull to refresh ——— */
+
+.mos-mobile-ptr {
+
+  position: relative;
+
+  min-height: 100%;
+
+}
+
+
+
+.mos-mobile-ptr__indicator {
+
+  position: absolute;
+
+  top: 0;
+
+  left: 50%;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.45rem;
+
+  transform: translate(-50%, -48px);
+
+  padding: 0.35rem 0.75rem;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.95);
+
+  border: 1px solid var(--mos-line, #e2e6ed);
+
+  box-shadow: 0 4px 14px rgb(15 23 42 / 8%);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: opacity 0.15s ease;
+
+}
+
+
+
+.mos-mobile-ptr__indicator[data-visible='true'] {
+
+  opacity: 1;
+
+}
+
+
+
+.mos-mobile-ptr__spinner {
+
+  width: 1rem;
+
+  height: 1rem;
+
+  border: 2px solid #dbeafe;
+
+  border-top-color: #863bff;
+
+  border-radius: 999px;
+
+}
+
+
+
+.mos-mobile-ptr__indicator[data-refreshing='true'] .mos-mobile-ptr__spinner {
+
+  animation: mos-ptr-spin 0.75s linear infinite;
+
+}
+
+
+
+.mos-mobile-ptr__label {
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  color: #475569;
+
+}
+
+
+
+@keyframes mos-ptr-spin {
+
+  to {
+
+    transform: rotate(360deg);
+
+  }
+
+}
+
+
+
+/* ——— Offline banner ——— */
+
+.mos-offline-banner--faz112 {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 50;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  padding: 0.55rem 0.85rem;
+
+  background: #dc2626;
+
+  color: #fff;
+
+  font-size: 0.82rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+
+}
+
+
+
+.mos-offline-banner__badge {
+
+  padding: 0.15rem 0.45rem;
+
+  border-radius: 4px;
+
+  background: rgb(0 0 0 / 18%);
+
+  font-size: 0.72rem;
+
+}
+
+
+
+.mos-offline-banner__text {
+
+  font-weight: 500;
+
+  letter-spacing: normal;
+
+}
+
+
+
+/* ——— Large touch mode (48px) ——— */
+
+@media (max-width: 767px) {
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-btn,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-detail__action,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl-op,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl-op,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-menu-btn,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-tabbar__btn,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-fab,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-page-refresh__btn,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-notification-btn,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-user-card__logout,
+
+  .mos-mobile-pwa.mos-viewport-phone input[type='checkbox'],
+
+  .mos-mobile-pwa.mos-viewport-phone input[type='radio'] {
+
+    min-height: 48px;
+
+    min-width: 48px;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone input:not([type='checkbox']):not([type='radio']),
+
+  .mos-mobile-pwa.mos-viewport-phone select,
+
+  .mos-mobile-pwa.mos-viewport-phone textarea {
+
+    min-height: 48px;
+
+    font-size: 1rem;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-global-search-input {
+
+    min-height: 48px;
+
+  }
+
+}
+
+
+
+/* ——— Swipe actions ——— */
+
+@media (max-width: 767px) {
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr {
+
+    position: relative;
+
+    transition: transform 0.18s ease;
+
+    touch-action: pan-y;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr::before,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr::before,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr::after,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr::after {
+
+    position: absolute;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 0.68rem;
+
+    font-weight: 700;
+
+    opacity: 0;
+
+    transition: opacity 0.15s ease;
+
+    pointer-events: none;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr::before,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr::before {
+
+    left: 0.5rem;
+
+    content: 'Düzenle';
+
+    color: #1d4ed8;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr::after,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr::after {
+
+    right: 0.5rem;
+
+    content: 'Detay';
+
+    color: #863bff;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr.mos-mobile-swipe--right,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr.mos-mobile-swipe--right {
+
+    transform: translateX(52px);
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr.mos-mobile-swipe--left,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr.mos-mobile-swipe--left {
+
+    transform: translateX(-52px);
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr.mos-mobile-swipe--right::before,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr.mos-mobile-swipe--right::before,
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl tbody tr.mos-mobile-swipe--left::after,
+
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-tbl tbody tr.mos-mobile-swipe--left::after {
+
+    opacity: 1;
+
+  }
+
+}
+
+
+
+/* ——— Tablet split view ——— */
+
+@media (min-width: 768px) and (max-width: 1366px) {
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__main,
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__main {
+
+    display: grid !important;
+
+    grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+
+    gap: 0.5rem;
+
+    min-height: 0;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__table-panel,
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__table-panel {
+
+    order: 1;
+
+    min-height: 0;
+
+    overflow: auto;
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-detail,
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-customer {
+
+    order: 2;
+
+    min-height: 0;
+
+    overflow: auto;
+
+  }
+
+}
+
+
+
+/* ——— Tablet landscape ——— */
+
+@media (min-width: 768px) and (max-width: 1366px) and (orientation: landscape) {
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__workspace,
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__workspace {
+
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__main,
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__main {
+
+    grid-template-columns: minmax(0, 38%) minmax(0, 62%);
+
+  }
+
+
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-content {
+
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+
+  }
+
+}
+
+
+
+/* ——— PWA install first visit ——— */
+
+.mos-pwa-install--faz112 {
+
+  position: relative;
+
+  z-index: 3;
+
+  margin-bottom: 0.65rem;
+
+  border-color: #863bff;
+
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+
+}
+
+
+
+/* ——— Desktop koruma ——— */
+
+@media (min-width: 1440px) {
+
+  .mos-mobile-pwa.mos-viewport-desktop .mos-mobile-fab,
+
+  .mos-mobile-pwa.mos-viewport-desktop .mos-mobile-ptr__indicator {
+
+    display: none !important;
+
+  }
+
+}
+
+

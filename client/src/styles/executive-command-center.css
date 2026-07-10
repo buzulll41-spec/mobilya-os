@@ -1,0 +1,1039 @@
+/* CEO Komuta Merkezi — FAZ 21A */
+
+.ecc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 1280px;
+}
+
+.ecc-head__eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-head__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ecc-head__sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-section {
+  border: 1px solid var(--mos-border, #e8edf2);
+  border-radius: 14px;
+  background: var(--mos-surface, #fff);
+  padding: 0.85rem 1rem;
+}
+
+.ecc-section--critical {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fffafa 0%, #fff 100%);
+}
+
+.ecc-section__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (max-width: 1100px) {
+  .ecc-kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ecc-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ecc-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--mos-border, #e8edf2);
+  border-radius: 12px;
+  background: #fafbfc;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ecc-kpi:hover,
+.ecc-kpi:focus-visible {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.ecc-kpi__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-kpi__value {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.ecc-tone--critical .ecc-kpi__value,
+.ecc-tone--critical .ecc-risk-card__score,
+.ecc-tone--critical .ecc-staff-row__load {
+  color: #b91c1c;
+}
+
+.ecc-tone--warning .ecc-kpi__value,
+.ecc-tone--warning .ecc-risk-card__score {
+  color: #b45309;
+}
+
+.ecc-tone--success .ecc-kpi__value {
+  color: #15803d;
+}
+
+.ecc-tone--accent .ecc-kpi__value {
+  color: #1d4ed8;
+}
+
+.ecc-main-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 0.85rem;
+}
+
+.ecc-main-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+  .ecc-main-grid,
+  .ecc-main-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ecc-critical-list,
+.ecc-task-list,
+.ecc-staff-list,
+.ecc-feed-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ecc-critical-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ecc-critical-item--critical {
+  border-color: #fecaca;
+}
+
+.ecc-critical-item--warning {
+  border-color: #fde68a;
+}
+
+.ecc-critical-item__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.ecc-critical-item__sub {
+  font-size: 0.78rem;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #dbeafe;
+  border-radius: 10px;
+  background: #f8fbff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ecc-task-item__mark {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+
+.ecc-trend-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (max-width: 1100px) {
+  .ecc-trend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ecc-trend-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ecc-trend-grid .mos-exec-trend {
+  min-height: 140px;
+}
+
+.ecc-staff-row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.82rem;
+}
+
+.ecc-staff-row:last-child {
+  border-bottom: none;
+}
+
+.ecc-staff-row__role {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-staff-row__name {
+  font-weight: 600;
+}
+
+.ecc-staff-row__load {
+  font-weight: 700;
+}
+
+.ecc-risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.ecc-risk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--mos-border, #e8edf2);
+  border-radius: 10px;
+  background: #fafbfc;
+}
+
+.ecc-risk-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-risk-card__score {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ecc-risk-card__hint {
+  font-size: 0.72rem;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-feed-item {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ecc-feed-item:last-child {
+  border-bottom: none;
+}
+
+.ecc-feed-item__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ecc-feed-item__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ecc-feed-item__time {
+  font-size: 0.72rem;
+  color: var(--mos-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.ecc-feed-item__detail {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.76rem;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--mos-text-muted, #64748b);
+}
+
+/* FAZ 30 — CEO AI Orchestration Timeline */
+
+.ecc-section--orchestration {
+  border-color: #dbeafe;
+  background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+}
+
+.ecc-orch-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ecc-orch-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.2rem 0.65rem 1fr;
+  gap: 0.55rem 0.65rem;
+  align-items: start;
+  padding: 0.45rem 0;
+}
+
+.ecc-orch-item__time {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #334155;
+}
+
+.ecc-orch-item__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.28rem;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.ecc-orch-item--sales .ecc-orch-item__dot {
+  background: #16a34a;
+}
+
+.ecc-orch-item--shipment .ecc-orch-item__dot {
+  background: #2563eb;
+}
+
+.ecc-orch-item--collection .ecc-orch-item__dot {
+  background: #ea580c;
+}
+
+.ecc-orch-item--procurement .ecc-orch-item__dot {
+  background: #9333ea;
+}
+
+.ecc-orch-item--success .ecc-orch-item__dot {
+  background: #16a34a;
+  box-shadow: 0 0 0 4px rgb(34 197 94 / 0.18);
+}
+
+.ecc-orch-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  font-size: 0.82rem;
+}
+
+.ecc-orch-item__body strong {
+  font-size: 0.84rem;
+}
+
+.ecc-orch-item__body span {
+  color: var(--mos-text-muted, #64748b);
+  line-height: 1.35;
+}
+
+.ecc-orch-item__arrow {
+  grid-column: 2 / 4;
+  margin: -0.15rem 0 0 0.1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* FAZ 31 — CEO Experience */
+
+.ecc-page--experience {
+  max-width: none;
+}
+
+.ecc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .ecc-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ecc-layout__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.ecc-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .ecc-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ecc-kpi--pulse {
+  animation: ecc-kpi-pulse 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes ecc-kpi-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  35% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.14);
+    background: #f0f9ff;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ecc-health {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f8fbff 0%, #fff 100%);
+}
+
+.ecc-health__ring {
+  --ecc-health-pct: 72%;
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 999px;
+  background: conic-gradient(#22c55e var(--ecc-health-pct), #e2e8f0 0);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.ecc-health__ring::before {
+  content: '';
+  position: absolute;
+  inset: 0.45rem;
+  border-radius: inherit;
+  background: #fff;
+}
+
+.ecc-health__score {
+  position: relative;
+  z-index: 1;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.ecc-health__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mos-text-muted, #64748b);
+}
+
+.ecc-health__label {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.ecc-health__label--success {
+  color: #15803d;
+}
+
+.ecc-health__label--warning {
+  color: #b45309;
+}
+
+.ecc-health__label--critical {
+  color: #b91c1c;
+}
+
+.ecc-health__expl {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--mos-text-muted, #64748b);
+  line-height: 1.45;
+}
+
+.ecc-today-summary {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--mos-border, #e8edf2);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.ecc-today-summary__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ecc-today-summary__item {
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding-left: 0.65rem;
+  border-left: 3px solid #cbd5e1;
+}
+
+.ecc-today-summary__item--success {
+  border-left-color: #22c55e;
+}
+
+.ecc-today-summary__item--critical {
+  border-left-color: #ef4444;
+}
+
+.ecc-today-summary__item--info {
+  border-left-color: #3b82f6;
+}
+
+.ecc-today-summary__revenue {
+  margin: 0.65rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.ecc-live-feed {
+  position: sticky;
+  top: 0.75rem;
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fafcff 0%, #fff 100%);
+  padding: 0.85rem 0.9rem;
+}
+
+.ecc-live-feed__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.ecc-live-feed__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #334155;
+}
+
+.ecc-live-feed__live-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #22c55e;
+  animation: ecc-live-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes ecc-live-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0.45);
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 0 6px rgb(34 197 94 / 0);
+  }
+}
+
+.ecc-live-feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ecc-live-feed__item {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.ecc-live-feed__item:last-child {
+  border-bottom: none;
+}
+
+.ecc-live-feed__time {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #64748b;
+}
+
+.ecc-live-feed__actor {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+}
+
+.ecc-live-feed__message {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--mos-text-muted, #64748b);
+  line-height: 1.4;
+}
+
+.ecc-section--ai {
+  border-color: #e9d5ff;
+  background: linear-gradient(180deg, #fdfaff 0%, #fff 100%);
+}
+
+.ecc-ai-activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ecc-ai-activity__row {
+  display: grid;
+  grid-template-columns: 5.5rem 5.5rem 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.55rem;
+  border: 1px solid #e9d5ff;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.ecc-ai-activity__row--active {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.ecc-ai-activity__name {
+  font-weight: 700;
+}
+
+.ecc-ai-activity__status {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.ecc-ai-activity__msg {
+  color: var(--mos-text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecc-ai-activity__progress {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #64748b;
+}
+
+.ecc-heatmap {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.ecc-heatmap__row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  gap: 0.65rem;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.ecc-heatmap__label {
+  font-weight: 600;
+}
+
+.ecc-heatmap__bar {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  color: #334155;
+}
+
+.ecc-heatmap__row--sales .ecc-heatmap__bar {
+  color: #16a34a;
+}
+
+.ecc-heatmap__row--shipment .ecc-heatmap__bar {
+  color: #2563eb;
+}
+
+.ecc-heatmap__row--collection .ecc-heatmap__bar {
+  color: #ea580c;
+}
+
+.ecc-heatmap__row--procurement .ecc-heatmap__bar {
+  color: #9333ea;
+}
+
+.ecc-heatmap__count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #64748b;
+}
+
+@media (max-width: 720px) {
+  .ecc-ai-activity__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ecc-ai-activity__msg {
+    grid-column: 1 / -1;
+  }
+}
+
+/* FAZ 41 — CEO Öğrenilenler */
+
+.ecc-learned {
+  margin-top: 0.85rem;
+  border: 1px solid #fde68a;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+  padding: 0.85rem 0.9rem;
+}
+
+.ecc-learned__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #92400e;
+}
+
+.ecc-learned__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ecc-learned__item {
+  padding: 0.55rem 0.6rem;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.ecc-learned__item--critical {
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.ecc-learned__worker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #b45309;
+}
+
+.ecc-learned__message {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+.ecc-learned__meta {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* FAZ 42 — CEO AI Executions */
+
+.ecc-ai-exec {
+  margin-top: 0.85rem;
+  border: 1px solid #ddd6fe;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+  padding: 0.85rem 0.9rem;
+}
+
+.ecc-ai-exec__title {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6d28d9;
+}
+
+.ecc-ai-exec__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.ecc-ai-exec__item {
+  padding: 0.5rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid #e9d5ff;
+  background: #fff;
+}
+
+.ecc-ai-exec__label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.ecc-ai-exec__value {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.ecc-ai-exec__item--success .ecc-ai-exec__value {
+  color: #15803d;
+}
+
+.ecc-ai-exec__item--warning .ecc-ai-exec__value {
+  color: #b45309;
+}
+
+.ecc-ai-exec__item--critical .ecc-ai-exec__value {
+  color: #b91c1c;
+}
+
+.ecc-ai-exec__item--info .ecc-ai-exec__value {
+  color: #2563eb;
+}
+
+/* FAZ 44 — CEO LIVE AI */
+
+.ecc-section--live-ai {
+  grid-column: 1 / -1;
+}
+
+.ecc-live-ai {
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 100%);
+}
+
+.ecc-live-ai--active {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 1px rgb(59 130 246 / 0.12);
+}
+
+.ecc-live-ai__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+}
+
+.ecc-live-ai__pulse {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #22c55e;
+}
+
+.ecc-live-ai--active .ecc-live-ai__pulse {
+  animation: ecc-live-pulse 1.8s ease-in-out infinite;
+}
+
+.ecc-live-ai__phase {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.ecc-live-ai__step {
+  margin: 0.45rem 0 0.65rem;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.ecc-live-ai__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+  font-size: 0.78rem;
+}
+
+.ecc-live-ai__grid dt {
+  color: #64748b;
+}
+
+.ecc-live-ai__tokens {
+  margin: 0.55rem 0 0;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.ecc-live-ai__link {
+  margin-top: 0.65rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes ecc-live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(34 197 94 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(34 197 94 / 0);
+  }
+}
+
+/* FAZ 45 — AI Company Summary */
+
+.ecc-section--company-summary {
+  margin-top: 0.85rem;
+}
+
+.ecc-company-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.ecc-company-summary__item {
+  padding: 0.6rem 0.65rem;
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%);
+}
+
+.ecc-company-summary__item dt {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ecc-company-summary__item dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.ecc-company-summary__scenario {
+  margin: 0 0 0.65rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}

@@ -1,0 +1,410 @@
+/* FAZ 115 — Mobile Store Operation (phone + tablet touch, desktop untouched) */
+
+.mos-viewport-phone .mos-role-home__desktop-only,
+.mos-viewport-phone .mos-store-ops-desktop-only {
+  display: none !important;
+}
+
+.mos-viewport-phone .mos-store-ops-mobile-only,
+.mos-viewport-tablet .mos-store-ops-mobile-only {
+  display: block;
+}
+
+.mos-viewport-desktop .mos-store-ops-mobile-only,
+.mos-viewport-laptop .mos-store-ops-mobile-only {
+  display: none !important;
+}
+
+/* Mobile home cards */
+.mos-mobile-store-home {
+  margin-bottom: 1rem;
+}
+
+.mos-mobile-store-home__head {
+  margin-bottom: 0.75rem;
+}
+
+.mos-mobile-store-home__date {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--mos-muted, #64748b);
+}
+
+.mos-mobile-store-home__greeting {
+  margin: 0.15rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.mos-mobile-store-home__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.mos-mobile-store-home__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  min-height: 7.5rem;
+  padding: 1rem;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 14px;
+  background: var(--mos-surface, #fff);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.mos-mobile-store-home__card:active {
+  transform: scale(0.98);
+}
+
+.mos-mobile-store-home__card.is-critical {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.mos-mobile-store-home__card.is-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.mos-mobile-store-home__card.is-success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.mos-mobile-store-home__card-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mos-muted, #64748b);
+  line-height: 1.3;
+}
+
+.mos-mobile-store-home__card-value {
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.mos-mobile-store-home__card-hint {
+  font-size: 0.75rem;
+  color: var(--mos-muted, #64748b);
+}
+
+/* Quick actions */
+.mos-mobile-quick-actions {
+  margin-bottom: 1rem;
+}
+
+.mos-mobile-quick-actions__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.mos-mobile-quick-actions__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.mos-mobile-quick-actions__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 4.5rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--mos-surface-2, #f8fafc);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mos-mobile-quick-actions__btn:active {
+  background: #e2e8f0;
+}
+
+.mos-mobile-quick-actions__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.mos-mobile-quick-actions--dock {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 94%);
+  border: 1px solid var(--mos-border, #e2e8f0);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+  backdrop-filter: blur(8px);
+}
+
+.mos-mobile-quick-actions--dock .mos-mobile-quick-actions__title {
+  display: none;
+}
+
+.mos-mobile-quick-actions--dock .mos-mobile-quick-actions__grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+}
+
+.mos-mobile-quick-actions--dock .mos-mobile-quick-actions__btn {
+  min-height: 3.25rem;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.6875rem;
+  border: none;
+  background: transparent;
+}
+
+.mos-mobile-quick-actions--dock .mos-mobile-quick-actions__icon {
+  font-size: 1.125rem;
+}
+
+/* Order cards */
+.mos-mobile-order-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.mos-mobile-order-card {
+  display: block;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mos-mobile-order-card.is-selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.mos-mobile-order-card.is-critical {
+  border-left: 4px solid #ef4444;
+}
+
+.mos-mobile-order-card.is-warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.mos-mobile-order-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.mos-mobile-order-card__customer {
+  display: block;
+  font-size: 1rem;
+}
+
+.mos-mobile-order-card__phone {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--mos-muted, #64748b);
+}
+
+.mos-mobile-order-card__status {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mos-mobile-order-card__meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.mos-mobile-order-card__meta dt {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--mos-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mos-mobile-order-card__meta dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.mos-mobile-order-card__meta dd.is-overdue {
+  color: #dc2626;
+}
+
+.mos-mobile-order-card__order-no {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--mos-muted, #64748b);
+}
+
+/* Search */
+.mos-mobile-store-search {
+  margin-bottom: 0.75rem;
+}
+
+.mos-mobile-store-search__hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--mos-muted, #64748b);
+}
+
+.mos-viewport-phone .mos-mobile-store-search .mos-global-search-input {
+  min-height: 48px;
+  font-size: 1rem;
+}
+
+/* Chip bar */
+.mos-mobile-store-chips {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mos-mobile-store-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.mos-mobile-store-chips__chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mos-mobile-store-chips__chip.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Empty + error */
+.mos-mobile-store-empty,
+.mos-mobile-store-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--mos-border, #e2e8f0);
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.mos-mobile-store-empty__icon,
+.mos-mobile-store-error__icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.mos-mobile-store-empty__title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.mos-mobile-store-empty__body,
+.mos-mobile-store-error__text {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.875rem;
+  color: var(--mos-muted, #64748b);
+  line-height: 1.45;
+}
+
+.mos-mobile-store-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.mos-mobile-store-empty__btn,
+.mos-mobile-store-error__retry {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mos-mobile-store-empty__btn.is-primary,
+.mos-mobile-store-error__retry {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Phone page simplification */
+.mos-viewport-phone .mos-erp-ops--orders .mos-erp-ops__workspace .mos-erp-ops__main .mos-erp-ops__table-panel .mos-erp-tbl,
+.mos-viewport-phone .mos-erp-ops--orders .mos-erp-ops__detail-strip,
+.mos-viewport-phone .mos-erp-ops--orders .mos-erp-ops__workspace .mos-erp-left-filters {
+  display: none !important;
+}
+
+.mos-viewport-phone .coll-ops-center .coll-ops-center__workspace .coll-ops-left-panel,
+.mos-viewport-phone .coll-ops-center .coll-ops-center__main .coll-ops-customer-card {
+  display: none !important;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__workspace .mos-erp-left-filters,
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-week-filters {
+  display: none !important;
+}
+
+.mos-viewport-phone .mos-content {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mos-viewport-phone .mos-mobile-quick-actions--dock ~ .mos-content,
+.mos-viewport-phone:has(.mos-mobile-quick-actions--dock) .mos-content {
+  padding-bottom: calc(9rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Tablet: 2-col home cards */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-viewport-tablet .mos-mobile-store-home__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mos-viewport-tablet .mos-mobile-quick-actions__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "modal": {
+    "text": "← Sevk Operasyonuna Dön",
+    "visible": true
+  },
+  "stopDetail": {
+    "text": "← Sevk Operasyonuna Dön",
+    "visible": true,
+    "skipped": false,
+    "agendaCount": 2,
+    "dateScanSteps": 6,
+    "boundingBox": {
+      "x": 396,
+      "y": 27.1875,
+      "width": 488,
+      "height": 37.59375
+    },
+    "computedStyles": {
+      "display": "inline-flex",
+      "visibility": "visible",
+      "opacity": "1",
+      "color": "rgb(29, 78, 216)",
+      "backgroundColor": "rgb(239, 246, 255)"
+    }
+  },
+  "screenshots": [
+    "client/test-artifacts/shipment-modal-back-button.png",
+    "client/test-artifacts/ssd-stop-detail-back-button.png"
+  ],
+  "passed": true
+}

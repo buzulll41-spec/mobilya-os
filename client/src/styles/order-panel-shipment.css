@@ -1,0 +1,388 @@
+/* Sipariş paneli — Sevk & Montaj sekmesi (ERP V1) */
+
+.oop-shipment {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.oop-shipment__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.oop-shipment__head .oop-shipment__ops-summary {
+  flex: 1 1 24rem;
+  min-width: 0;
+}
+
+.oop-shipment__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.oop-shipment__plan-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  max-width: 16rem;
+}
+
+.oop-shipment__plan-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #92400e;
+}
+
+.oop-shipment__btn {
+  min-height: 1.85rem;
+  padding: 0.35rem 0.7rem;
+  border: 1.5px solid var(--mos-btn-neutral-border, #64748b);
+  border-radius: 6px;
+  background: var(--mos-btn-neutral-bg, #fff);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.oop-shipment__btn:hover:not(:disabled) {
+  background: var(--mos-btn-neutral-hover, #f1f5f9);
+  border-color: #475569;
+}
+
+.oop-shipment__btn--primary {
+  background: var(--mos-btn-primary-bg, #2563eb);
+  border-color: var(--mos-btn-primary-border, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.28);
+}
+
+.oop-shipment__btn--primary:hover:not(:disabled) {
+  background: var(--mos-btn-primary-hover, #1e40af);
+  border-color: var(--mos-btn-primary-hover, #1e40af);
+}
+
+.oop-shipment__btn--info {
+  background: var(--mos-btn-info-bg, #1e3a8a);
+  border-color: var(--mos-btn-info-border, #1e40af);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(30, 58, 138, 0.24);
+}
+
+.oop-shipment__btn--info:hover:not(:disabled) {
+  background: var(--mos-btn-info-hover, #172554);
+  border-color: var(--mos-btn-info-hover, #172554);
+}
+
+.oop-shipment__btn--ops {
+  background: var(--mos-btn-ops-bg, #ea580c);
+  border-color: var(--mos-btn-ops-border, #c2410c);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(234, 88, 12, 0.24);
+}
+
+.oop-shipment__btn--ops:hover:not(:disabled) {
+  background: var(--mos-btn-ops-hover, #9a3412);
+  border-color: var(--mos-btn-ops-hover, #9a3412);
+}
+
+.oop-shipment__btn--neutral {
+  background: var(--mos-btn-neutral-bg, #fff);
+  border-color: var(--mos-btn-neutral-border, #64748b);
+  color: #1e293b;
+}
+
+.oop-shipment__btn--neutral:hover:not(:disabled) {
+  background: var(--mos-btn-neutral-hover, #f1f5f9);
+  border-color: #475569;
+}
+
+.oop-shipment__btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.oop-shipment .mos-erp-summary {
+  border-radius: 6px;
+}
+
+/* Operasyon özeti renkleri */
+.oop-shipment__ops-summary [data-item-tone='done'] .mos-erp-summary__label,
+.oop-shipment__ops-summary [data-item-tone='done'] .mos-erp-summary__value {
+  color: #15803d;
+}
+
+.oop-shipment__ops-summary [data-item-tone='waiting'] .mos-erp-summary__label,
+.oop-shipment__ops-summary [data-item-tone='waiting'] .mos-erp-summary__value {
+  color: #c2410c;
+}
+
+.oop-shipment__ops-summary [data-item-tone='problem'] .mos-erp-summary__label,
+.oop-shipment__ops-summary [data-item-tone='problem'] .mos-erp-summary__value {
+  color: #b42318;
+}
+
+.oop-shipment__ops-summary [data-item-tone='planned'] .mos-erp-summary__label,
+.oop-shipment__ops-summary [data-item-tone='planned'] .mos-erp-summary__value {
+  color: #2563eb;
+}
+
+.oop-shipment__ops-summary [data-item-tone='idle'] .mos-erp-summary__label,
+.oop-shipment__ops-summary [data-item-tone='idle'] .mos-erp-summary__value {
+  color: #64748b;
+}
+
+/* KPI şeridi — Ürünler sekmesi renk mantığı */
+.oop-shipment__kpi-strip [data-metric-id='total'] .mos-erp-summary__label,
+.oop-shipment__kpi-strip [data-metric-id='total'] .mos-erp-summary__value {
+  color: #64748b;
+}
+
+.oop-shipment__kpi-strip [data-metric-id='arrived'] .mos-erp-summary__label,
+.oop-shipment__kpi-strip [data-metric-id='arrived'] .mos-erp-summary__value {
+  color: #15803d;
+}
+
+.oop-shipment__kpi-strip [data-metric-id='missing'] .mos-erp-summary__label,
+.oop-shipment__kpi-strip [data-metric-id='missing'] .mos-erp-summary__value {
+  color: #b42318;
+}
+
+.oop-shipment__kpi-strip [data-metric-id='ready'] .mos-erp-summary__label,
+.oop-shipment__kpi-strip [data-metric-id='ready'] .mos-erp-summary__value {
+  color: #2563eb;
+}
+
+.oop-shipment__kpi-strip [data-metric-id='install'] .mos-erp-summary__label,
+.oop-shipment__kpi-strip [data-metric-id='install'] .mos-erp-summary__value {
+  color: #c2410c;
+}
+
+.oop-shipment__alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.oop-shipment__alert {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid #cfd6df;
+}
+
+.oop-shipment__alert--warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.oop-shipment__alert--critical {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b42318;
+}
+
+.oop-shipment__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.oop-shipment__panel {
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  min-width: 0;
+}
+
+.oop-shipment__panel-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.oop-shipment__panel .mos-timeline {
+  margin: 0;
+  padding: 0;
+}
+
+.oop-shipment__table-panel {
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.oop-shipment__tbl-wrap {
+  max-height: min(40vh, 18rem);
+  overflow: auto;
+}
+
+.oop-shipment__tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+  box-shadow: inset 0 -1px 0 #cfd6df;
+}
+
+.oop-shipment-row td {
+  background: #fff;
+}
+
+.oop-shipment-row--alt td {
+  background: #f8fafc;
+}
+
+.oop-shipment-row:hover td {
+  background: #f4f7fa !important;
+}
+
+.oop-shipment__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.oop-shipment__badge--waiting {
+  color: #c2410c;
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.oop-shipment__badge--ready {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-shipment__badge--transit {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.oop-shipment__badge--delivered {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-shipment__badge--install-pending {
+  color: #c2410c;
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.oop-shipment__badge--install-done {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-shipment__badge--problem {
+  color: #b42318;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.oop-shipment__row-btn {
+  padding: 0.2rem 0.45rem;
+  border: 1.5px solid var(--mos-btn-neutral-border, #64748b);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.oop-shipment__row-btn:hover:not(:disabled) {
+  background: var(--mos-btn-neutral-hover, #f1f5f9);
+  border-color: #475569;
+}
+
+.oop-shipment__row-btn--neutral {
+  border-color: var(--mos-btn-neutral-border, #64748b);
+}
+
+.oop-shipment__row-btn--info {
+  background: var(--mos-btn-info-bg, #1e3a8a);
+  border-color: var(--mos-btn-info-border, #1e40af);
+  color: #fff;
+}
+
+.oop-shipment__row-btn--info:hover:not(:disabled) {
+  background: var(--mos-btn-info-hover, #172554);
+  border-color: var(--mos-btn-info-hover, #172554);
+}
+
+.oop-shipment__row-btn--ops {
+  background: var(--mos-btn-ops-bg, #ea580c);
+  border-color: var(--mos-btn-ops-border, #c2410c);
+  color: #fff;
+}
+
+.oop-shipment__row-btn--ops:hover:not(:disabled) {
+  background: var(--mos-btn-ops-hover, #9a3412);
+  border-color: var(--mos-btn-ops-hover, #9a3412);
+}
+
+.oop-shipment__row-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.oop-shipment__load-error {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #b42318;
+  font-size: 0.78rem;
+}
+
+.oop-shipment__balance-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .oop-shipment__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oop-shipment .mos-erp-summary--cols-5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

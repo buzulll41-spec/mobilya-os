@@ -1,0 +1,354 @@
+/**
+ * FAZ 113 — Touch First ERP responsive katmanı.
+ * Desktop korunur; phone/tablet touch-first override'ları scoped.
+ */
+
+/* ——— Safe area (iPhone çentik / Android nav) ——— */
+.mos-mobile-pwa .mos-main {
+  padding-top: env(safe-area-inset-top);
+}
+
+.mos-mobile-pwa .mos-app-chrome {
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+}
+
+.mos-mobile-pwa .mos-mobile-tabbar {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+.mos-mobile-pwa .mos-mobile-fab {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+
+.mos-mobile-pwa .mos-mobile-save-bar {
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+  padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+}
+
+/* ——— Bottom sheet standardı ——— */
+.mos-bottom-sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+}
+
+.mos-bottom-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgb(15 23 42 / 42%);
+}
+
+.mos-bottom-sheet-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: min(92vh, 920px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px 18px 0 0;
+  background: #fff;
+  box-shadow: 0 -12px 40px rgb(15 23 42 / 16%);
+  animation: mos-bottom-sheet-in 0.28s ease;
+}
+
+.mos-bottom-sheet-handle {
+  width: 2.5rem;
+  height: 0.28rem;
+  margin: 0.55rem auto 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.mos-bottom-sheet-head {
+  padding: 0.65rem 1rem 0.35rem;
+}
+
+.mos-bottom-sheet-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mos-bottom-sheet-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.mos-bottom-sheet-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 0.65rem 1rem 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mos-bottom-sheet-foot {
+  flex: 0 0 auto;
+  border-top: 1px solid #e2e8f0;
+}
+
+@keyframes mos-bottom-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .oop-panel,
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-panel,
+  .mos-mobile-pwa.mos-viewport-phone .now-dialog,
+  .mos-mobile-pwa.mos-viewport-phone .spc-v2-panel,
+  .mos-mobile-pwa.mos-viewport-phone .mos-modal-panel {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: min(92vh, 920px) !important;
+    margin: 0 !important;
+    border-radius: 18px 18px 0 0 !important;
+    transform: none !important;
+    animation: mos-bottom-sheet-in 0.28s ease;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .oop-panel::before,
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-panel::before,
+  .mos-mobile-pwa.mos-viewport-phone .spc-v2-panel::before {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 0.28rem;
+    margin: 0.55rem auto 0.35rem;
+    border-radius: 999px;
+    background: #cbd5e1;
+  }
+}
+
+/* ——— Long press menu ——— */
+.mos-long-press-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  border: none;
+  background: transparent;
+}
+
+.mos-long-press-menu {
+  position: fixed;
+  z-index: 131;
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 18%);
+}
+
+.mos-long-press-menu__btn {
+  min-height: 48px;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mos-long-press-menu__btn:active {
+  background: #f1f5f9;
+}
+
+/* ——— Native date picker UX ——— */
+.mos-mobile-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mos-mobile-date-field__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.mos-mobile-date-field__input {
+  min-height: 48px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-date-field__input,
+  .mos-mobile-pwa.mos-viewport-phone input[type='date'] {
+    min-height: 48px;
+    font-size: 1rem;
+    border-radius: 12px;
+    padding: 0.55rem 0.75rem;
+  }
+}
+
+/* ——— Large form mode ——— */
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .now-input,
+  .mos-mobile-pwa.mos-viewport-phone .now-select,
+  .mos-mobile-pwa.mos-viewport-phone .now-textarea,
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-input,
+  .mos-mobile-pwa.mos-viewport-phone .spc-v2-field input,
+  .mos-mobile-pwa.mos-viewport-phone .spc-v2-field select,
+  .mos-mobile-pwa.mos-viewport-phone .mos-input,
+  .mos-mobile-pwa.mos-viewport-phone .mos-drawer-field input,
+  .mos-mobile-pwa.mos-viewport-phone .mos-drawer-field select,
+  .mos-mobile-pwa.mos-viewport-phone .mos-drawer-field textarea {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-method input[type='radio'],
+  .mos-mobile-pwa.mos-viewport-phone .now-field input[type='checkbox'],
+  .mos-mobile-pwa.mos-viewport-phone input[type='checkbox'],
+  .mos-mobile-pwa.mos-viewport-phone input[type='radio'] {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+/* ——— Sticky save bar ——— */
+.mos-mobile-save-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(255, 255, 255, 0.98);
+  border-top: 1px solid #e2e8f0;
+  backdrop-filter: blur(8px);
+}
+
+.mos-mobile-save-bar__btn {
+  flex: 1 1 0;
+  min-height: 48px;
+  min-width: 48px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mos-mobile-save-bar__btn--ghost {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+}
+
+.mos-mobile-save-bar__btn--primary {
+  border: none;
+  background: linear-gradient(145deg, #863bff 0%, #6d28d9 100%);
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-save-bar,
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-foot,
+  .mos-mobile-pwa.mos-viewport-phone .now-foot--sticky,
+  .mos-mobile-pwa.mos-viewport-phone .spc-v2-foot {
+    position: sticky;
+    bottom: calc(3.35rem + env(safe-area-inset-bottom));
+    z-index: 4;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-form-section .cc-v2-submit {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .cc-v2-panel .cc-v2-body {
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* ——— Touch feedback ——— */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-btn,
+  .mos-mobile-pwa .mos-erp-tbl-op,
+  .mos-mobile-pwa .coll-ops-tbl-op,
+  .mos-mobile-pwa .mos-mobile-tabbar__btn,
+  .mos-mobile-pwa .mos-mobile-fab,
+  .mos-mobile-pwa .mos-mobile-save-bar__btn,
+  .mos-mobile-pwa .mos-long-press-menu__btn,
+  .mos-mobile-pwa .mos-erp-tbl tbody tr,
+  .mos-mobile-pwa .coll-ops-tbl tbody tr {
+    transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+  }
+
+  .mos-mobile-pwa .mos-btn:active,
+  .mos-mobile-pwa .mos-erp-tbl-op:active,
+  .mos-mobile-pwa .coll-ops-tbl-op:active,
+  .mos-mobile-pwa .mos-mobile-tabbar__btn:active,
+  .mos-mobile-pwa .mos-mobile-fab:active,
+  .mos-mobile-pwa .mos-mobile-save-bar__btn:active,
+  .mos-mobile-pwa .mos-long-press-menu__btn:active {
+    transform: scale(0.97);
+    opacity: 0.92;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody tr:active,
+  .mos-mobile-pwa .coll-ops-tbl tbody tr:active {
+    transform: scale(0.985);
+    background: #f8fafc;
+  }
+}
+
+/* ——— Tablet touch grid ——— */
+@media (min-width: 768px) and (max-width: 1366px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__kpis,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__action-grid,
+  .mos-mobile-pwa.mos-viewport-tablet .ecd__grid,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-summary,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-pmc-list__cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__kpis button,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__action-grid button,
+  .mos-mobile-pwa.mos-viewport-tablet .ecd__panel,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-pmc-list__cards > * {
+    min-height: 72px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__kpis,
+  .mos-mobile-pwa.mos-viewport-tablet .ecd__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ——— Desktop koruma ——— */
+@media (min-width: 1440px) {
+  .mos-mobile-pwa.mos-viewport-desktop .mos-long-press-menu,
+  .mos-mobile-pwa.mos-viewport-desktop .mos-long-press-backdrop {
+    display: none !important;
+  }
+}

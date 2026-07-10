@@ -1,0 +1,107 @@
+/* PILOT 0.1 — demo/test kayıt ayırma */
+
+.coll-ops-center__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mos-pilot-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.mos-pilot-badge--demo {
+  color: #7c3aed;
+  background: #ede9fe;
+  border: 1px solid #c4b5fd;
+}
+
+.mos-pilot-badge--test {
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+}
+
+.mos-pilot-scope {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.mos-pilot-scope__btn {
+  padding: 0.28rem 0.55rem;
+  border: 1px solid var(--mos-border, #d8dce3);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--mos-text-muted, #5c6470);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mos-pilot-scope__btn.is-active {
+  border-color: var(--mos-accent, #1e3a5f);
+  background: var(--mos-accent, #1e3a5f);
+  color: #fff;
+}
+
+.mos-pilot-scope-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--mos-text-muted, #5c6470);
+}
+
+.mos-pmc-list__toolbar .mos-pilot-scope,
+.mos-erp-ops__head-actions .mos-pilot-scope {
+  margin-left: auto;
+}
+
+.mos-erp-tbl-row.is-pilot-record,
+.mos-pmc-row.is-pilot-record,
+.coll-ops-tbl-row.is-pilot-record {
+  opacity: 0.92;
+}
+
+.mos-erp-tbl-row.is-pilot-record.is-selected,
+.mos-pmc-row.is-pilot-record.is-selected,
+.coll-ops-tbl-row.is-pilot-record.is-selected {
+  opacity: 1;
+}
+
+.mos-orders-cell-customer,
+.mos-pmc-td--name {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.coll-ops-left__group--pilot {
+  border-top: 1px solid var(--mos-border, #e5e7eb);
+  padding-top: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 1366px) {
+  .mos-pilot-scope {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+
+  .mos-pmc-list__toolbar {
+    flex-wrap: wrap;
+  }
+}

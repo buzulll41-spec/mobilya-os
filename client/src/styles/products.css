@@ -1,0 +1,58 @@
+/**
+ * Ürün Kartları — MOBILYA OS Design System V1
+ * Kaynak dil: Tahsilat / Dashboard / Siparişler ERP operasyon masası (mos-erp-ops.css)
+ * Kurallar: border #cfd6df, radius 6px, shadow 0, yoğun ERP tablo. Kart/KPI/SaaS dili yok.
+ * Bu dosya yalnızca ürün tablosuna özgü, V1 token'larıyla küçük ekleri tanımlar.
+ */
+
+/* İşlem kolonu: iki aksiyon butonu sığacak genişlik */
+.mos-erp-ops--products .mos-erp-tbl th.is-ops,
+.mos-erp-ops--products .mos-erp-tbl td.is-ops {
+  width: auto;
+  min-width: 11rem;
+  text-align: right;
+}
+
+.mos-erp-ops--products .mos-erp-tbl-ops {
+  display: inline-flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+.mos-erp-ops--products .mos-erp-tbl-op:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Ürün kodu — sabit genişlikli, sayısal hizalı */
+.mos-erp-ops--products .mos-erp-tbl-td--order {
+  font-variant-numeric: tabular-nums;
+  color: var(--mos-erp-neutral);
+}
+
+/* Ürün adı sütunu biraz daha geniş */
+.mos-erp-ops--products .mos-erp-tbl-td--customer {
+  max-width: 16rem;
+}
+
+/* Zebra satır + V1 vurgu durumları (sonra gelen kurallar hover/seçili/uyarıyı korur) */
+.mos-erp-ops--products .mos-erp-tbl-row:nth-child(even) {
+  background: #fafbfc;
+}
+
+.mos-erp-ops--products .mos-erp-tbl-row.is-warning td {
+  background: #fffaf5;
+}
+
+.mos-erp-ops--products .mos-erp-tbl-row:hover {
+  background: #f0f4f8;
+}
+
+.mos-erp-ops--products .mos-erp-tbl-row.is-selected {
+  background: #e3edf7;
+}
+
+/* Detay şeridi — çok alanlı yatay yerleşim (V1 mos-erp-detail dilinde) */
+.mos-erp-ops--products .mos-erp-detail__body {
+  gap: 0.5rem 1.5rem;
+}

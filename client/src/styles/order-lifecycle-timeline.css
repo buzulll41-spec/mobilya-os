@@ -1,0 +1,232 @@
+.oop-lifecycle {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.oop-lifecycle__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.oop-lifecycle__summary {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.oop-lifecycle__summary dt {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.72rem;
+}
+
+.oop-lifecycle__summary dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.oop-lifecycle__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.oop-lifecycle__progress-track {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.oop-lifecycle__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #16a34a);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.oop-lifecycle__progress-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: #334155;
+  min-width: 2.5rem;
+}
+
+.oop-lifecycle__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.oop-lifecycle__step {
+  position: relative;
+  padding-left: 0.25rem;
+}
+
+.oop-lifecycle__gap {
+  margin: 0.35rem 0 0.35rem 2.1rem;
+  font-size: 0.72rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.oop-lifecycle__gap--overdue {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.oop-lifecycle__gap-warn {
+  font-weight: 500;
+}
+
+.oop-lifecycle__step-btn {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.oop-lifecycle__step-btn:hover:not(:disabled) {
+  border-color: #93c5fd;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+}
+
+.oop-lifecycle__step-btn:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.oop-lifecycle__step--done .oop-lifecycle__step-btn {
+  border-left: 3px solid #16a34a;
+}
+
+.oop-lifecycle__step--delayed .oop-lifecycle__step-btn {
+  border-left: 3px solid #dc2626;
+}
+
+.oop-lifecycle__step--in_progress .oop-lifecycle__step-btn {
+  border-left: 3px solid #2563eb;
+  background: #f8fbff;
+}
+
+.oop-lifecycle__step--pending .oop-lifecycle__step-btn {
+  border-left: 3px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.oop-lifecycle__icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.oop-lifecycle__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.oop-lifecycle__step-title {
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.oop-lifecycle__step-meta {
+  font-size: 0.74rem;
+  color: #475569;
+}
+
+.oop-lifecycle__step-meta--active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.oop-lifecycle__step-meta--muted {
+  color: #94a3b8;
+}
+
+.oop-lifecycle__step-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.oop-lifecycle__ceo {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.oop-lifecycle__ceo-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.oop-lifecycle__ceo-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.oop-lifecycle__ceo-grid dt {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.oop-lifecycle__ceo-grid dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.oop-lifecycle__ceo-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.oop-lifecycle__ai {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--mos-border, #e2e8f0);
+}
+
+.oop-lifecycle__ai-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.oop-lifecycle__ai-item {
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 0.5rem;
+  background: var(--mos-surface-muted, #f8fafc);
+}

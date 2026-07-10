@@ -1,32 +1,20 @@
+import EmptyState from './EmptyState.jsx'
+
 /**
- * Sipariş listesi gerçekten boş olduğunda (mock store sıfırlandıysa veya API boş döndüyse).
+ * Sipariş listesi gerçekten boş olduğunda.
  * @param {{ onRefresh?: () => void; isBusy?: boolean; onAddOrder?: () => void }} props
  */
 export default function EmptyOrdersState({ onRefresh, isBusy = false, onAddOrder }) {
   return (
-    <div className="mos-empty-state" role="status">
-      <p className="mos-empty-state-title">Henüz sipariş yok</p>
-      <p className="mos-empty-state-body">
-        Yeni sipariş ekleyerek operasyon akışını başlatın. Veriler şu an yalnızca bu oturumda tutuluyor
-        (mock API).
-      </p>
-      <div className="mos-empty-state-actions">
-        {onAddOrder ? (
-          <button type="button" className="mos-btn mos-btn-primary" onClick={onAddOrder}>
-            Yeni sipariş
-          </button>
-        ) : null}
-        {onRefresh ? (
-          <button
-            type="button"
-            className="mos-btn mos-btn-ghost"
-            onClick={onRefresh}
-            disabled={isBusy}
-          >
-            {isBusy ? 'Yükleniyor…' : 'Listeyi yenile'}
-          </button>
-        ) : null}
-      </div>
-    </div>
+    <EmptyState
+      icon="📦"
+      title="Henüz sipariş yok"
+      body="Yeni sipariş ekleyerek operasyon akışını başlatın. Veriler şu an yalnızca bu oturumda tutuluyor (mock API)."
+      actionLabel={onAddOrder ? 'Yeni sipariş' : undefined}
+      onAction={onAddOrder}
+      secondaryLabel={onRefresh ? (isBusy ? 'Yükleniyor…' : 'Listeyi yenile') : undefined}
+      onSecondary={onRefresh}
+      secondaryDisabled={isBusy}
+    />
   )
 }

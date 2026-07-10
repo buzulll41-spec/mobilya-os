@@ -9,7 +9,7 @@ import { isTerminOverdue } from './orderFinance.js'
  */
 
 /**
- * @param {import('../data/seedOrders.js').Order[]} orders
+ * @param {import('../data/seedOrders.js').Order[] | import('../contracts/v1/orderListRowVm.js').OrderListRowVM[] | import('../contracts/v1/shipmentRowVm.js').ShipmentRowVM[] | import('../contracts/v1/collectionRowVm.js').CollectionRowVM[]} orders
  * @param {OrderFilterState} f
  * @param {string} todayIso
  */
@@ -42,7 +42,7 @@ export function applyOrderFilters(orders, f, todayIso) {
 }
 
 /**
- * @param {import('../data/seedOrders.js').Order[]} orders
+ * @param {import('../data/seedOrders.js').Order[] | import('../contracts/v1/orderListRowVm.js').OrderListRowVM[] | import('../contracts/v1/shipmentRowVm.js').ShipmentRowVM[] | import('../contracts/v1/collectionRowVm.js').CollectionRowVM[]} orders
  * @returns {string[]}
  */
 export function uniqueSalesPeople(orders) {

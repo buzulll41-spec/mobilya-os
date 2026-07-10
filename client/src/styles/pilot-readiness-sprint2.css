@@ -1,0 +1,307 @@
+/**
+ * FAZ 111 Sprint 2 — Pilot Readiness UI katmanı.
+ */
+
+/* —— Pilot Mode —— */
+.mos-pilot-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  white-space: nowrap;
+}
+
+.mos-pilot-indicator--real {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.mos-pilot-indicator--pilot {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.mos-pilot-indicator--all {
+  border-color: #ddd6fe;
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.mos-pilot-indicator__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* —— API Connection Status —— */
+.mos-api-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mos-api-status__pill {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.mos-api-status__pill.is-connected {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.mos-api-status__pill.is-disconnected {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.mos-api-status__pill.is-mock {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.mos-api-status__pill.is-checking {
+  color: #64748b;
+}
+
+/* —— User Profile Card —— */
+.mos-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.35rem 0.25rem 0.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.mos-user-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.mos-user-card__avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%);
+  color: #4338ca;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mos-user-card__meta {
+  display: none;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mos-user-card__name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 8rem;
+}
+
+.mos-user-card__role {
+  font-size: 0.62rem;
+  color: #64748b;
+}
+
+.mos-user-card__logout {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.mos-user-card__logout:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+@media (min-width: 1100px) {
+  .mos-user-card__meta {
+    display: flex;
+  }
+}
+
+/* —— Toast —— */
+.mos-toast-viewport {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.mos-toast {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 12%);
+  pointer-events: auto;
+}
+
+.mos-toast--success { border-color: #86efac; background: #f0fdf4; }
+.mos-toast--warning { border-color: #fde68a; background: #fffbeb; }
+.mos-toast--error { border-color: #fecaca; background: #fef2f2; }
+.mos-toast--info { border-color: #bfdbfe; background: #eff6ff; }
+
+.mos-toast__message {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.mos-toast__close {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+}
+
+/* —— Skeleton standard —— */
+.mos-skeleton-standard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mos-skeleton-standard__label {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* —— Page refresh —— */
+.mos-page-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.85rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.mos-page-refresh__title {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mos-page-refresh__meta {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.mos-page-refresh__btn {
+  min-height: 44px;
+}
+
+/* —— Developer performance panel —— */
+.mos-dev-perf {
+  position: fixed;
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
+  z-index: 110;
+}
+
+.mos-dev-perf__toggle {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgb(15 23 42 / 18%);
+}
+
+.mos-dev-perf__panel {
+  margin-top: 0.45rem;
+  width: 14rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: rgb(15 23 42 / 94%);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+}
+
+.mos-dev-perf__panel dl {
+  margin: 0.45rem 0 0;
+}
+
+.mos-dev-perf__panel dt {
+  color: #94a3b8;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mos-dev-perf__panel dd {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .mos-pilot-indicator,
+  .mos-api-status {
+    display: none;
+  }
+}

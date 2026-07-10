@@ -5,6 +5,10 @@ import { ORDER_FIXTURES } from './mock/orderFixtures.js'
  * @property {string} id
  * @property {string} customer
  * @property {string} [phone]
+ * @property {string} [phone2]
+ * @property {string} [nationalId] TC Kimlik No
+ * @property {string} [taxNumber] Vergi numarası
+ * @property {string} [taxOffice] Vergi dairesi
  * @property {string} product
  * @property {import('./constants.js').OrderStatus} status
  * @property {number} amount Satış (TL)

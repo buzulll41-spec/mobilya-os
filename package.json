@@ -1,0 +1,16 @@
+{
+  "name": "mobilya-os",
+  "private": true,
+  "version": "1.0.0",
+  "description": "MOBILYA OS Enterprise 1.0",
+  "scripts": {
+    "test:client": "npm --prefix client test",
+    "test:backend": "npm --prefix backend test",
+    "test": "npm run test:backend && npm run test:client",
+    "lint:client": "npm --prefix client run lint",
+    "build:backend": "npm --prefix backend run build",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:backend && npm run build:client",
+    "release:validate": "npm run test && npm run lint:client && npm run build"
+  }
+}

@@ -1,0 +1,99 @@
+.ecd {
+  padding: 1.25rem 1.5rem;
+}
+
+.ecd__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ecd__kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ecd__head h1 {
+  margin: 0.15rem 0 0;
+}
+
+.ecd__health {
+  min-width: 120px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.ecd__health span {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ecd__health strong {
+  font-size: 1.6rem;
+}
+
+.ecd__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ecd__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ecd__grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ecd__panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.ecd__panel h2 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.ecd__panel ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.ecd__panel--risk { border-color: #fecaca; background: #fef2f2; }
+.ecd__panel--opp { border-color: #bbf7d0; background: #f0fdf4; }
+
+.ecd__empty {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+.ecd__body-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+@media (max-width: 900px) {
+  .ecd__grid, .ecd__grid--2 { grid-template-columns: 1fr; }
+}

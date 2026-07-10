@@ -1,0 +1,270 @@
+/* Sipariş paneli — Geçmiş sekmesi (ERP V1) */
+
+.oop-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.oop-history__kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.oop-history__kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  min-width: 0;
+}
+
+.oop-history__kpi-card-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.oop-history__kpi-card-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.oop-history__kpi-card--neutral {
+  background: #f8fafc;
+}
+
+.oop-history__kpi-card--progress {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.oop-history__kpi-card--progress .oop-history__kpi-card-label,
+.oop-history__kpi-card--progress .oop-history__kpi-card-value {
+  color: #1d4ed8;
+}
+
+.oop-history__kpi-card--warning {
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.oop-history__kpi-card--warning .oop-history__kpi-card-label,
+.oop-history__kpi-card--warning .oop-history__kpi-card-value {
+  color: #c2410c;
+}
+
+.oop-history__kpi-card--success {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-history__kpi-card--success .oop-history__kpi-card-label,
+.oop-history__kpi-card--success .oop-history__kpi-card-value {
+  color: #166534;
+}
+
+.oop-history__meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.oop-history__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.oop-history__filter {
+  padding: 0.28rem 0.55rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.oop-history__filter:hover {
+  background: #f4f6f9;
+}
+
+.oop-history__filter--active {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.oop-history__section-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.oop-history__timeline-panel,
+.oop-history__table-panel {
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+}
+
+.oop-history__empty {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.oop-history__timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.oop-history__timeline-day {
+  border-left: 2px solid #cfd6df;
+  padding-left: 0.65rem;
+}
+
+.oop-history__timeline-dayhead {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.oop-history__timeline-events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.oop-history__timeline-event {
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.oop-history__tbl-wrap {
+  max-height: min(48vh, 24rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.oop-history__tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+  box-shadow: inset 0 -1px 0 #cfd6df;
+}
+
+.oop-history-row td {
+  background: #fff;
+}
+
+.oop-history-row--alt td {
+  background: #f8fafc;
+}
+
+.oop-history-row:hover td {
+  background: #f4f7fa !important;
+}
+
+.oop-history__action {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.oop-history__desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  max-width: 16rem;
+}
+
+.oop-history__cat {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.oop-history__cat--success {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-history__cat--progress {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.oop-history__cat--critical {
+  color: #b42318;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.oop-history__cat--warning {
+  color: #c2410c;
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.oop-history__cat--neutral {
+  color: #64748b;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+}
+
+.oop-history__footer td {
+  font-weight: 700;
+  background: #f8fafc !important;
+  border-top: 2px solid #cfd6df;
+}
+
+@media (max-width: 900px) {
+  .oop-history__kpi-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .oop-history__kpi-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oop-history__tbl-wrap {
+    overflow-x: auto;
+  }
+
+  .oop-history__tbl {
+    min-width: 42rem;
+  }
+}

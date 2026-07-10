@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "shipments" ADD COLUMN IF NOT EXISTS "crewName" TEXT,
+ADD COLUMN IF NOT EXISTS "vehicleNote" TEXT,
+ADD COLUMN IF NOT EXISTS "note" TEXT;

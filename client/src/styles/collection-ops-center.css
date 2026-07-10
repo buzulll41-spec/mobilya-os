@@ -1,0 +1,678 @@
+/* Tahsilat — MOBILYA OS Design System V1 (ERP operasyon masası, tablo odaklı) */
+
+.mos-content:has(> .coll-ops-center) {
+  max-width: none;
+  width: 100%;
+  padding: 0.5rem 0.65rem 0.65rem;
+  background: #eceff3;
+}
+
+.coll-ops-center {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: calc(100svh - 6.5rem);
+  min-height: 32rem;
+}
+
+.coll-ops-center__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.15rem 0.1rem 0.25rem;
+}
+
+.coll-ops-center__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.coll-ops-center__sub {
+  font-size: 0.75rem;
+  color: #5c6678;
+}
+
+.coll-ops-center__search-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.45rem 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.coll-ops-center__search-badge-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(55, 48, 163, 0.12);
+  color: #3730a3;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.coll-ops-center__search-badge-clear:hover {
+  background: rgba(55, 48, 163, 0.22);
+}
+
+/* —— İnce özet şeridi (~10%) —— */
+
+.coll-ops-summary {
+  flex: 0 0 56px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #f7f9fb;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.coll-ops-summary__item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  border-right: 1px solid #d5dce4;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: default;
+}
+
+.coll-ops-summary__item:last-child {
+  border-right: 0;
+}
+
+button.coll-ops-summary__item {
+  cursor: pointer;
+}
+
+button.coll-ops-summary__item:hover {
+  background: #eef2f6;
+}
+
+.coll-ops-summary__item.is-active {
+  background: #e8edf2;
+}
+
+.coll-ops-summary__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.coll-ops-summary__value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+  line-height: 1.15;
+}
+
+/* —— Sol filtreler —— */
+
+.coll-ops-center__workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 11.5rem minmax(0, 1fr);
+  gap: 0.4rem;
+}
+
+.coll-ops-left {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.4rem 0.35rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #f7f9fb;
+  box-shadow: none;
+}
+
+.coll-ops-left__group + .coll-ops-left__group {
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid #cfd6df;
+}
+
+.coll-ops-left__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.coll-ops-left__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coll-ops-left__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.35rem;
+  padding: 0.22rem 0.38rem;
+  margin-bottom: 0.06rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  line-height: 1.2;
+  background: transparent;
+  font: inherit;
+  font-size: 0.75rem;
+  color: #334155;
+  text-align: left;
+  cursor: pointer;
+}
+
+.coll-ops-left__btn:hover {
+  background: #eef2f6;
+  border-color: #d5dce4;
+}
+
+.coll-ops-left__btn.is-active {
+  background: #fff;
+  border-color: #94a3b8;
+  font-weight: 600;
+}
+
+.coll-ops-left__count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-ops-left__supplier {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.coll-ops-left__supplier-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.coll-ops-left__supplier-select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid #cfd6df;
+  border-radius: 4px;
+  background: #fff;
+  color: #1e293b;
+}
+
+/* —— Ana kolon: müşteri kartı (~20%) + tablo (~70%) —— */
+
+.coll-ops-center__main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.coll-ops-customer {
+  flex: 0 0 auto;
+  max-height: 22%;
+  min-height: 7.5rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.coll-ops-customer--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.coll-ops-customer__empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.coll-ops-customer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.5rem;
+  min-height: 7.5rem;
+  height: 100%;
+}
+
+.coll-ops-customer__fields {
+  padding: 0.55rem 0.75rem;
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) repeat(4, minmax(5rem, 1fr)) minmax(7rem, 1.1fr);
+  gap: 0.5rem 0.85rem;
+  align-items: start;
+  overflow: hidden;
+}
+
+.coll-ops-customer__primary {
+  min-width: 0;
+}
+
+.coll-ops-customer__name {
+  margin: 0;
+  font-size: 1.14rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.coll-ops-customer__order {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-top: 0.1rem;
+}
+
+.coll-ops-customer__phone {
+  display: block;
+  font-size: 0.75rem;
+  color: #475569;
+  margin-top: 0.2rem;
+}
+
+.coll-ops-customer__dl {
+  margin: 0;
+  display: contents;
+}
+
+.coll-ops-customer__dl > div {
+  min-width: 0;
+}
+
+.coll-ops-customer__dl dt {
+  margin: 0;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #94a3b8;
+}
+
+.coll-ops-customer__dl dd {
+  margin: 0.12rem 0 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #1e293b;
+}
+
+.coll-ops-customer__balance-wrap {
+  min-width: 0;
+}
+
+.coll-ops-customer__balance-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #94a3b8;
+}
+
+.coll-ops-customer__balance {
+  margin: 0.1rem 0 0;
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #b91c1c;
+}
+
+.coll-ops-customer__notes {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.85rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #e8edf2;
+}
+
+.coll-ops-customer__note-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.1rem;
+}
+
+.coll-ops-customer__note p {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: #475569;
+  font-weight: 500;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.coll-ops-customer__notes .coll-ops-customer__note:last-child p {
+  font-weight: 600;
+  color: #334155;
+}
+
+.coll-ops-customer__actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.45rem;
+  border-left: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.coll-ops-customer__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.coll-ops-customer__btn:hover:not(.is-disabled) {
+  background: #f1f5f9;
+}
+
+.coll-ops-customer__btn.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.coll-ops-customer__btn--pay {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.coll-ops-customer__btn--pay:hover {
+  background: #1e293b;
+}
+
+/* —— Tablo (~70%) —— */
+
+.coll-ops-center__table-panel {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.coll-ops-tbl-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.coll-ops-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.coll-ops-tbl thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.coll-ops-tbl thead th {
+  padding: 0.4rem 0.65rem;
+  border-bottom: 1px solid #b8c4d0;
+  background: #e4e9ef;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #475569;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.coll-ops-tbl thead th.is-num,
+.coll-ops-tbl thead th.is-ops {
+  text-align: right;
+}
+
+.coll-ops-tbl-row {
+  height: 43px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.coll-ops-tbl-row:nth-child(even) {
+  background: #fafbfc;
+}
+
+.coll-ops-tbl-row:hover {
+  background: #f0f4f8 !important;
+}
+
+.coll-ops-tbl-row.is-selected {
+  background: #e3edf7 !important;
+}
+
+.coll-ops-tbl-row.is-critical {
+  background: #fff8f8;
+}
+
+.coll-ops-tbl-row.is-critical.is-selected {
+  background: #f5e8e8 !important;
+}
+
+.coll-ops-tbl-td {
+  padding: 0.36rem 0.65rem;
+  border-bottom: 1px solid #e8edf2;
+  vertical-align: middle;
+  color: #1e293b;
+}
+
+.coll-ops-tbl-td--prio {
+  width: 3.25rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.coll-ops-tbl-td--order {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.coll-ops-tbl-td--customer {
+  font-weight: 600;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coll-ops-tbl-td--status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.coll-ops-tbl-td--status--critical {
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.coll-ops-tbl-td--status--high {
+  color: #c2410c;
+  font-weight: 800;
+}
+
+.coll-ops-tbl-td--status--medium {
+  color: #a16207;
+  font-weight: 800;
+}
+
+.coll-ops-tbl-td--status--normal {
+  color: #475569;
+  font-weight: 700;
+}
+
+.coll-ops-tbl-td--num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.coll-ops-tbl-td--balance {
+  font-weight: 700;
+}
+
+.coll-ops-tbl-td--muted {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.coll-ops-tbl-td--action {
+  max-width: 8.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.coll-ops-tbl-ops {
+  display: inline-flex;
+  gap: 0.2rem;
+  justify-content: flex-end;
+}
+
+.coll-ops-tbl-op {
+  padding: 0.15rem 0.35rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.coll-ops-tbl-op--pay {
+  background: #475569;
+  border-color: #475569;
+  color: #fff;
+}
+
+.coll-ops-tbl-op.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.coll-ops-tbl-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 1100px) {
+  .coll-ops-center__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .coll-ops-left {
+    max-height: 10rem;
+  }
+
+  .coll-ops-customer__fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .coll-ops-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    height: auto;
+  }
+
+  .coll-ops-summary__item {
+    border-bottom: 1px solid #d5dce4;
+  }
+}
+
+.coll-pending-approval__ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.coll-pending-approval__reject {
+  color: #b42318;
+}
+
+.coll-pending-approval__error {
+  margin: 0 0 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 0.78rem;
+}
+
+.coll-pending-approval__row--warning td {
+  background: #fffbeb !important;
+}
+
+.coll-pending-approval__row--critical td {
+  background: #fef2f2 !important;
+}

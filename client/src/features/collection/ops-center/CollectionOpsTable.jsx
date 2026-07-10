@@ -1,0 +1,167 @@
+import { PRIORITY_CALL_LIMIT } from '../../../mappers/collection/collectionCommandCenterModel.js'
+import { buildErpTableRows } from '../collectionErpTableUi.js'
+import PilotRecordBadge from '../../../components/pilot/PilotRecordBadge.jsx'
+import { getOrderPilotKind } from '../../../lib/pilotRecordHeuristics.js'
+
+/** @typedef {import('../../../mappers/collection/collectionCommandCenterModel.js').CollectionCardModel} CollectionCardModel */
+/** @typedef {import('../../../contracts/v1/collectionRowVm.js').CollectionRowVM} CollectionRowVM */
+/** @typedef {import('../collectionErpTableUi.js').CollectionErpTableRow} CollectionErpTableRow */
+
+/**
+ * @param {{
+ *   row: CollectionErpTableRow
+ *   selected: boolean
+ *   onSelect: () => void
+ *   onOpenPayment: () => void
+ * }} props
+ */
+function OpsTableRow({ row, selected, onSelect, onOpenPayment }) {
+  const {
+    card,
+    priorityRank,
+    statusBadge,
+    statusLabel,
+    remainingLabel,
+    paidPct,
+    phoneDisplay,
+    nextActionFull,
+    lastOperationLabel,
+    telHref,
+    whatsappHref,
+  } = row
+  const hasPhone = Boolean(telHref)
+  const isCritical = statusBadge.level === 'critical' || card.stripeTone === 'critical'
+  const pilotKind = getOrderPilotKind(card.row)
+
+  const stop = (/** @type {import('react').SyntheticEvent} */ e) => {
+    e.stopPropagation()
+  }
+
+  return (
+    <tr
+      className={`coll-ops-tbl-row${selected ? ' is-selected' : ''}${isCritical ? ' is-critical' : ''}${pilotKind ? ' is-pilot-record' : ''}`}
+      onClick={onSelect}
+      tabIndex={0}
+      role="button"
+      aria-selected={selected}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect()
+        }
+      }}
+    >
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--prio coll-col--desk">{priorityRank != null ? `P${priorityRank}` : '—'}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--order coll-col--desk">{card.orderNo}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--customer">
+        {card.row.customer}
+        <PilotRecordBadge kind={pilotKind} />
+      </td>
+      <td className="coll-ops-tbl-td coll-col--desk">{phoneDisplay ?? '—'}</td>
+      <td
+        className={`coll-ops-tbl-td coll-ops-tbl-td--status coll-ops-tbl-td--status--${statusBadge.level}`}
+        title={statusLabel}
+      >
+        {statusBadge.label}
+      </td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-ops-tbl-td--balance">{remainingLabel}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-col--desk">%{paidPct}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--muted coll-col--tablet-last">{lastOperationLabel}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--action coll-col--desk" title={nextActionFull}>
+        {nextActionFull}
+      </td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--ops">
+        <div className="coll-ops-tbl-ops" onClick={stop} onKeyDown={stop} role="presentation">
+          {hasPhone ? (
+            <a className="coll-ops-tbl-op" href={telHref ?? undefined}>
+              Ara
+            </a>
+          ) : (
+            <span className="coll-ops-tbl-op is-disabled">Ara</span>
+          )}
+          {hasPhone ? (
+            <a
+              className="coll-ops-tbl-op"
+              href={whatsappHref ?? undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WA
+            </a>
+          ) : (
+            <span className="coll-ops-tbl-op is-disabled">WA</span>
+          )}
+          <button
+            type="button"
+            className="coll-ops-tbl-op coll-ops-tbl-op--pay"
+            onClick={(e) => {
+              stop(e)
+              onOpenPayment()
+            }}
+          >
+            Ödeme
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
+
+/**
+ * @param {{
+ *   cards: CollectionCardModel[]
+ *   todayIso: string
+ *   selectedRowId: string | null
+ *   onSelectRow: (row: CollectionRowVM) => void
+ *   onOpenPayment?: (row: CollectionRowVM) => void
+ * }} props
+ */
+export default function CollectionOpsTable({
+  cards,
+  todayIso,
+  selectedRowId,
+  onSelectRow,
+  onOpenPayment,
+}) {
+  if (cards.length === 0) {
+    return (
+      <div className="coll-ops-tbl-empty">
+        <p>Bu filtrede kayıt yok.</p>
+      </div>
+    )
+  }
+
+  const rows = buildErpTableRows(cards, todayIso, PRIORITY_CALL_LIMIT)
+
+  return (
+    <div className="coll-ops-tbl-wrap">
+      <table className="coll-ops-tbl">
+        <thead>
+          <tr>
+            <th className="coll-col--desk">Öncelik</th>
+            <th className="coll-col--desk">Sipariş No</th>
+            <th>Müşteri</th>
+            <th className="coll-col--desk">Telefon</th>
+            <th>Risk</th>
+            <th className="is-num">Kalan Borç</th>
+            <th className="is-num coll-col--desk">Tahsilat %</th>
+            <th>Son Ödeme</th>
+            <th className="coll-col--desk">Sonraki Aksiyon</th>
+            <th className="is-ops">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <OpsTableRow
+              key={row.card.row.id}
+              row={row}
+              selected={selectedRowId === row.card.row.id}
+              onSelect={() => onSelectRow(row.card.row)}
+              onOpenPayment={() => onOpenPayment?.(row.card.row)}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}

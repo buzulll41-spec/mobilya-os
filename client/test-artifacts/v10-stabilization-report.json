@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-05-31T14:51:52.791Z",
+  "checks": [
+    {
+      "id": "order-panel-opens",
+      "pass": true,
+      "detail": "Sipariş operasyon paneli görünür"
+    },
+    {
+      "id": "health-bar",
+      "pass": true,
+      "detail": "🟡\nTahsilat Riski\n· Kalan bakiye yüksek"
+    },
+    {
+      "id": "contact-actions",
+      "pass": true,
+      "detail": "4 aksiyon slotu; tel=yok, wa=yok"
+    },
+    {
+      "id": "payments-tab",
+      "pass": true,
+      "detail": "Ödemeler sekmesi finans kartı yüklendi"
+    },
+    {
+      "id": "shipment-readiness",
+      "pass": true,
+      "detail": "Uygunluk skoru: 64/100"
+    },
+    {
+      "id": "history-filters",
+      "pass": true,
+      "detail": "Tümü=9, Tahsilat=0, Sevk=5 (filtre tıklanabilir)"
+    },
+    {
+      "id": "mobile-overflow",
+      "pass": true,
+      "detail": "Taşma yok"
+    }
+  ],
+  "passed": true,
+  "screenshots": [
+    "client/test-artifacts/v10-stabilization-overview.png",
+    "client/test-artifacts/v10-stabilization-shipment.png",
+    "client/test-artifacts/v10-stabilization-history.png",
+    "client/test-artifacts/v10-stabilization-mobile.png"
+  ]
+}

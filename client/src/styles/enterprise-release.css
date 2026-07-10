@@ -1,0 +1,122 @@
+.ent-release {
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ent-release__hero {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.ent-release__kicker {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.ent-release__title {
+  margin: 0.25rem 0;
+  font-size: 2rem;
+}
+
+.ent-release__success {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.ent-release__rc {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ent-release__rc.is-ready {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.ent-release__meta {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.ent-release__meta div {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.65rem;
+  background: #f8fafc;
+}
+
+.ent-release__meta span {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ent-release__score-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.ent-release__score-grid div {
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.ent-release__score-grid span {
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.ent-release__section {
+  margin-bottom: 1.25rem;
+}
+
+.ent-release__checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem;
+}
+
+.ent-release__check--pass { color: #15803d; }
+.ent-release__check--warn { color: #b45309; }
+.ent-release__check--fail { color: #b91c1c; }
+
+.ent-release__columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.ent-release__footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .ent-release__meta { grid-template-columns: repeat(2, 1fr); }
+  .ent-release__checks { grid-template-columns: 1fr; }
+  .ent-release__columns { grid-template-columns: 1fr; }
+}
