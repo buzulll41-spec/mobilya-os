@@ -11,6 +11,7 @@ import {
 } from '../../src/features/orders/newOrderWizardModel.js'
 import { PAYMENT_METHOD } from '../../src/contracts/v1/enums.js'
 import { createOrder, resetMockOrdersStore } from '../../src/services/mockApi.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 import { getPaymentTransactionsForSalesOrder } from '../../src/services/mockPaymentStore.js'
 import { getLedgerForSupplier } from '../../src/services/mockSupplierLedgerStore.js'
 import { PAYMENT_TRANSACTION_KIND } from '../../src/contracts/v1/enums.js'
@@ -86,6 +87,7 @@ describe('mail order payment', () => {
 
   it('mock kayıt — kısmi tutar tedarikçi cariye yansır', async () => {
     resetMockOrdersStore()
+    authenticateTestAdmin()
     const total = 120_000
     const partial = 40_000
 

@@ -4,7 +4,7 @@ import { PRODUCT_STOCK_TYPE } from '../../src/constants/productCatalog.js'
 import { mapWizardProductsToLines } from '../../src/features/orders/newOrderWizardModel.js'
 import { computeShipmentPlanLinesFromSeeds } from '../../src/mappers/shipment/computeShipmentPlanLines.js'
 import { validateShipmentPlanSelection } from '../../src/mappers/shipment/computeShipmentPlanLines.js'
-import { createOrder, getShipmentPlanLines, resetMockOrdersStore } from '../../src/services/mockApi.js'
+import { confirmOrderLineSupplySent, createOrder, getShipmentPlanLines, resetMockOrdersStore } from '../../src/services/mockApi.js'
 import { getOrderLinesForSalesOrder } from '../../src/services/mockOrderLineStore.js'
 import {
   mockCreateIncomingGoods,
@@ -15,11 +15,13 @@ import { getOpenBalanceForSupplier } from '../../src/services/mockSupplierLedger
 import { mockCreateProduct } from '../../src/services/mockProductsApi.js'
 import { mockCreateSupplier } from '../../src/services/mockSuppliersApi.js'
 import { fetchSalesContractLineRows } from '../../src/services/salesContractLines.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('product lifecycle mock (ürün kartı → sevk)', () => {
   beforeEach(() => {
     resetMockOrdersStore()
     resetMockIncomingGoodsStore()
+    authenticateTestAdmin()
   })
 
   it('productId sipariş satırında kalır; gelen ürün qtyReceived ve cariyi günceller; sevk sadece geleni sayar', async () => {
@@ -99,6 +101,8 @@ describe('product lifecycle mock (ürün kartı → sevk)', () => {
     expect(catalogLine?.suggestedPurchasePrice).toBe('22000.00')
 
     const balanceBefore = getOpenBalanceForSupplier(supplier.id)
+
+    await confirmOrderLineSupplySent(order.id, { lineIds: [seeds[0].id], channel: 'WHATSAPP' })
 
     await mockCreateIncomingGoods({
       supplierId: supplier.id,

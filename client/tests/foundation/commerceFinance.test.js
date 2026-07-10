@@ -6,6 +6,7 @@ import {
 import { normalizeCreateOrderInput } from '../../src/domain/order/normalizeCreateOrder.js'
 import { runWithMockApiTimers } from './_helpers/mockApiTimers.js'
 import { createOrder, resetMockOrdersStore } from '../../src/services/mockApi.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('commerce finance (client)', () => {
   it('resolveCommerceTotals mirrors backend rule', () => {
@@ -38,6 +39,7 @@ describe('commerce finance (client)', () => {
 
   it('mock createOrder — partial payment updates remaining', async () => {
     resetMockOrdersStore()
+    authenticateTestAdmin()
     const order = await runWithMockApiTimers(() =>
       createOrder({
         customerName: 'Tahsilat',

@@ -11,10 +11,12 @@ import { mapWizardProductsToLines, mapWizardToCreateOrderRequest } from '../../s
 import { projectLegacyOrderToListItemDto } from '../../src/services/orderListItemProjection.js'
 import { computeShipmentPlanLinesFromSeeds } from '../../src/mappers/shipment/computeShipmentPlanLines.js'
 import { runWithMockApiTimers } from './_helpers/mockApiTimers.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('order lines create (FAZ A1)', () => {
   beforeEach(() => {
     resetMockOrdersStore()
+    authenticateTestAdmin()
   })
 
   it('multi-line create persists real order_lines in mock store', async () => {

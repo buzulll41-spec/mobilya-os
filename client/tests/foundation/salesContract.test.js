@@ -15,10 +15,12 @@ import {
 import { emptyWizardForm } from '../../src/features/orders/newOrderWizardModel.js'
 import { buildSalesContractPdfFilename } from '../../src/lib/exportSalesContractPdf.js'
 import { runWithMockApiTimers } from './_helpers/mockApiTimers.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('sales contract', () => {
   beforeEach(() => {
     resetMockOrdersStore()
+    authenticateTestAdmin()
   })
 
   it('buildSalesContractModel — müşteri ek ve finans', () => {

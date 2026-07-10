@@ -48,16 +48,6 @@ export default function BusinessRulesPage({ onNavigate }) {
 
   useEffect(() => load(), [load])
 
-  if (detailId) {
-    return (
-      <BusinessRuleDetailPage
-        ruleId={detailId}
-        onBack={() => { setDetailId(null); load() }}
-        onNavigate={onNavigate}
-      />
-    )
-  }
-
   const s = data?.summary
   const summaryMetrics = useMemo(() => {
     if (!s) return []
@@ -69,6 +59,16 @@ export default function BusinessRulesPage({ onNavigate }) {
       { id: 'updated', label: 'Son Güncelleme', value: (s.lastUpdatedAt ?? '').slice(0, 10) || '—' },
     ]
   }, [s])
+
+  if (detailId) {
+    return (
+      <BusinessRuleDetailPage
+        ruleId={detailId}
+        onBack={() => { setDetailId(null); load() }}
+        onNavigate={onNavigate}
+      />
+    )
+  }
 
   const rules = data?.rules ?? []
 

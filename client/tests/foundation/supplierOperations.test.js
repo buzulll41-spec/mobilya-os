@@ -33,6 +33,7 @@ describe('supplierOperations mock', () => {
         qtyOrdered: '10',
         qtyReceived: '0',
         title: 'MAYER KÖŞE',
+        supplyStatus: 'SENT',
       },
     ])
     await mockCreateIncomingGoods({
@@ -70,6 +71,7 @@ describe('supplierOperations mock', () => {
         qtyOrdered: '6',
         qtyReceived: '0',
         title: 'Sandalye',
+        supplyStatus: 'SENT',
       },
     ])
     await mockCreateIncomingGoods({

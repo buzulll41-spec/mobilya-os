@@ -5,6 +5,7 @@ import { buildSalesContractModel } from '../../src/mappers/sales-contract/buildS
 import { normalizeCreateOrderRequest } from '../../src/domain/order/normalizeCreateOrder.js'
 import { buildSalesContractPdfFilename } from '../../src/lib/exportSalesContractPdf.js'
 import {
+  confirmOrderLineSupplySent,
   createOrder,
   getOrderLines,
   getOrders,
@@ -31,9 +32,11 @@ import {
   MAIL_ORDER_SCENARIO,
   parseMoney,
 } from './_helpers/commerceScenario.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('commerce E2E chain (mock)', () => {
   beforeEach(() => {
+    authenticateTestAdmin()
     resetMockOrdersStore()
     resetMockSupplierStore()
     resetMockSupplierLedgerStore()
@@ -87,6 +90,8 @@ describe('commerce E2E chain (mock)', () => {
         lines: [{ orderLineId: lineId, qty: 1 }],
       }),
     ).rejects.toThrow(/fiziksel/)
+
+    await confirmOrderLineSupplySent(order.id, { lineIds: [lineId], channel: 'WHATSAPP' })
 
     await mockCreateIncomingGoods({
       supplierId: sup.id,

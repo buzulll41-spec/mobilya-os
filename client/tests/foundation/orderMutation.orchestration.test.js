@@ -7,6 +7,7 @@ import {
   executeUpdateOrderFlow,
 } from '../../src/application/orderMutationOrchestration.js'
 import { runWithMockApiTimers } from './_helpers/mockApiTimers.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('orderMutationOrchestration', () => {
   /** @type {string | undefined} */
@@ -16,6 +17,7 @@ describe('orderMutationOrchestration', () => {
     prevApiBase = import.meta.env.VITE_API_BASE_URL
     import.meta.env.VITE_API_BASE_URL = ''
     resetMockOrdersStore()
+    authenticateTestAdmin()
   })
 
   afterEach(() => {
