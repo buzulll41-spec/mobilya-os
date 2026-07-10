@@ -10,7 +10,7 @@ import {
   sanitizeConfigurationForContext,
   validateLineConfiguration,
 } from '../../constants/productConfigurationSchema.js'
-import { toE164Phone, parseE164Phone } from '../../lib/phoneInput.js'
+import { toE164Phone } from '../../lib/phoneInput.js'
 import { parseCurrencyInput } from '../../lib/formatCurrencyInput.js'
 
 /** @typedef {import('../../data/seedOrders.js').Order} Order */

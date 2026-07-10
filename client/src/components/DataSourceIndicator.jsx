@@ -1,5 +1,4 @@
 import { getDataSourceDisplay } from '../config/dataSource.js'
-import { shouldShowDemoBanner } from '../config/appMode.js'
 
 export default function DataSourceIndicator() {
   const { mode, label, apiBase, showIndicator } = getDataSourceDisplay()

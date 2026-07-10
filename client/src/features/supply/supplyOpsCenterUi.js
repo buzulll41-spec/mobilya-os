@@ -1,4 +1,3 @@
-import { formatSupplierListBalance } from '../../mappers/supply/normalizeSupplierDto.js'
 import { SUPPLIER_HEALTH_STATUS } from '../../mappers/supply/supplierHealth.js'
 
 /** @typedef {import('../../contracts/v1/supplierOperations.js').SupplierOpsListItemDto} SupplierOpsListItemDto */

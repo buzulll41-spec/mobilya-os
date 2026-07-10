@@ -5,7 +5,6 @@ import {
   WORKER_PIPELINE_STAGE,
   WORKER_DISPLAY_NAMES,
 } from '../contracts/v1/workerOrchestration.js'
-import { formatDurationMs } from './digitalWorkforceCore.js'
 import {
   buildCeoTimelineMessage,
   buildChainCompleteMessage,

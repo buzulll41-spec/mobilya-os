@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { isDemoMode, isDevelopmentMode } from '../../config/appMode.js'
 import {
   clearOfflineCaches,
-  forceOfflineSync,
   getOfflineFirstSnapshot,
 } from '../../services/offline/offlineFirstFacade.js'
 import { drainOfflineSyncQueue } from '../../services/offline/offlineSyncEngine.js'

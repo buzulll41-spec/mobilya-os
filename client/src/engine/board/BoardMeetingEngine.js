@@ -4,7 +4,6 @@ import { buildExecutiveSummary } from './ExecutiveSummaryBuilder.js'
 import { BusinessEngine } from '../businessEngine.js'
 import {
   pickDominantDomain,
-  rankSnapshotsByPriority,
   scoreOperationalDomains,
 } from '../company-manager/PriorityEngine.js'
 import { getAllDomainEventsSnapshot } from '../../services/mockDomainEventStore.js'

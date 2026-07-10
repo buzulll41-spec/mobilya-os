@@ -2,7 +2,6 @@ import { DEMO_TODAY } from '../../data/constants.js'
 import { DIGITAL_WORKER_STATUS, DIGITAL_WORKER_STATUS_LABEL } from '../../contracts/v1/digitalWorker.js'
 import { WORKER_PRIORITY_LABEL } from '../../contracts/v1/digitalWorker.js'
 import { formatDurationMs, toTaskHistoryEntry } from '../../engine/digitalWorkforceCore.js'
-import { formatShortDate } from '../../utils/dates.js'
 import { relativeTimeLabelTr } from '../timeline/relativeTimeLabelTr.js'
 import { AI_COMPANY_MANAGER_WORKER_ID } from '../../contracts/v1/aiCompanyManager.js'
 

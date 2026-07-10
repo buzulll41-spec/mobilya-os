@@ -1,7 +1,6 @@
 import { SHIPMENT_OPERATION_STATUS } from '../../contracts/v1/shipmentStatuses.js'
 import { SHIPMENT_PLAN_STATUS } from '../../constants/shipmentPlanStatuses.js'
 import { getOrderPilotKind } from '../../lib/pilotRecordHeuristics.js'
-import { remainingBalance } from '../../utils/orderFinance.js'
 import { formatShortDate } from '../../utils/dates.js'
 
 /** @typedef {import('../../mappers/shipment-ops/shipmentOpsAgendaViewModel.js').ShipmentAgendaItem} ShipmentAgendaItem */

@@ -5,7 +5,6 @@ import {
   roundMoney,
 } from '../commerce/commerceFinance.js'
 import {
-  computeTotalFromLines,
   formatProductSummaryFromLines,
   parseCreateOrderLine,
   sortLinesByOrder,

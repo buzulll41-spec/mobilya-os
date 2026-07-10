@@ -1,4 +1,3 @@
-import { DEMO_TODAY } from '../../data/constants.js'
 import { DIGITAL_WORKER_STATUS } from '../../contracts/v1/digitalWorker.js'
 import {
   AI_SPECIALIST_WORKER_IDS,

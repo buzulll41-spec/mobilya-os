@@ -1,5 +1,4 @@
 import { formatTry } from '../../data/dashboardHelpers.js'
-import { formatShortDate } from '../../utils/dates.js'
 import { PAYMENT_METHOD } from '../../contracts/v1/enums.js'
 import {
   buildOrderPanelPaymentRows,

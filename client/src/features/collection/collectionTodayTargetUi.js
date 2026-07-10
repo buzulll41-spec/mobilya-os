@@ -4,7 +4,6 @@ import {
   isDeliveredOpenBalance,
   pickPriorityCallRows,
 } from '../../mappers/collection/collectionCommandCenterModel.js'
-import { remainingBalance } from '../../utils/orderFinance.js'
 
 /** @typedef {import('../../contracts/v1/collectionRowVm.js').CollectionRowVM} CollectionRowVM */
 

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   MISSING_ITEM_STATUS,
-  isMissingItemResolvedStatus,
 } from '../../../contracts/v1/missingItemStatuses.js'
 import { DEMO_TODAY } from '../../../data/constants.js'
 import {

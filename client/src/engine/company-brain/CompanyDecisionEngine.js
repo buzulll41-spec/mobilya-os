@@ -1,11 +1,10 @@
-import { DIGITAL_WORKER_STATUS, WORKER_PRIORITY } from '../../contracts/v1/digitalWorker.js'
+import { WORKER_PRIORITY } from '../../contracts/v1/digitalWorker.js'
 import { COMPANY_MANAGER_DECISION } from '../../contracts/v1/aiCompanyManager.js'
 import { AI_COMPANY_MANAGER_WORKER_ID } from '../../contracts/v1/aiCompanyManager.js'
 import { AI_COLLECTION_SPECIALIST_WORKER_ID } from '../../contracts/v1/aiCollectionSpecialist.js'
 import { AI_PROCUREMENT_SPECIALIST_WORKER_ID } from '../../contracts/v1/aiProcurementSpecialist.js'
 import { AI_SALES_FOLLOW_UP_WORKER_ID } from '../../contracts/v1/aiSalesFollowUp.js'
 import { AI_SHIPMENT_SPECIALIST_WORKER_ID } from '../../contracts/v1/aiShipmentSpecialist.js'
-import { PIPELINE_WORKERS } from '../company-manager/ConflictResolver.js'
 import { WORKER_BY_DOMAIN } from '../company-manager/WorkerCoordinator.js'
 
 /** @typedef {import('../../contracts/v1/aiCompanyManager.js').CompanyManagerDecisionDto} CompanyManagerDecisionDto */
