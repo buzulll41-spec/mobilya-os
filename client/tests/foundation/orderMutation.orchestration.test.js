@@ -25,7 +25,7 @@ describe('orderMutationOrchestration', () => {
   })
 
   it('executeRefreshOrdersFlow liste ve snapshot döner', async () => {
-    const r = await runWithMockApiTimers(() => executeRefreshOrdersFlow())
+    const r = await executeRefreshOrdersFlow()
     expect(Array.isArray(r.salesOrderListItemDtos)).toBe(true)
     expect(r.salesOrderListItemDtos.length).toBeGreaterThan(0)
     expect(Array.isArray(r.domainEvents)).toBe(true)
@@ -33,7 +33,7 @@ describe('orderMutationOrchestration', () => {
   })
 
   it('executeRollbackOrdersState getOrders + snapshot birleşir', async () => {
-    const r = await runWithMockApiTimers(() => executeRollbackOrdersState())
+    const r = await executeRollbackOrdersState()
     expect(r.salesOrderListItemDtos.length).toBeGreaterThan(0)
     expect(Array.isArray(r.domainEvents)).toBe(true)
     expect(Array.isArray(r.operationalTasks)).toBe(true)

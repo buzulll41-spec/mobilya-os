@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { DOMAIN_EVENT_TYPE } from '../../src/contracts/v1/domainEventTypes.js'
 import { resetMockOrdersStore, postOrderPayment, patchOrderTermin, getDomainEvents } from '../../src/services/mockApi.js'
 import { PAYMENT_METHOD } from '../../src/contracts/v1/enums.js'
+import { authenticateTestAdmin } from './_helpers/testAuth.js'
 
 describe('mock order operations', () => {
   beforeEach(() => {
     resetMockOrdersStore()
+    authenticateTestAdmin()
   })
 
   it('postOrderPayment — tahsilat ve payment.posted event', async () => {

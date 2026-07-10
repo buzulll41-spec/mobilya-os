@@ -25,17 +25,10 @@ function formWithProductLines(n) {
 }
 
 describe('wizardProductsUi', () => {
-  it('formatWizardMoney — Türkçe ondalık ve ₺', () => {
-    expect(formatWizardMoney(35_000)).toMatch(/35\.000,00/)
+  it('formatWizardMoney — Türkçe binlik ayraç ve ₺', () => {
+    expect(formatWizardMoney(35_000)).toMatch(/35\.000/)
     expect(formatWizardMoney(35_000)).toContain('₺')
-    expect(formatWizardMoney(30_000)).toBe(
-      new Intl.NumberFormat('tr-TR', {
-        style: 'currency',
-        currency: 'TRY',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(30_000),
-    )
+    expect(formatWizardMoney(30_000)).toBe('30.000 ₺')
   })
 
   it('parseWizardPriceInput — binlik ayraçlı giriş', () => {
@@ -65,7 +58,7 @@ describe('wizardProductsUi', () => {
   it('satır tutarı qty × birim fiyat', () => {
     const line = { name: 'Masa', group: 'Yemek odası', qty: '3', unitPrice: '35000', note: '', id: 'x' }
     expect(wizardLineTotal(line)).toBe(105_000)
-    expect(formatWizardMoney(wizardLineTotal(line))).toMatch(/105\.000,00/)
+    expect(formatWizardMoney(wizardLineTotal(line))).toMatch(/105\.000/)
   })
 
   it('validation — en az 1 ürün, ad ve fiyat zorunlu', () => {

@@ -162,6 +162,6 @@ describe('deliveryConfirmationQueue mock actions', () => {
 
     expect(result.plan.status).toBe(SHIPMENT_PLAN_STATUS.PLANNED)
     expect(result.plan.plannedDate).toBe(newDate)
-    expect(result.order.displayStatus).toBe('Planlandı')
+    expect(result.order.displayStatus).toBe('Sevk Planlandı')
   })
 })

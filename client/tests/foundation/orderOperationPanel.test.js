@@ -24,11 +24,13 @@ describe('order operation panel model', () => {
   it('sekme yapısı tanımlı', () => {
     const ids = ORDER_PANEL_TABS.map((t) => t.id)
     expect(ids).toContain('overview')
+    expect(ids).toContain('timeline')
     expect(ids).toContain('products')
     expect(ids).toContain('payments')
+    expect(ids).toContain('shipment')
     expect(ids).toContain('ssh')
     expect(ids).toContain('history')
-    expect(ids).toHaveLength(6)
+    expect(ids).toHaveLength(7)
   })
 
   it('initialTab çözümlemesi', () => {

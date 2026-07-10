@@ -6,6 +6,7 @@ import { projectLegacyOrderToListItemDto } from '../../src/services/orderListIte
 import { getOrders } from '../../src/services/mockApi.js'
 import { listItemDtoToLegacyOrder } from '../../src/mappers/listItemDtoToLegacyOrder.js'
 import { WAREHOUSE_ENTRY_STATUS } from '../../src/constants/supplyOrderStatus.js'
+import { getShipmentsForSalesOrder } from '../../src/services/mockShipmentStore.js'
 
 describe('order list displayStatus projection', () => {
   beforeEach(() => {
@@ -14,7 +15,10 @@ describe('order list displayStatus projection', () => {
 
   async function seedAykutLikeOrder() {
     const dtos = await getOrders()
-    const dto = dtos.find((o) => o.displayStatus !== 'Teslim Edildi') ?? dtos[0]
+    const dto =
+      dtos.find(
+        (o) => o.displayStatus !== 'Teslim Edildi' && getShipmentsForSalesOrder(o.id).length === 0,
+      ) ?? dtos[0]
     const order = listItemDtoToLegacyOrder(dto)
     setOrderLinesForSalesOrder(order.id, [
       {

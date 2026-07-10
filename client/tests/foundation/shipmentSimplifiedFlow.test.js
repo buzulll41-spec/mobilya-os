@@ -11,13 +11,12 @@ import {
 import { getShipmentFlowPresentation } from '../../src/mappers/shipment/shipmentOperationUx.js'
 
 describe('shipment simplified flow', () => {
-  it('PLANNED ana CTA → DELIVERED zinciri', () => {
+  it('PLANNED ana CTA → DISPATCHED (adım adım ilerleme)', () => {
     const flow = getShipmentFlowPresentation('PLANNED')
-    expect(flow.primaryAction?.label).toBe('Teslim edildi')
+    expect(flow.primaryAction?.label).toBe('Yola Çıktı')
     expect(flow.primaryAction?.advanceChain).toEqual([
       SHIPMENT_OPERATION_STATUS.LOADED,
       SHIPMENT_OPERATION_STATUS.DISPATCHED,
-      SHIPMENT_OPERATION_STATUS.DELIVERED,
     ])
   })
 

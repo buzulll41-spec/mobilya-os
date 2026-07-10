@@ -54,8 +54,8 @@ describe('executive command center navigation', () => {
   it('admin ve manager erişebilir; admin varsayılan ana sayfa', () => {
     expect(canAccessPage(USER_ROLE.ADMIN, 'executive-command-center')).toBe(true)
     expect(canAccessPage(USER_ROLE.MANAGER, 'executive-command-center')).toBe(true)
-    expect(resolveDefaultHomePage(USER_ROLE.ADMIN)).toBe('executive-command-center')
-    expect(resolveDefaultHomePage(USER_ROLE.MANAGER)).toBe('executive-command-center')
+    expect(resolveDefaultHomePage(USER_ROLE.ADMIN)).toBe('enterprise-ceo-dashboard')
+    expect(resolveDefaultHomePage(USER_ROLE.MANAGER)).toBe('enterprise-ceo-dashboard')
   })
 })
 

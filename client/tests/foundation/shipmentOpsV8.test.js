@@ -14,6 +14,7 @@ import {
 } from '../../src/mappers/shipment-ops/shipmentOpportunityEngine.js'
 import { buildDailyVehiclePlan } from '../../src/mappers/shipment-ops/shipmentVehiclePlanModel.js'
 import { TRIP_SAVINGS_TRY } from '../../src/mappers/shipment-ops/shipmentPlanConstants.js'
+import { formatTry } from '../../src/data/dashboardHelpers.js'
 
 describe('dispatchAdvisorEngine v8', () => {
   const selectedDate = '2026-05-14'
@@ -236,14 +237,6 @@ describe('dispatchAdvisorEngine v8', () => {
     expect(Array.isArray(advisor.risks)).toBe(true)
   })
 })
-
-function formatTry(amount) {
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: 'TRY',
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
 
 describe('dispatch advisor audit labels', () => {
   it('audit event etiketleri Türkçe', async () => {

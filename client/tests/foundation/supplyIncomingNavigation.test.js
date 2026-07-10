@@ -21,6 +21,7 @@ describe('supplyIncomingNavigation', () => {
         '#/supply-incoming?incoming=1&q=Aykut&orderId=S-99&lineId=line-x',
       ),
     ).toEqual({
+      tab: 'operasyon',
       openIncoming: true,
       q: 'Aykut',
       orderId: 'S-99',

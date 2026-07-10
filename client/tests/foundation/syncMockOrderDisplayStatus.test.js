@@ -9,6 +9,7 @@ import { resetMockMissingItemStore, upsertMissingItem } from '../../src/services
 import { MISSING_ITEM_STATUS } from '../../src/contracts/v1/missingItemStatuses.js'
 import { getOrders, resetMockOrdersStore, syncMockOrderDisplayStatusById } from '../../src/services/mockApi.js'
 import { deriveMockOrderStatusFromLines } from '../../src/services/syncMockOrderDisplayStatus.js'
+import { getShipmentsForSalesOrder } from '../../src/services/mockShipmentStore.js'
 
 describe('syncMockOrderDisplayStatus', () => {
   beforeEach(() => {
@@ -38,7 +39,7 @@ describe('syncMockOrderDisplayStatus', () => {
 
   it('3 ürün geldi → otomatik Sevke Hazır', async () => {
     const orders = await getOrders()
-    const order = orders[0]
+    const order = orders.find((o) => getShipmentsForSalesOrder(o.id).length === 0) ?? orders[0]
     seedArrivedLines(order.id, 3)
 
     expect(deriveMockOrderStatusFromLines({ ...order, status: 'Bekleniyor' })).toBe(
