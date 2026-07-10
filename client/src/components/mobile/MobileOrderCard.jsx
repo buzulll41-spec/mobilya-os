@@ -21,6 +21,7 @@ export default function MobileOrderCard({ card, selected = false, onOpen }) {
       type="button"
       className={`mos-mobile-order-card ${toneClass(card.tone)} ${selected ? 'is-selected' : ''}`.trim()}
       data-order-row-id={card.id}
+      aria-label={`${card.customer}, ${card.orderNo}, ${card.statusLabel}`}
       onClick={onOpen}
     >
       <div className="mos-mobile-order-card__head">

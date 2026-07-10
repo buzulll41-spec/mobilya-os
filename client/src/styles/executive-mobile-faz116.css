@@ -270,7 +270,7 @@
 }
 
 .exec-mobile-approval__actions button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0.35rem 0.65rem;
   border-radius: 8px;
   border: 1px solid var(--mos-border, #e2e8f0);

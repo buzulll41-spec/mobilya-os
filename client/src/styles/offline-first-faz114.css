@@ -30,6 +30,17 @@
   color: #fff;
 }
 
+.mos-offline-banner--faz114.mos-offline-banner--slim {
+  padding: 0.15rem 0.85rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  opacity: 0.72;
+}
+
+.mos-offline-banner--faz114.mos-offline-banner--slim .mos-offline-banner__text {
+  display: none;
+}
+
 .mos-pending-actions,
 .mos-conflict-center {
   margin: 0 0 0.65rem;

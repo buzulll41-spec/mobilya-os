@@ -29,9 +29,13 @@ export default function OfflineBanner() {
           ? `${pendingCount} bekleyen işlem senkron bekliyor`
           : 'Bağlantı aktif'
 
+  const isIdleOnline = tone === 'online' && pendingCount === 0 && !syncing
+
   return (
     <div
-      className={`mos-offline-banner mos-offline-banner--faz114 mos-offline-banner--${tone}`}
+      className={`mos-offline-banner mos-offline-banner--faz114 mos-offline-banner--${tone}${
+        isIdleOnline ? ' mos-offline-banner--slim' : ''
+      }`}
       role="status"
       aria-live="polite"
     >

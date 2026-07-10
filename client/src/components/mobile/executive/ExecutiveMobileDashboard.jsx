@@ -128,7 +128,7 @@ export default function ExecutiveMobileDashboard({
                     disabled={mutating}
                     onClick={() => void onApprove?.(row)}
                   >
-                    Onayla
+                    {mutating ? 'Onaylanıyor…' : 'Onayla'}
                   </button>
                   <button
                     type="button"
@@ -136,7 +136,7 @@ export default function ExecutiveMobileDashboard({
                     disabled={mutating}
                     onClick={() => void onReject?.(row)}
                   >
-                    Reddet
+                    {mutating ? 'Reddediliyor…' : 'Reddet'}
                   </button>
                   <button type="button" className="is-review" onClick={() => onReview?.(row)}>
                     İncele

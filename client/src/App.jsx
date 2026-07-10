@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import NewOrderWizard from './features/orders/NewOrderWizard.jsx'
 import SalesContractPrint from './features/orders/SalesContractPrint.jsx'
 import { getApiBaseUrl } from './config/dataSource.js'
-import { isDemoMode } from './config/appMode.js'
+import { isDemoMode, isProductionMode } from './config/appMode.js'
 import { projectLegacyOrderToListItemDto } from './services/orderListItemProjection.js'
 import { buildSshMissingPartsQueue } from './mappers/ssh/sshMissingPartsModel.js'
 import { getAllMissingItemsSnapshot } from './services/mockMissingItemStore.js'
@@ -91,6 +91,7 @@ import DeveloperOfflinePanel from './components/dev/DeveloperOfflinePanel.jsx'
 import PendingActionsPanel from './components/offline/PendingActionsPanel.jsx'
 import ConflictCenterPanel from './components/offline/ConflictCenterPanel.jsx'
 import { useOfflineFirst } from './state/OfflineFirstProvider.jsx'
+import { onOfflineSyncDrainComplete } from './services/offline/offlineSyncEngine.js'
 import { toastInfo } from './lib/toastBus.js'
 import { buildGlobalSearchResults } from './utils/globalSearchExperience.js'
 import { useViewportTier } from './hooks/useViewportTier.js'
@@ -170,7 +171,8 @@ export default function App() {
 
   const viewportTier = useViewportTier()
   const { forceSync } = useOfflineFirst()
-  const showMobileTestFlow = viewportTier === 'phone' || viewportTier === 'tablet'
+  const isTouchViewport = viewportTier === 'phone' || viewportTier === 'tablet'
+  const showMobileTestFlow = isTouchViewport && !isProductionMode()
 
   const { plans, refreshPlans } = useShipmentPlans()
   const pendingDeliveryConfirmCount = useMemo(
@@ -531,6 +533,14 @@ export default function App() {
     await forceSync()
   }, [refreshOrders, refreshPlans, forceSync])
 
+  useEffect(() => {
+    onOfflineSyncDrainComplete(() => {
+      void refreshOrders()
+      void refreshPlans()
+    })
+    return () => onOfflineSyncDrainComplete(() => {})
+  }, [refreshOrders, refreshPlans])
+
   const handleNotificationNavigate = useCallback(
     (targetPage, ctx) => {
       navigateTo(targetPage)
@@ -856,6 +866,7 @@ export default function App() {
           <LoadingBlock
             title="Siparişler yükleniyor"
             hint={apiMode ? 'GET /v1/orders' : 'Mock API: getOrders()'}
+            variant={isTouchViewport ? 'card-grid' : 'table'}
           />
         ) : orders.length === 0 && page !== 'dashboard' ? (
           <EmptyOrdersState
