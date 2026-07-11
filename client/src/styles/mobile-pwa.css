@@ -498,3 +498,23 @@
     color: var(--mos-accent, #863bff);
   }
 }
+
+/* ——— P1-6 FAB yerlesimi: tab bar ustunde net konum + safe-area + erisilebilir odak ———
+   FAB yalnizca telefonda gorunur. Sayfa eslemesi/aksiyon degismez; yalnizca konum
+   ve odak gorunurlugu iyilestirilir. */
+@media (max-width: 767px) {
+  .mos-mobile-pwa .mos-mobile-fab {
+    /* Tab bar (~3.5rem) uzerinde net bosluk; cihaz safe-area'si dahil. */
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  .mos-mobile-pwa .mos-mobile-fab:focus-visible {
+    outline: 3px solid #c4b5fd;
+    outline-offset: 2px;
+  }
+
+  /* '+' glyph optik ortalama. */
+  .mos-mobile-pwa .mos-mobile-fab__icon {
+    margin-top: -1px;
+  }
+}
