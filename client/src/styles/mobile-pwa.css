@@ -462,6 +462,22 @@
   }
 }
 
+/* ——— P2-12 Scroll davranislari (touch): ic panel momentum + zincirleme engeli ———
+   Ic scroll panellerinde iOS momentum scroll ve overscroll zincirleme engeli;
+   panel scroll'u sayfayi/pull-to-refresh'i kazara tetiklemez. Yalnizca scroll
+   hissi; layout/logic/API degismez. */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-erp-filters,
+  .mos-mobile-pwa .coll-ops-left,
+  .mos-mobile-pwa .mos-erp-detail,
+  .mos-mobile-pwa .coll-ops-customer,
+  .mos-mobile-pwa .mos-erp-tbl-wrap,
+  .mos-mobile-pwa .coll-ops-tbl-wrap {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
 /* ——— Offline banner PWA ——— */
 .mos-offline-banner--pwa {
   position: sticky;
