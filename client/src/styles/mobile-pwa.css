@@ -364,6 +364,19 @@
   }
 }
 
+/* ——— P2-10 Tablet gorunumu: store-home / hizli islem konfor yuksekligi ———
+   Tablet (768-1024) dashboard kart ve hizli islem butonlari daha dengeli yukseklik
+   alir; dokunma konforu artar. Telefon/desktop degismez; grid/logic degismez. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-mobile-store-home__card {
+    min-height: 8.5rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-mobile-quick-actions__btn {
+    min-height: 5.25rem;
+  }
+}
+
 /* ——— Tablet: iki kolon liste + detay ——— */
 @media (min-width: 768px) and (max-width: 1024px) {
   .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops--orders .mos-erp-detail,
