@@ -50,24 +50,20 @@
 }
 
 .mos-mobile-tabbar__list {
+  /* P2-9: 5 sabit sekme tam genislige esit yayilir; yatay scroll gerekmez.
+     (Onceki overflow-x:auto + flex:1 0 auto zaten --faz112 tarafindan eziliyordu;
+     taban artik efektif davranisla tutarli, latent yatay-scroll borcu kaldirildi.) */
   display: flex;
   align-items: stretch;
   gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.mos-mobile-tabbar__list::-webkit-scrollbar {
-  display: none;
 }
 
 .mos-mobile-tabbar__item {
-  flex: 1 0 auto;
-  min-width: 4.25rem;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .mos-mobile-tabbar__btn {
