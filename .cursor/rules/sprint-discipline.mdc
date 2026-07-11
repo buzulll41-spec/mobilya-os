@@ -10,7 +10,13 @@ alwaysApply: true
 - **Tek risk**: Aynı anda birden fazla riskli değişiklik yapılmaz.
 - **<1000 satır**: Hiçbir sprintte 1000 satırdan büyük refactor yapılmaz. Büyükse böl.
 - **Her zaman deploy edilebilir**: Sprint sonunda sistem deploy edilebilir kalır; **kırık build bırakılmaz**.
-- **Yeşil gate**: Her önemli değişiklikten sonra `npm run build`, `npm test`, `lint` çalıştırılır ve yeşil olmalıdır.
+- **Yeşil gate**: Her önemli değişiklikten sonra `npm run build`, `npm test`, `lint` çalıştırılır.
+
+## NO NEW LINT DEBT (KİLİTLİ)
+- **Baseline korunabilir**: Mevcut (önceden var olan) repo lint baseline'ı bu sprintte düzeltilmek zorunda değildir.
+- **Yeni lint hatası eklenemez**: Sprint hiçbir yeni lint hatası/uyarısı eklemez.
+- **Değişen dosyalar temiz olmalı**: Sprint tarafından oluşturulan/değiştirilen dosyalarda lint **tertemiz** (0 sorun) olmak zorundadır.
+- **Doğrulama**: `npm run lint` toplam kırmızıysa, en az sprintin dokunduğu dosyaların çıktıda **hiç görünmediği** kanıtlanır.
 
 ## Riskli/tasarım gerektiren işlerde
 - Önce **analiz + mevcut/hedef akış diyagramı + etkilenen dosyalar + risk analizi** sun.
