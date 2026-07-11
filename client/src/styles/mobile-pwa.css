@@ -518,3 +518,20 @@
     margin-top: -1px;
   }
 }
+
+/* ——— P1-7 Font okunabilirligi (telefon): kartlasmis tablo icerigi ———
+   Telefonda (<=767) yigilmis kart satirlarindaki degerler ve alan etiketleri
+   okunabilir tabana yukseltilir. Kartlar bloklu oldugundan tasma olmaz.
+   Desktop tablo gorunumu (>767) degismez. */
+@media (max-width: 767px) {
+  .mos-mobile-pwa .mos-erp-tbl tbody td,
+  .mos-mobile-pwa .coll-ops-tbl tbody td {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody td[data-label]::before,
+  .mos-mobile-pwa .coll-ops-tbl tbody td[data-label]::before {
+    font-size: 0.7rem;
+  }
+}
