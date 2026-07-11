@@ -85,24 +85,24 @@ export default function ShipmentOpsPlannedTable({
                 onClick={() => onSelectRow(row)}
               >
                 {confirmationMode ? (
-                  <td className="mos-erp-tbl-td">{row.orderNumber}</td>
+                  <td className="mos-erp-tbl-td" data-label="Sipariş No">{row.orderNumber}</td>
                 ) : null}
-                <td className="mos-erp-tbl-td mos-erp-tbl-td--date">{row.plannedDateLabel}</td>
-                <td className="mos-erp-tbl-td mos-erp-tbl-td--customer">
+                <td className="mos-erp-tbl-td mos-erp-tbl-td--date" data-label="Planlanan tarih">{row.plannedDateLabel}</td>
+                <td className="mos-erp-tbl-td mos-erp-tbl-td--customer" data-label="Müşteri">
                   <span className="mos-erp-tbl-customer-name">{row.customer}</span>
                   <PilotRecordBadge kind={row.pilotKind ?? null} />
                 </td>
-                <td className="mos-erp-tbl-td">{row.region}</td>
-                <td className="mos-erp-tbl-td">{row.vehicleLabel}</td>
-                <td className="mos-erp-tbl-td">{row.crewLabel}</td>
+                <td className="mos-erp-tbl-td" data-label="Bölge">{row.region}</td>
+                <td className="mos-erp-tbl-td" data-label="Araç">{row.vehicleLabel}</td>
+                <td className="mos-erp-tbl-td" data-label="Montaj ekibi">{row.crewLabel}</td>
                 {confirmationMode ? (
                   <>
-                    <td className="mos-erp-tbl-td">{row.productCount ?? 1}</td>
-                    <td className="mos-erp-tbl-td">{row.productSummary ?? '—'}</td>
+                    <td className="mos-erp-tbl-td" data-label="Ürün">{row.productCount ?? 1}</td>
+                    <td className="mos-erp-tbl-td" data-label="Özet">{row.productSummary ?? '—'}</td>
                   </>
                 ) : null}
-                <td className="mos-erp-tbl-td">{row.statusLabel}</td>
-                <td className="mos-erp-tbl-td is-ops">
+                <td className="mos-erp-tbl-td" data-label="Durum">{row.statusLabel}</td>
+                <td className="mos-erp-tbl-td is-ops" data-label="İşlem">
                   <div className="mos-erp-tbl-ops">
                     {row.canConfirmDelivery && onConfirmDelivery ? (
                       <MosButton

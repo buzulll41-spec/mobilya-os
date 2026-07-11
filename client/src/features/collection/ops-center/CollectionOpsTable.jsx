@@ -51,26 +51,27 @@ function OpsTableRow({ row, selected, onSelect, onOpenPayment }) {
         }
       }}
     >
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--prio coll-col--desk">{priorityRank != null ? `P${priorityRank}` : '—'}</td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--order coll-col--desk">{card.orderNo}</td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--customer">
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--prio coll-col--desk" data-label="Öncelik">{priorityRank != null ? `P${priorityRank}` : '—'}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--order coll-col--desk" data-label="Sipariş No">{card.orderNo}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--customer" data-label="Müşteri">
         {card.row.customer}
         <PilotRecordBadge kind={pilotKind} />
       </td>
-      <td className="coll-ops-tbl-td coll-col--desk">{phoneDisplay ?? '—'}</td>
+      <td className="coll-ops-tbl-td coll-col--desk" data-label="Telefon">{phoneDisplay ?? '—'}</td>
       <td
         className={`coll-ops-tbl-td coll-ops-tbl-td--status coll-ops-tbl-td--status--${statusBadge.level}`}
         title={statusLabel}
+        data-label="Risk"
       >
         {statusBadge.label}
       </td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-ops-tbl-td--balance">{remainingLabel}</td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-col--desk">%{paidPct}</td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--muted coll-col--tablet-last">{lastOperationLabel}</td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--action coll-col--desk" title={nextActionFull}>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-ops-tbl-td--balance" data-label="Kalan Borç">{remainingLabel}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--num coll-col--desk" data-label="Tahsilat %">%{paidPct}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--muted coll-col--tablet-last" data-label="Son Ödeme">{lastOperationLabel}</td>
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--action coll-col--desk" title={nextActionFull} data-label="Sonraki Aksiyon">
         {nextActionFull}
       </td>
-      <td className="coll-ops-tbl-td coll-ops-tbl-td--ops">
+      <td className="coll-ops-tbl-td coll-ops-tbl-td--ops" data-label="İşlem">
         <div className="coll-ops-tbl-ops" onClick={stop} onKeyDown={stop} role="presentation">
           {hasPhone ? (
             <a className="coll-ops-tbl-op" href={telHref ?? undefined}>
