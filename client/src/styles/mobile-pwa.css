@@ -45,7 +45,8 @@
   z-index: 40;
   background: rgba(255, 255, 255, 0.96);
   border-top: 1px solid var(--mos-line, #e2e6ed);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* P2-11: fallback 0px — env() desteklemeyen tarayicida deklarasyon dusmez. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   backdrop-filter: blur(10px);
 }
 
@@ -286,7 +287,7 @@
   }
 
   .mos-mobile-pwa .mos-content {
-    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
   }
 
   .mos-mobile-pwa .mos-erp-tbl-wrap {
@@ -360,7 +361,7 @@
   .mos-mobile-pwa .mos-input,
   .mos-mobile-pwa .cc-v2-input {
     scroll-margin-top: 4.75rem;
-    scroll-margin-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+    scroll-margin-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -514,7 +515,7 @@
 @media (max-width: 767px) {
   .mos-mobile-pwa .mos-mobile-fab {
     /* Tab bar (~3.5rem) uzerinde net bosluk; cihaz safe-area'si dahil. */
-    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
   }
 
   .mos-mobile-pwa .mos-mobile-fab:focus-visible {
