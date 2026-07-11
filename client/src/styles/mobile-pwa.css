@@ -436,6 +436,22 @@
   }
 }
 
+/* ——— P0-4 Touch target ≥44px: mevcut kurallarda kapsanmayan tiklanabilir alanlar ———
+   Touch cihaz genisligi (max-width:1024) esas alinir — bu dosyadaki mevcut touch
+   kurali (satir 250) ile ayni konvansiyon. Desktop (>1024) etkilenmez;
+   layout/logic/API degismez, yalnizca min boyut buyutulur. */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-icon-btn,
+  .mos-mobile-pwa .mos-quick-action-btn,
+  .mos-mobile-pwa .mos-sidebar-close,
+  .mos-mobile-pwa .mos-nav-item,
+  .mos-mobile-pwa .coll-ops-left__btn,
+  .mos-mobile-pwa .mos-erp-filters__btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* ——— Offline banner PWA ——— */
 .mos-offline-banner--pwa {
   position: sticky;
