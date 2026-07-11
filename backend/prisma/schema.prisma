@@ -245,6 +245,9 @@ model PaymentTransaction {
   mailOrderSupplierNameSnapshot String?
   mailOrderSupplier Supplier? @relation(fields: [mailOrderSupplierId], references: [id], onDelete: SetNull)
 
+  /// Enterprise 2.2 — Saha operasyonu tahsilat köprüsü (referans; tahsilat SSOT burada kalır)
+  fieldOperationLinks FieldOperationPaymentLink[]
+
   @@index([salesOrderId])
   @@index([mailOrderSupplierId])
   @@map("payment_transactions")
@@ -567,4 +570,247 @@ model AIToolExecution {
   @@index([status, createdAt(sort: Desc)])
   @@index([orderId])
   @@map("ai_tool_executions")
+}
+
+// ============================================================================
+// Enterprise 2.2 — SAHA OPERASYON MERKEZİ (Field Operation Core Model)
+// Kural: SSOT değişmez. Sipariş/sevk/tahsilat/SSH verisi kendi modüllerinde kalır;
+// FieldOperation bu kayıtları referanslar (kopyalamaz). Durum/tip String + TS
+// constant (repo konvansiyonu; ayrı lookup tablosu yok). Soft delete + version +
+// append-only timeline + audit (createdBy/updatedBy) standarttır.
+// ============================================================================
+
+/// Saha operasyonunun ana kaydı (tüm saha iş türleri için tek SSOT — süreç)
+model FieldOperation {
+  id                String    @id @default(uuid())
+  operationNumber   String    @unique
+  type              String
+  status            String    @default("PLANNED")
+  priority          String    @default("NORMAL")
+  title             String
+  description       String?
+  /// Kaynak referansları (FK değil; ilgili modül SSOT'u değişmez)
+  orderId           String?
+  shipmentPlanId    String?
+  serviceRecordId   String?
+  customerId        String?
+  addressId         String?
+  plannedDate       DateTime? @db.Date
+  plannedStartTime  String?
+  plannedEndTime    String?
+  actualStartTime   DateTime?
+  actualEndTime     DateTime?
+  assignedTeamId    String?
+  assignedVehicleId String?
+  requiresPhoto     Boolean   @default(false)
+  requiresSignature Boolean   @default(false)
+  requiresPayment   Boolean   @default(false)
+  requiresLocation  Boolean   @default(false)
+  /// Duplicate guard: aktifken `${sourceType}:${sourceId}:${type}`; terminal/silinince NULL
+  dedupeKey         String?   @unique
+  createdByUserId   String?
+  updatedByUserId   String?
+  version           Int       @default(1)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  tasks             FieldTask[]
+  assignments       FieldOperationAssignment[]
+  vehicles          FieldOperationVehicle[]
+  timeline          FieldOperationTimeline[]
+  evidence          FieldOperationEvidence[]
+  issues            FieldOperationIssue[]
+  partRequests      FieldOperationPartRequest[]
+  paymentLinks      FieldOperationPaymentLink[]
+  customerApprovals FieldOperationCustomerApproval[]
+
+  @@index([status, plannedDate])
+  @@index([type, status])
+  @@index([orderId])
+  @@index([shipmentPlanId])
+  @@index([assignedTeamId])
+  @@index([deletedAt])
+  @@map("field_operations")
+}
+
+/// Saha operasyonu alt görevi (opsiyonel kırılım)
+model FieldTask {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  title            String
+  status           String         @default("PLANNED")
+  sequence         Int            @default(0)
+  assignedUserId   String?
+  note             String?
+  createdByUserId  String?
+  updatedByUserId  String?
+  version          Int            @default(1)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, sequence])
+  @@map("field_tasks")
+}
+
+/// Personel ataması (kim → hangi rolde; kim atadı audit'i)
+model FieldOperationAssignment {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  userId           String
+  role             String
+  assignedAt       DateTime       @default(now())
+  unassignedAt     DateTime?
+  assignedByUserId String?
+  isPrimary        Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([fieldOperationId, role])
+  @@index([userId])
+  @@map("field_operation_assignments")
+}
+
+/// Ekip tanımı (lider + üyeler ataması FieldOperationAssignment üzerinden)
+model FieldOperationTeam {
+  id           String    @id @default(uuid())
+  name         String
+  active       Boolean   @default(true)
+  leaderUserId String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@index([active])
+  @@map("field_operation_teams")
+}
+
+/// Araç ilişki tablosu (araç master YOK → vehicleId serbest referans)
+model FieldOperationVehicle {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  vehicleId        String
+  assignedAt       DateTime       @default(now())
+  releasedAt       DateTime?
+
+  @@index([fieldOperationId])
+  @@index([vehicleId])
+  @@map("field_operation_vehicles")
+}
+
+/// Append-only zaman çizelgesi (durum geçişi + saha olayları). Güncellenmez/silinmez.
+model FieldOperationTimeline {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  eventType        String
+  fromStatus       String?
+  toStatus         String?
+  note             String?
+  actorUserId      String?
+  latitude         Float?
+  longitude        Float?
+  occurredAt       DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+
+  @@index([fieldOperationId, occurredAt])
+  @@map("field_operation_timelines")
+}
+
+/// Kanıt (foto/imza/belge) — bu sprintte yalnızca model; upload akışı yok
+model FieldOperationEvidence {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  type             String
+  fileUrl          String
+  fileName         String?
+  mimeType         String?
+  sizeBytes        Int?
+  latitude         Float?
+  longitude        Float?
+  capturedAt       DateTime?
+  uploadedByUserId String?
+  createdAt        DateTime       @default(now())
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, type])
+  @@map("field_operation_evidences")
+}
+
+/// Saha sorunu (eksik/hasar/adres vb.)
+model FieldOperationIssue {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  type             String
+  severity         String         @default("MEDIUM")
+  description      String?
+  status           String         @default("OPEN")
+  reportedByUserId String?
+  assignedToUserId String?
+  resolvedAt       DateTime?
+  resolutionNote   String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, status])
+  @@map("field_operation_issues")
+}
+
+/// Eksik parça talebi (SSH/OrderMissingItem ile ileride köprülenir)
+model FieldOperationPartRequest {
+  id                String         @id @default(uuid())
+  fieldOperationId  String
+  fieldOperation    FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  productId         String?
+  quantity          Int            @default(1)
+  reason            String?
+  status            String         @default("REQUESTED")
+  requestedByUserId String?
+  approvedByUserId  String?
+  approvedAt        DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  @@index([fieldOperationId, status])
+  @@map("field_operation_part_requests")
+}
+
+/// Tahsilat köprüsü — PaymentTransaction (SSOT) referansı; yeni ödeme sistemi YOK
+model FieldOperationPaymentLink {
+  id                   String             @id @default(uuid())
+  fieldOperationId     String
+  fieldOperation       FieldOperation     @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  paymentTransactionId String
+  paymentTransaction   PaymentTransaction @relation(fields: [paymentTransactionId], references: [id], onDelete: Cascade)
+  createdAt            DateTime           @default(now())
+
+  @@unique([fieldOperationId, paymentTransactionId])
+  @@index([paymentTransactionId])
+  @@map("field_operation_payment_links")
+}
+
+/// Müşteri onayı / imza kaydı
+model FieldOperationCustomerApproval {
+  id                  String         @id @default(uuid())
+  fieldOperationId    String
+  fieldOperation      FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  customerName        String?
+  approvalType        String?
+  approved            Boolean        @default(false)
+  signatureEvidenceId String?
+  note                String?
+  approvedAt          DateTime?
+  createdAt           DateTime       @default(now())
+
+  @@index([fieldOperationId])
+  @@map("field_operation_customer_approvals")
 }
