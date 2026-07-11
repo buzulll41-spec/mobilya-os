@@ -47,6 +47,11 @@ export default function LoginPage({ onLoggedIn }) {
           <input
             type="email"
             autoComplete="username"
+            inputMode="email"
+            enterKeyHint="next"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="ornek@mobilya.local"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -57,6 +62,7 @@ export default function LoginPage({ onLoggedIn }) {
           <input
             type="password"
             autoComplete="current-password"
+            enterKeyHint="go"
             placeholder="demo şifresi"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

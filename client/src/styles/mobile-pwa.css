@@ -354,6 +354,18 @@
   .mos-mobile-pwa .coll-ops-left {
     max-height: 8rem;
   }
+
+  /* Klavye açılınca native focus-scroll odaklanan alanı sticky topbar/offline banner
+     (üst) ve sticky save-bar + alt tab bar (alt) arkasında bırakmasın. scroll-margin
+     yalnızca scrollIntoView davranışını etkiler; layout/logic değişmez. */
+  .mos-mobile-pwa input,
+  .mos-mobile-pwa select,
+  .mos-mobile-pwa textarea,
+  .mos-mobile-pwa .mos-input,
+  .mos-mobile-pwa .cc-v2-input {
+    scroll-margin-top: 4.75rem;
+    scroll-margin-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* ——— Tablet: iki kolon liste + detay ——— */

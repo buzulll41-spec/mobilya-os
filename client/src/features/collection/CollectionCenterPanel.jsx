@@ -356,6 +356,8 @@ export default function CollectionCenterPanel({
                       onChange={(e) => setPayNote(e.target.value)}
                       disabled={mutating}
                       maxLength={200}
+                      autoComplete="off"
+                      enterKeyHint="done"
                       placeholder="Kapora, taksit, havale referansı…"
                     />
                   </label>
