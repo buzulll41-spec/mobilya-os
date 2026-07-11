@@ -127,7 +127,11 @@ describe.skipIf(!hasDb)('shipment operations integration', () => {
     body = await advanceTo(SHIPMENT_OPERATION_STATUS.DISPATCHED)
     expect(body.shipment.status).toBe(SHIPMENT_OPERATION_STATUS.DISPATCHED)
 
-    body = await advanceTo(SHIPMENT_OPERATION_STATUS.DELIVERED)
+    body = await advanceTo(SHIPMENT_OPERATION_STATUS.DELIVERED, {
+      deliveredBy: 'Ekip A',
+      vehicle: 'Kamyon 12',
+      deliveredAt: '2026-05-21',
+    })
     expect(body.shipment.status).toBe(SHIPMENT_OPERATION_STATUS.DELIVERED)
     expect(body.order.displayStatus).toBe('Teslim Edildi')
     expect(body.order.installationPending).toBe(true)

@@ -113,6 +113,14 @@ describe.skipIf(!hasDb)('commerce E2E chain (API)', () => {
     })
     expect(blocked.statusCode).toBe(400)
 
+    // Depo girişi öncesi tedarik emri zorunlu (iş kuralı): önce supply-order confirm.
+    const supplyConfirm = await app.inject({
+      method: 'POST',
+      url: `/v1/orders/${orderId}/supply-order/confirm`,
+      payload: { lineIds: [lineId], channel: 'MAIL' },
+    })
+    expect(supplyConfirm.statusCode).toBe(200)
+
     const incoming = await app.inject({
       method: 'POST',
       url: '/v1/incoming-goods',
@@ -174,7 +182,15 @@ describe.skipIf(!hasDb)('commerce E2E chain (API)', () => {
         customerName: 'MO API Parity',
         paidAmount: 8000,
         status: 'Bekleniyor',
-        lines: [{ title: 'Sandalye', quantity: 2, unitPrice: 4000, sortOrder: 0 }],
+        lines: [
+          {
+            title: 'Sandalye',
+            quantity: 2,
+            unitPrice: 4000,
+            sortOrder: 0,
+            configuration: { fabricBrand: 'Test Kumaş' },
+          },
+        ],
         paymentMethod: 'MAIL_ORDER',
         mailOrderCustomerId: 'Kart',
         mailOrderSupplierId: supplier!.id,

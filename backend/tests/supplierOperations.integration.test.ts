@@ -40,6 +40,13 @@ describe.skipIf(!hasDb)('supplier operations integration', () => {
     const lines = await prisma.orderLine.findMany({ where: { salesOrderId: orderId } })
     orderLineId = lines[0].id
 
+    // Depo girişi öncesi tedarik emri zorunlu (iş kuralı): önce supply-order confirm.
+    await app.inject({
+      method: 'POST',
+      url: `/v1/orders/${orderId}/supply-order/confirm`,
+      payload: { lineIds: [orderLineId], channel: 'MAIL' },
+    })
+
     await app.inject({
       method: 'POST',
       url: '/v1/incoming-goods',

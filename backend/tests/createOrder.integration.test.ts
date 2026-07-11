@@ -379,7 +379,15 @@ describe.skipIf(!hasDb)('POST /v1/orders integration', () => {
         customerName: 'Mail Order Integration',
         paidAmount: 8000,
         status: 'Bekleniyor',
-        lines: [{ title: 'Sandalye', quantity: 2, unitPrice: 4000, sortOrder: 0 }],
+        lines: [
+          {
+            title: 'Sandalye',
+            quantity: 2,
+            unitPrice: 4000,
+            sortOrder: 0,
+            configuration: { fabricBrand: 'Test Kumaş' },
+          },
+        ],
         paymentMethod: 'MAIL_ORDER',
         paymentNote: 'Kart tahsilatı',
         mailOrderCustomerId: 'Kart Sahibi Test',

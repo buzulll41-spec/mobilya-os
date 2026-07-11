@@ -63,7 +63,15 @@ describe.skipIf(!hasDb)('incoming goods integration', () => {
         totalAmount: 18_000,
         paidAmount: 0,
         status: 'Üretimde',
-        lines: [{ title: '6 Sandalye', quantity: 6, unitPrice: 3000, sortOrder: 0 }],
+        lines: [
+          {
+            title: '6 Sandalye',
+            quantity: 6,
+            unitPrice: 3000,
+            sortOrder: 0,
+            configuration: { fabricBrand: 'Test Kumaş' },
+          },
+        ],
       },
     })
     const orderBody = orderRes.json() as { id: string }
@@ -173,13 +181,14 @@ describe.skipIf(!hasDb)('incoming goods integration', () => {
     line = await prisma.orderLine.findUniqueOrThrow({ where: { id: orderLineId } })
     expect(line.qtyReceived.toString()).toBe('6')
 
+    // Tüm satırlar depoda + tedarik gönderilmiş → otomatik "Sevke Hazır" (autoShipmentReady).
     const orderAfterFull = await prisma.salesOrder.findUniqueOrThrow({ where: { id: orderId } })
-    expect(orderAfterFull.displayStatus).toBe('Geldi')
+    expect(orderAfterFull.displayStatus).toBe('Sevke Hazır')
 
     const listRes = await app.inject({ method: 'GET', url: '/v1/orders' })
     const listItems = listRes.json() as { id: string; displayStatus: string }[]
     const listRow = listItems.find((row) => row.id === orderId)
-    expect(listRow?.displayStatus).toBe('Geldi')
+    expect(listRow?.displayStatus).toBe('Sevke Hazır')
   })
 
   it('teşhir + ödeme sonrası bakiye', async () => {
