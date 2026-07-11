@@ -1,0 +1,38 @@
+---
+description: MOBILYA OS degismez mimari kurallari (tek backend/logic/domain/API/source-of-truth; cihazlar sadece view)
+alwaysApply: true
+---
+
+# MOBILYA OS — Değişmez Mimari Kuralları (KİLİTLİ)
+
+Bu kurallar bağlayıcıdır. Tüm yeni geliştirmeler buna uymak zorundadır.
+
+## Değişmezler
+1. **Tek Backend** — Tek bir backend uygulaması.
+2. **Tek Business Logic** — İş kuralları tek yerde; kopyalanmaz.
+3. **Tek Domain Model** — Tek domain/DB modeli.
+4. **Tek API** — Tek API sözleşmesi.
+5. **Tek Source of Truth** — Tek veri kaynağı.
+6. **Desktop / Tablet / Telefon aynı veriyi kullanır.** Yalnızca **View** değişir.
+
+## Yasaklar
+- ❌ Cihaza özel business logic YAZILMAZ.
+- ❌ Cihaza özel API YAZILMAZ.
+- ❌ Cihaza özel database/domain modeli OLUŞTURULMAZ.
+- ❌ Aynı iş kuralının cihaza göre ikinci bir kopyası YAZILMAZ.
+- ✅ Responsive yalnızca **sunum katmanında** (view/CSS/layout, `useViewportTier()` vb.) olur.
+
+## Uygulama
+- Bu kurala aykırı bir durum görürsen **RAPORLA** (dosya:satır ile).
+- Düzeltme gerekiyorsa **önce onay iste**; onaysız aykırılık düzeltmesi yapma.
+
+## Örnek
+```js
+// ❌ YANLIŞ — cihaza özel iş mantığı
+function getMobileOrderTotal(o) { /* farklı hesap */ }
+function getDesktopOrderTotal(o) { /* farklı hesap */ }
+
+// ✅ DOĞRU — tek iş mantığı, view farkı sunumda
+import { getOrderTotal } from '@/application/orderFinance' // tek kaynak
+// Mobil ve masaüstü aynı getOrderTotal'ı çağırır; sadece render değişir.
+```
