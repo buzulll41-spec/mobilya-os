@@ -462,3 +462,39 @@
 .mos-offline-banner--pwa strong {
   font-weight: 700;
 }
+
+/* ——— P1-5 Bottom navigation: aktif durum netligi + esit yerlesim (telefon) ———
+   Alt tab bar yalnizca telefonda (≤767) gorunur. Yeni sekme/route eklenmez;
+   yalnizca gorsel netlik ve dokunma konforu artirilir. Logic/API degismez. */
+@media (max-width: 767px) {
+  /* 5 sekme tam genislige esit yayilir; kazara yatay scroll olmaz. */
+  .mos-mobile-pwa .mos-mobile-tabbar__list {
+    overflow-x: visible;
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn {
+    position: relative;
+  }
+
+  /* Aktif sekme: ust aksan cizgisi + kalin etiket + ikon tint. */
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true'] {
+    font-weight: 700;
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true']::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.75rem;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--mos-accent, #863bff);
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true'] .mos-mobile-tabbar__icon {
+    background: #ede6ff;
+    color: var(--mos-accent, #863bff);
+  }
+}
