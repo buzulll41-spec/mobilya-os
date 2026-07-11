@@ -1,0 +1,18 @@
+---
+description: MOBILYA OS sprint disiplini — tek konu/commit/rollback/risk, <1000 satir, her sprint sonunda deploy edilebilir
+alwaysApply: true
+---
+
+# Sprint Disiplini (KİLİTLİ)
+
+- **Tek konu**: Her sprint yalnızca tek bir konuya odaklanır.
+- **Tek commit / tek rollback**: Değişiklik tek commit'e sığar ve tek adımda geri alınabilir olur.
+- **Tek risk**: Aynı anda birden fazla riskli değişiklik yapılmaz.
+- **<1000 satır**: Hiçbir sprintte 1000 satırdan büyük refactor yapılmaz. Büyükse böl.
+- **Her zaman deploy edilebilir**: Sprint sonunda sistem deploy edilebilir kalır; **kırık build bırakılmaz**.
+- **Yeşil gate**: Her önemli değişiklikten sonra `npm run build`, `npm test`, `lint` çalıştırılır ve yeşil olmalıdır.
+
+## Riskli/tasarım gerektiren işlerde
+- Önce **analiz + mevcut/hedef akış diyagramı + etkilenen dosyalar + risk analizi** sun.
+- **Kullanıcı onayı olmadan kod yazma.**
+- Onaydan sonra küçük, geri-alınabilir adımlarla ilerle.

@@ -1,12 +1,9 @@
 import { DEMO_TODAY } from '../../data/constants.js'
-import { computeDashboardKpis, formatTry } from '../../data/dashboardHelpers.js'
+import { formatTry } from '../../data/dashboardHelpers.js'
+import { computeOperationalKpis } from '../../domain/kpi/operationalKpiService.js'
 import { USER_ROLE } from '../../contracts/v1/user.js'
 import { ROLE_HOME_TITLE } from '../../constants/roleDefaults.js'
-import {
-  filterCollectionRows,
-  isCollectionCritical,
-  isCollectionOverdue,
-} from '../collection/collectionCommandCenterModel.js'
+import { filterCollectionRows } from '../collection/collectionCommandCenterModel.js'
 import { buildSshMissingPartsQueue } from '../ssh/sshMissingPartsModel.js'
 import { remainingBalance } from '../../utils/orderFinance.js'
 import {
@@ -15,10 +12,7 @@ import {
   getOrderPilotKind,
   getProductPilotKind,
 } from '../../lib/pilotRecordHeuristics.js'
-import {
-  countDelayedShipmentKpi,
-  countPendingDeliveryConfirmations,
-} from '../shipment/deliveryConfirmationQueue.js'
+import { countPendingDeliveryConfirmations } from '../shipment/deliveryConfirmationQueue.js'
 
 /** @typedef {import('../../contracts/v1/user.js').UserRole} UserRole */
 /** @typedef {import('../../data/seedOrders.js').Order} Order */
@@ -88,19 +82,23 @@ function buildMetrics(input) {
     shipmentPlans = [],
   } = input
 
-  const kpis = computeDashboardKpis(orders, listItemDtos, todayIso, shipmentPlans)
-  const openCollections = collectionRows.filter((r) => remainingBalance(r) > 0.009)
-  const criticalCollections = openCollections.filter((r) => isCollectionCritical(r, todayIso))
-  const overdueCollections = openCollections.filter((r) => isCollectionOverdue(r, todayIso))
+  const {
+    dashKpis: kpis,
+    openCollections,
+    criticalCollections,
+    overdueCollections,
+    activeOrders,
+    todayShipments,
+    delayedShipmentKpi,
+  } = computeOperationalKpis({ orders, listItemDtos, collectionRows, shipmentPlans, todayIso })
+
   const partialPayments = filterCollectionRows(openCollections, 'partial', todayIso)
   const noPayments = filterCollectionRows(openCollections, 'none', todayIso)
   const openBalanceTotal = openCollections.reduce((s, r) => s + remainingBalance(r), 0)
 
-  const activeOrders = orders.filter((o) => o.status !== 'Teslim Edildi')
   const overdueShipments = activeOrders.filter(
     (o) => o.shipmentDate && o.shipmentDate < todayIso,
   )
-  const todayShipments = activeOrders.filter((o) => o.shipmentDate === todayIso)
   const readyForInstall = activeOrders.filter((o) => o.status === 'Hazır')
   const readyToDeliver = activeOrders.filter(
     (o) => o.shipmentDate && o.shipmentDate <= todayIso && o.status !== 'Teslim Edildi',
@@ -118,7 +116,6 @@ function buildMetrics(input) {
   const readySsh = sshQueue.filter((c) => c.uiStatus === 'ready' || c.uiStatus === 'arrived')
 
   const pendingDeliveryConfirmations = countPendingDeliveryConfirmations(shipmentPlans)
-  const delayedShipmentKpi = countDelayedShipmentKpi(shipmentPlans)
 
   return {
     kpis,

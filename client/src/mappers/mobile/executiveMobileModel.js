@@ -1,11 +1,8 @@
 import { addDays } from '../../data/constants.js'
-import { computeDashboardKpis, formatTry } from '../../data/dashboardHelpers.js'
+import { formatTry } from '../../data/dashboardHelpers.js'
+import { computeOperationalKpis } from '../../domain/kpi/operationalKpiService.js'
 import { buildExecutiveCommandCenterView } from '../executive/executiveCommandCenterModel.js'
 import { buildCeoLiveFeed } from '../executive/ceoExperienceModel.js'
-import {
-  isCollectionCritical,
-  isCollectionOverdue,
-} from '../collection/collectionCommandCenterModel.js'
 import { remainingBalance } from '../../utils/orderFinance.js'
 
 /** @typedef {import('../../contracts/v1/enterpriseCommandCenter.js').EnterpriseCommandCenterResponseDto} EnterpriseCommandCenterResponseDto */
@@ -109,16 +106,15 @@ export function buildExecutiveMobileView(input) {
     todayIso,
   })
 
-  const dashKpis = computeDashboardKpis(orders, listItemDtos, todayIso, shipmentPlans)
+  const {
+    dashKpis,
+    overdueCollections,
+    criticalCollections,
+    todayShipments,
+  } = computeOperationalKpis({ orders, listItemDtos, collectionRows, shipmentPlans, todayIso })
   const trends = eccView.operationTrends
 
-  const openCollections = collectionRows.filter((r) => remainingBalance(r) > 0.009)
-  const overdueCollections = openCollections.filter((r) => isCollectionOverdue(r, todayIso))
-  const criticalCollections = openCollections.filter((r) => isCollectionCritical(r, todayIso))
-
-  const activeOrders = orders.filter((o) => o.status !== 'Teslim Edildi')
   const pendingOrderCount = listItemDtos.filter((d) => d.displayStatus !== 'Teslim Edildi').length
-  const todayShipments = activeOrders.filter((o) => o.shipmentDate === todayIso)
   const delayedShipments = dashKpis.delayedShipmentKpi ?? 0
   const pendingDelivery = dashKpis.pendingDeliveryConfirmations ?? 0
 

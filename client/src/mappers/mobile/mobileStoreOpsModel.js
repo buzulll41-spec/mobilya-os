@@ -1,12 +1,9 @@
 import { DEMO_TODAY } from '../../data/constants.js'
-import { computeDashboardKpis, formatTry } from '../../data/dashboardHelpers.js'
-import { remainingBalance, isTerminOverdue } from '../../utils/orderFinance.js'
+import { formatTry } from '../../data/dashboardHelpers.js'
+import { computeOperationalKpis } from '../../domain/kpi/operationalKpiService.js'
+import { isTerminOverdue } from '../../utils/orderFinance.js'
 import { formatShortDate } from '../../utils/dates.js'
-import {
-  filterCollectionRows,
-  isCollectionCritical,
-  isCollectionOverdue,
-} from '../collection/collectionCommandCenterModel.js'
+import { filterCollectionRows } from '../collection/collectionCommandCenterModel.js'
 import {
   buildCollectionLabel,
   buildOrdersOpsTableRow,
@@ -14,7 +11,6 @@ import {
   isCriticalRiskOrder,
   isOpenOrder,
 } from '../../features/orders/ordersOpsCenterUi.js'
-import { countDelayedShipmentKpi } from '../shipment/deliveryConfirmationQueue.js'
 
 /** @typedef {import('../../data/seedOrders.js').Order} Order */
 /** @typedef {import('../../contracts/v1/orderListRowVm.js').OrderListRowVM} OrderListRowVM */
@@ -103,17 +99,18 @@ export function buildMobileStoreHomeCards(input) {
   } = input
 
   const dtoById = new Map(listItemDtos.map((d) => [d.id, d]))
-  const kpis = computeDashboardKpis(orders, listItemDtos, todayIso, shipmentPlans)
+  const {
+    dashKpis: kpis,
+    openCollections,
+    criticalCollections,
+    overdueCollections,
+    activeOrders,
+    todayShipments,
+    delayedShipmentKpi: delayedShipments,
+  } = computeOperationalKpis({ orders, listItemDtos, collectionRows, shipmentPlans, todayIso })
 
-  const openCollections = collectionRows.filter((r) => remainingBalance(r) > 0.009)
   const pendingCollection = openCollections.length
-  const criticalCollections = openCollections.filter((r) => isCollectionCritical(r, todayIso))
-  const overdueCollections = openCollections.filter((r) => isCollectionOverdue(r, todayIso))
-
-  const activeOrders = orders.filter((o) => o.status !== 'Teslim Edildi')
   const todayOrders = activeOrders.filter((o) => o.orderDate === todayIso)
-  const todayShipments = activeOrders.filter((o) => o.shipmentDate === todayIso)
-  const delayedShipments = countDelayedShipmentKpi(shipmentPlans)
 
   const criticalOrders = activeOrders.filter((row) => {
     const dto = dtoById.get(row.id)
