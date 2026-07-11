@@ -1,13 +1,19 @@
 .login-page {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
+  /* svh = küçük görünüm yüksekliği: mobil tarayıcı çubuğu/klavye açılınca
+     yükseklik değişmez → ekran zıplamaz (100vh yerine). */
+  min-height: 100svh;
+  display: flex;
+  /* margin:auto ile merkezleme, içerik taşınca (klavye açık) üst kısmı da
+     scroll edilebilir tutar (flex align-items:center kırpma hatasını önler). */
+  overflow-y: auto;
   background: #f1f5f9;
-  padding: 1.5rem;
+  padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
 }
 
 .login-card {
   width: min(100%, 22rem);
+  margin: auto;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -39,14 +45,16 @@
 }
 
 .login-card__session-dismiss {
-  display: block;
+  display: inline-flex;
+  align-items: center;
   margin-top: 0.35rem;
-  font-size: 0.75rem;
+  min-height: 44px;
+  padding: 0 0.35rem;
+  font-size: 0.8rem;
   color: #c2410c;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
 }
 
 .login-field {
@@ -60,9 +68,11 @@
 }
 
 .login-field input {
-  font: inherit;
+  /* 16px: iOS Safari odakta otomatik zoom/zıplamayı engeller. */
+  font-size: 16px;
   font-weight: 400;
-  padding: 0.55rem 0.65rem;
+  min-height: 44px;
+  padding: 0.6rem 0.7rem;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
 }
