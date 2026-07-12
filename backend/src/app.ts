@@ -18,6 +18,7 @@ import { registerOptimizationRoutes } from './routes/optimizationRoutes.js'
 import { registerCollaborationRoutes } from './routes/collaborationRoutes.js'
 import { registerBoardMeetingRoutes } from './routes/boardMeetingRoutes.js'
 import { registerEnterpriseReleaseRoutes } from './routes/enterpriseReleaseRoutes.js'
+import { registerFieldOperationRoutes } from './routes/fieldOperationRoutes.js'
 import { registerEnterpriseRateLimit } from './middleware/enterpriseRateLimit.js'
 import { registerAuthHook, requireAuthUser } from './middleware/authenticateRequest.js'
 import {
@@ -418,6 +419,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerCollaborationRoutes(app, prisma)
   registerBoardMeetingRoutes(app, prisma)
   registerEnterpriseReleaseRoutes(app, prisma)
+  registerFieldOperationRoutes(app, prisma)
 
   app.get('/v1/orders/:id/domain-events', async (req) => {
     const orderId = String((req.params as { id: string }).id)

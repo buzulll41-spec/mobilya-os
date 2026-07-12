@@ -1,9 +1,9 @@
 /**
- * Enterprise 2.2 — Saha Operasyon Merkezi çekirdek servisi (domain + persistence).
+ * Enterprise 2.2 — Field Operation Command Service (create/update/soft-delete/get).
  *
- * Sadece çekirdek: oluşturma (duplicate guard + operationNumber), durum geçişi
- * (optimistic locking + append-only timeline), soft delete ve personel ataması.
- * UI / route / harita / foto upload / offline sync YOK.
+ * Durum geçişi ve atama ayrı servislerdedir; buradan facade olarak yeniden ihraç
+ * edilir (S1 API uyumluluğu). Duplicate guard + operationNumber üretimi + CREATE
+ * timeline olayı bu serviste üretilir.
  */
 
 import { Prisma, type PrismaClient } from '@prisma/client'
@@ -13,45 +13,39 @@ import {
   FIELD_OPERATION_PRIORITY,
   FIELD_OPERATION_STATUS,
   FIELD_OPERATION_TIMELINE_EVENT,
-  canTransitionFieldOperation,
-  isFieldOperationAssignmentRole,
-  isFieldOperationPriority,
-  isFieldOperationType,
-  isTerminalFieldOperationStatus,
 } from '../../constants/fieldOperationConstants.js'
 import { buildFieldOperationDedupeKey } from './fieldOperationDedupe.js'
+import { appendCreateEvent, appendFieldOperationTimeline } from './fieldOperationTimelineService.js'
+import { loadActiveFieldOperation, type FieldOperationRow } from './fieldOperationRepository.js'
+import {
+  assertValidCreateFieldOperationInput,
+  type CreateFieldOperationInput,
+  type UpdateFieldOperationInput,
+} from './fieldOperationValidationService.js'
 
-type Tx = Prisma.TransactionClient
-type FieldOperationRow = Prisma.FieldOperationGetPayload<{}>
+// S1 API uyumluluğu + tek giriş noktası (facade)
+export { transitionFieldOperationStatus } from './fieldOperationStatusTransitionService.js'
+export type { TransitionOptions } from './fieldOperationStatusTransitionService.js'
+export {
+  addFieldOperationAssignment,
+  unassignFieldOperationAssignment,
+} from './fieldOperationAssignmentService.js'
+export type { AddAssignmentInput } from './fieldOperationAssignmentService.js'
+export type { CreateFieldOperationInput } from './fieldOperationValidationService.js'
+
+type ServiceActor = { authUser?: AuthUserContext }
 
 const OPERATION_NUMBER_PREFIX = 'FO-'
 const MAX_CREATE_ATTEMPTS = 5
 
-export type CreateFieldOperationInput = {
-  type: string
-  title: string
-  priority?: string
-  description?: string | null
-  orderId?: string | null
-  shipmentPlanId?: string | null
-  serviceRecordId?: string | null
-  customerId?: string | null
-  addressId?: string | null
-  plannedDate?: Date | string | null
-  plannedStartTime?: string | null
-  plannedEndTime?: string | null
-  assignedTeamId?: string | null
-  assignedVehicleId?: string | null
-  requiresPhoto?: boolean
-  requiresSignature?: boolean
-  requiresPayment?: boolean
-  requiresLocation?: boolean
-}
-
-export type ServiceActor = { authUser?: AuthUserContext }
-
 function actorId(options?: ServiceActor): string | null {
   return options?.authUser?.id ?? null
+}
+
+function toPlannedDate(value: Date | string | null | undefined): Date | null {
+  if (!value) return null
+  const d = value instanceof Date ? value : new Date(value)
+  return Number.isNaN(d.getTime()) ? null : d
 }
 
 function isUniqueViolationOn(err: unknown, field: string): boolean {
@@ -61,58 +55,25 @@ function isUniqueViolationOn(err: unknown, field: string): boolean {
   return typeof target === 'string' && target.includes(field)
 }
 
-function normalizeText(value: unknown, max: number): string | null {
-  if (typeof value !== 'string') return null
-  const trimmed = value.trim()
-  if (!trimmed) return null
-  return trimmed.length > max ? trimmed.slice(0, max) : trimmed
+async function generateOperationNumber(prisma: PrismaClient, attempt: number): Promise<string> {
+  const count = await prisma.fieldOperation.count()
+  return `${OPERATION_NUMBER_PREFIX}${String(count + 1 + attempt).padStart(6, '0')}`
 }
 
-function toPlannedDate(value: CreateFieldOperationInput['plannedDate']): Date | null {
-  if (!value) return null
-  const d = value instanceof Date ? value : new Date(value)
-  return Number.isNaN(d.getTime()) ? null : d
-}
-
-/** Create girdisini domain kurallarına göre doğrular (400 fırlatır). */
-export function assertValidCreateFieldOperationInput(input: CreateFieldOperationInput): void {
-  const details: Record<string, string> = {}
-  if (!isFieldOperationType(input.type)) details.type = 'Geçersiz operasyon türü'
-  const title = normalizeText(input.title, 200)
-  if (!title) details.title = 'Zorunlu, max 200'
-  if (input.priority !== undefined && !isFieldOperationPriority(input.priority)) {
-    details.priority = 'Geçersiz öncelik'
-  }
-  if (Object.keys(details).length > 0) {
-    throw new AppHttpError(400, 'Saha operasyonu doğrulaması başarısız', 'Bad Request', details)
-  }
-}
-
-async function generateOperationNumber(client: PrismaClient | Tx, attempt: number): Promise<string> {
-  const count = await client.fieldOperation.count()
-  const seq = count + 1 + attempt
-  return `${OPERATION_NUMBER_PREFIX}${String(seq).padStart(6, '0')}`
-}
-
-/**
- * Yeni saha operasyonu oluşturur. Duplicate guard aktifse (kaynaklı) aynı kaynak+tip
- * için ikinci aktif operasyonu engeller (409). İlk timeline olayı (CREATED) yazılır.
- */
+/** Yeni saha operasyonu oluşturur (duplicate guard + operationNumber + CREATE timeline). */
 export async function createFieldOperation(
   prisma: PrismaClient,
-  input: CreateFieldOperationInput,
+  rawInput: CreateFieldOperationInput,
   options?: ServiceActor,
 ): Promise<FieldOperationRow> {
-  assertValidCreateFieldOperationInput(input)
-
-  const type = input.type
+  const input = assertValidCreateFieldOperationInput(rawInput)
   const dedupeKey = buildFieldOperationDedupeKey(
     {
       orderId: input.orderId ?? null,
       shipmentPlanId: input.shipmentPlanId ?? null,
       serviceRecordId: input.serviceRecordId ?? null,
     },
-    type,
+    input.type,
   )
 
   if (dedupeKey) {
@@ -135,19 +96,19 @@ export async function createFieldOperation(
         const created = await tx.fieldOperation.create({
           data: {
             operationNumber,
-            type,
+            type: input.type,
             status: FIELD_OPERATION_STATUS.PLANNED,
             priority: input.priority ?? FIELD_OPERATION_PRIORITY.NORMAL,
-            title: normalizeText(input.title, 200) as string,
-            description: normalizeText(input.description, 2000),
+            title: input.title,
+            description: input.description ?? null,
             orderId: input.orderId ?? null,
             shipmentPlanId: input.shipmentPlanId ?? null,
             serviceRecordId: input.serviceRecordId ?? null,
             customerId: input.customerId ?? null,
             addressId: input.addressId ?? null,
             plannedDate: toPlannedDate(input.plannedDate),
-            plannedStartTime: normalizeText(input.plannedStartTime, 16),
-            plannedEndTime: normalizeText(input.plannedEndTime, 16),
+            plannedStartTime: input.plannedStartTime ?? null,
+            plannedEndTime: input.plannedEndTime ?? null,
             assignedTeamId: input.assignedTeamId ?? null,
             assignedVehicleId: input.assignedVehicleId ?? null,
             requiresPhoto: input.requiresPhoto ?? false,
@@ -161,17 +122,7 @@ export async function createFieldOperation(
           },
         })
 
-        await tx.fieldOperationTimeline.create({
-          data: {
-            fieldOperationId: created.id,
-            eventType: FIELD_OPERATION_TIMELINE_EVENT.CREATED,
-            fromStatus: null,
-            toStatus: FIELD_OPERATION_STATUS.PLANNED,
-            actorUserId: createdByUserId,
-            occurredAt: now,
-          },
-        })
-
+        await appendCreateEvent(tx, created.id, FIELD_OPERATION_STATUS.PLANNED, createdByUserId, now)
         return created
       })
     } catch (err) {
@@ -180,9 +131,7 @@ export async function createFieldOperation(
           dedupeKey,
         })
       }
-      if (isUniqueViolationOn(err, 'operationNumber')) {
-        continue
-      }
+      if (isUniqueViolationOn(err, 'operationNumber')) continue
       throw err
     }
   }
@@ -190,97 +139,48 @@ export async function createFieldOperation(
   throw new AppHttpError(500, 'operationNumber üretilemedi', 'Internal Server Error')
 }
 
-export type TransitionOptions = ServiceActor & {
-  expectedVersion?: number
-  note?: string | null
-  latitude?: number | null
-  longitude?: number | null
-}
-
-async function loadActiveOperation(
+/** Operasyon alanlarını kısmi günceller (optimistic locking; durum/atama HARİÇ). */
+export async function updateFieldOperation(
   prisma: PrismaClient,
   id: string,
+  input: UpdateFieldOperationInput,
+  options?: ServiceActor,
 ): Promise<FieldOperationRow> {
-  const op = await prisma.fieldOperation.findUnique({ where: { id } })
-  if (!op || op.deletedAt) {
-    throw new AppHttpError(404, 'Saha operasyonu bulunamadı', 'Not Found', { id })
-  }
-  return op
-}
-
-/**
- * Durum geçişi uygular. Optimistic locking (version) + geçiş matrisi doğrulaması +
- * append-only timeline (STATUS_CHANGED). Terminal duruma geçişte dedupeKey NULL'lanır.
- */
-export async function transitionFieldOperationStatus(
-  prisma: PrismaClient,
-  id: string,
-  toStatus: string,
-  options?: TransitionOptions,
-): Promise<FieldOperationRow> {
-  const op = await loadActiveOperation(prisma, id)
-
-  if (options?.expectedVersion !== undefined && options.expectedVersion !== op.version) {
+  const op = await loadActiveFieldOperation(prisma, id)
+  if (input.expectedVersion !== undefined && input.expectedVersion !== op.version) {
     throw new AppHttpError(409, 'Sürüm çakışması (kayıt değişmiş)', 'Conflict', {
-      expectedVersion: options.expectedVersion,
+      expectedVersion: input.expectedVersion,
       actualVersion: op.version,
     })
   }
 
-  if (!canTransitionFieldOperation(op.status, toStatus)) {
-    throw new AppHttpError(400, 'Geçersiz durum geçişi', 'Bad Request', {
-      fromStatus: op.status,
-      toStatus,
-    })
-  }
-
-  const actor = actorId(options)
-  const now = new Date()
-  const terminal = isTerminalFieldOperationStatus(toStatus)
-
   const data: Prisma.FieldOperationUpdateManyMutationInput = {
-    status: toStatus,
     version: { increment: 1 },
-    updatedByUserId: actor,
+    updatedByUserId: actorId(options),
   }
-  if (terminal) data.dedupeKey = null
-  if (toStatus === FIELD_OPERATION_STATUS.IN_PROGRESS && !op.actualStartTime) {
-    data.actualStartTime = now
-  }
-  if (
-    (toStatus === FIELD_OPERATION_STATUS.COMPLETED || toStatus === FIELD_OPERATION_STATUS.CLOSED) &&
-    !op.actualEndTime
-  ) {
-    data.actualEndTime = now
-  }
+  if (input.title !== undefined) data.title = input.title
+  if (input.description !== undefined) data.description = input.description
+  if (input.priority !== undefined) data.priority = input.priority
+  if (input.plannedDate !== undefined) data.plannedDate = toPlannedDate(input.plannedDate)
+  if (input.plannedStartTime !== undefined) data.plannedStartTime = input.plannedStartTime
+  if (input.plannedEndTime !== undefined) data.plannedEndTime = input.plannedEndTime
+  if (input.assignedTeamId !== undefined) data.assignedTeamId = input.assignedTeamId
+  if (input.assignedVehicleId !== undefined) data.assignedVehicleId = input.assignedVehicleId
+  if (input.requiresPhoto !== undefined) data.requiresPhoto = input.requiresPhoto
+  if (input.requiresSignature !== undefined) data.requiresSignature = input.requiresSignature
+  if (input.requiresPayment !== undefined) data.requiresPayment = input.requiresPayment
+  if (input.requiresLocation !== undefined) data.requiresLocation = input.requiresLocation
 
-  return prisma.$transaction(async (tx) => {
-    const res = await tx.fieldOperation.updateMany({
-      where: { id, version: op.version, deletedAt: null },
-      data,
-    })
-    if (res.count === 0) {
-      throw new AppHttpError(409, 'Sürüm çakışması (kayıt değişmiş)', 'Conflict', {
-        actualVersion: op.version,
-      })
-    }
-
-    await tx.fieldOperationTimeline.create({
-      data: {
-        fieldOperationId: id,
-        eventType: FIELD_OPERATION_TIMELINE_EVENT.STATUS_CHANGED,
-        fromStatus: op.status,
-        toStatus,
-        note: normalizeText(options?.note, 1000),
-        actorUserId: actor,
-        latitude: options?.latitude ?? null,
-        longitude: options?.longitude ?? null,
-        occurredAt: now,
-      },
-    })
-
-    return tx.fieldOperation.findUniqueOrThrow({ where: { id } })
+  const res = await prisma.fieldOperation.updateMany({
+    where: { id, version: op.version, deletedAt: null },
+    data,
   })
+  if (res.count === 0) {
+    throw new AppHttpError(409, 'Sürüm çakışması (kayıt değişmiş)', 'Conflict', {
+      actualVersion: op.version,
+    })
+  }
+  return prisma.fieldOperation.findUniqueOrThrow({ where: { id } })
 }
 
 /** Soft delete: deletedAt işaretlenir, dedupeKey NULL'lanır, timeline'a olay yazılır. */
@@ -289,7 +189,7 @@ export async function softDeleteFieldOperation(
   id: string,
   options?: ServiceActor & { expectedVersion?: number },
 ): Promise<void> {
-  const op = await loadActiveOperation(prisma, id)
+  const op = await loadActiveFieldOperation(prisma, id)
   if (options?.expectedVersion !== undefined && options.expectedVersion !== op.version) {
     throw new AppHttpError(409, 'Sürüm çakışması (kayıt değişmiş)', 'Conflict', {
       expectedVersion: options.expectedVersion,
@@ -303,79 +203,28 @@ export async function softDeleteFieldOperation(
   await prisma.$transaction(async (tx) => {
     const res = await tx.fieldOperation.updateMany({
       where: { id, version: op.version, deletedAt: null },
-      data: {
-        deletedAt: now,
-        dedupeKey: null,
-        version: { increment: 1 },
-        updatedByUserId: actor,
-      },
+      data: { deletedAt: now, dedupeKey: null, version: { increment: 1 }, updatedByUserId: actor },
     })
     if (res.count === 0) {
       throw new AppHttpError(409, 'Sürüm çakışması (kayıt değişmiş)', 'Conflict', {
         actualVersion: op.version,
       })
     }
-
-    await tx.fieldOperationTimeline.create({
-      data: {
-        fieldOperationId: id,
-        eventType: FIELD_OPERATION_TIMELINE_EVENT.SOFT_DELETED,
-        fromStatus: op.status,
-        toStatus: null,
-        actorUserId: actor,
-        occurredAt: now,
-      },
+    await appendFieldOperationTimeline(tx, {
+      fieldOperationId: id,
+      eventType: FIELD_OPERATION_TIMELINE_EVENT.SOFT_DELETED,
+      fromStatus: op.status,
+      toStatus: null,
+      actorUserId: actor,
+      occurredAt: now,
     })
   })
 }
 
-export type AddAssignmentInput = {
-  userId: string
-  role: string
-  isPrimary?: boolean
-}
-
-/** Personel ataması ekler (kim atadı audit'i + timeline ASSIGNMENT_ADDED). */
-export async function addFieldOperationAssignment(
+/** Tek operasyonu döndürür (silinmişse 404). */
+export async function getFieldOperationById(
   prisma: PrismaClient,
   id: string,
-  input: AddAssignmentInput,
-  options?: ServiceActor,
-): Promise<Prisma.FieldOperationAssignmentGetPayload<{}>> {
-  await loadActiveOperation(prisma, id)
-
-  const userId = normalizeText(input.userId, 64)
-  if (!userId) {
-    throw new AppHttpError(400, 'userId zorunlu', 'Bad Request', { userId: 'Zorunlu' })
-  }
-  if (!isFieldOperationAssignmentRole(input.role)) {
-    throw new AppHttpError(400, 'Geçersiz atama rolü', 'Bad Request', { role: input.role })
-  }
-
-  const assignedByUserId = actorId(options)
-  const now = new Date()
-
-  return prisma.$transaction(async (tx) => {
-    const assignment = await tx.fieldOperationAssignment.create({
-      data: {
-        fieldOperationId: id,
-        userId,
-        role: input.role,
-        isPrimary: input.isPrimary ?? false,
-        assignedByUserId,
-      },
-    })
-
-    await tx.fieldOperationTimeline.create({
-      data: {
-        fieldOperationId: id,
-        eventType: FIELD_OPERATION_TIMELINE_EVENT.ASSIGNMENT_ADDED,
-        note: `${input.role}:${userId}`,
-        actorUserId: assignedByUserId,
-        occurredAt: now,
-      },
-    })
-
-    return assignment
-  })
+): Promise<FieldOperationRow> {
+  return loadActiveFieldOperation(prisma, id)
 }

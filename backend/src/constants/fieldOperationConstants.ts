@@ -126,14 +126,44 @@ export const FIELD_OPERATION_PART_REQUEST_STATUS = {
   DELIVERED: 'DELIVERED',
 } as const
 
-/** Timeline olay türleri. */
+/**
+ * Timeline olay türleri (S2 semantik yaşam döngüsü olayları).
+ * S1 anahtarları (CREATED/ASSIGNMENT_ADDED/ASSIGNMENT_REMOVED) geriye dönük uyum için
+ * aynı değerlere alias'lanır.
+ */
 export const FIELD_OPERATION_TIMELINE_EVENT = {
-  CREATED: 'CREATED',
+  CREATE: 'CREATE',
+  ASSIGN: 'ASSIGN',
+  UNASSIGN: 'UNASSIGN',
   STATUS_CHANGED: 'STATUS_CHANGED',
-  ASSIGNMENT_ADDED: 'ASSIGNMENT_ADDED',
-  ASSIGNMENT_REMOVED: 'ASSIGNMENT_REMOVED',
+  ON_THE_WAY: 'ON_THE_WAY',
+  ARRIVED: 'ARRIVED',
+  STARTED: 'STARTED',
+  PAUSED: 'PAUSED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
   SOFT_DELETED: 'SOFT_DELETED',
+  // S1 geriye dönük uyum aliasları (aynı değere işaret eder)
+  CREATED: 'CREATE',
+  ASSIGNMENT_ADDED: 'ASSIGN',
+  ASSIGNMENT_REMOVED: 'UNASSIGN',
 } as const
+
+/** Durum → semantik timeline olayı eşlemesi (yoksa STATUS_CHANGED). */
+const STATUS_TIMELINE_EVENT: Readonly<Record<string, string>> = {
+  ON_THE_WAY: FIELD_OPERATION_TIMELINE_EVENT.ON_THE_WAY,
+  ARRIVED: FIELD_OPERATION_TIMELINE_EVENT.ARRIVED,
+  IN_PROGRESS: FIELD_OPERATION_TIMELINE_EVENT.STARTED,
+  BLOCKED: FIELD_OPERATION_TIMELINE_EVENT.PAUSED,
+  WAITING: FIELD_OPERATION_TIMELINE_EVENT.PAUSED,
+  COMPLETED: FIELD_OPERATION_TIMELINE_EVENT.COMPLETED,
+  CANCELLED: FIELD_OPERATION_TIMELINE_EVENT.CANCELLED,
+}
+
+/** Bir hedef duruma geçişin üreteceği timeline olay türünü döndürür. */
+export function timelineEventForStatus(toStatus: string): string {
+  return STATUS_TIMELINE_EVENT[toStatus] ?? FIELD_OPERATION_TIMELINE_EVENT.STATUS_CHANGED
+}
 
 /** Duplicate guard için kaynak türleri (öncelik sırasıyla türetilir). */
 export const FIELD_OPERATION_SOURCE_TYPE = {

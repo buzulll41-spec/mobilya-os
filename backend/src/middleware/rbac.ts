@@ -56,6 +56,12 @@ export const PERM = {
   USERS_MANAGE: 'users:manage',
   WOO_CONNECTIONS_READ: 'woo_connections:read',
   WOO_CONNECTIONS_WRITE: 'woo_connections:write',
+  // Enterprise 2.2 — Saha Operasyon Merkezi
+  FIELD_OPS_READ: 'field_ops:read',
+  FIELD_OPS_WRITE: 'field_ops:write',
+  FIELD_OPS_STATUS: 'field_ops:status',
+  FIELD_OPS_ASSIGN: 'field_ops:assign',
+  FIELD_OPS_DELETE: 'field_ops:delete',
 } as const
 
 export type Permission = (typeof PERM)[keyof typeof PERM]
@@ -107,6 +113,10 @@ const ROLE_PERMISSIONS: Record<UserRole, Set<string>> = {
     PERM.STRATEGIC_INTELLIGENCE_READ,
     PERM.BUSINESS_RULES_READ,
     PERM.WOO_CONNECTIONS_READ,
+    PERM.FIELD_OPS_READ,
+    PERM.FIELD_OPS_WRITE,
+    PERM.FIELD_OPS_STATUS,
+    PERM.FIELD_OPS_ASSIGN,
   ]),
   [USER_ROLE.WAREHOUSE]: new Set([
     PERM.AUTH_SESSION,
@@ -117,6 +127,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Set<string>> = {
     PERM.INCOMING_WRITE,
     PERM.SUPPLIERS_READ,
     PERM.PRODUCTS_READ,
+    PERM.FIELD_OPS_READ,
+    PERM.FIELD_OPS_STATUS,
   ]),
   [USER_ROLE.SERVICE]: new Set([
     PERM.AUTH_SESSION,
@@ -126,6 +138,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Set<string>> = {
     PERM.MISSING_WRITE,
     PERM.SHIPMENTS_READ,
     PERM.REPORTS_READ,
+    PERM.FIELD_OPS_READ,
+    PERM.FIELD_OPS_WRITE,
+    PERM.FIELD_OPS_STATUS,
   ]),
   [USER_ROLE.FINANCE]: new Set([
     PERM.AUTH_SESSION,
@@ -318,6 +333,15 @@ const ROUTE_RULES: RouteRule[] = [
 
   { methods: ['GET'], pattern: /^\/v1\/admin\/woo-connections/, permission: PERM.WOO_CONNECTIONS_READ },
   { methods: ['PUT', 'POST'], pattern: /^\/v1\/admin\/woo-connections/, permission: PERM.WOO_CONNECTIONS_WRITE },
+
+  // Enterprise 2.2 — Saha Operasyon Merkezi (spesifik kurallar genelden önce)
+  { methods: ['POST'], pattern: /^\/v1\/field-operations\/[^/]+\/transition$/, permission: PERM.FIELD_OPS_STATUS },
+  { methods: ['POST'], pattern: /^\/v1\/field-operations\/[^/]+\/assignments$/, permission: PERM.FIELD_OPS_ASSIGN },
+  { methods: ['DELETE'], pattern: /^\/v1\/field-operations\/[^/]+\/assignments\/[^/]+$/, permission: PERM.FIELD_OPS_ASSIGN },
+  { methods: ['GET'], pattern: /^\/v1\/field-operations/, permission: PERM.FIELD_OPS_READ },
+  { methods: ['POST'], pattern: /^\/v1\/field-operations$/, permission: PERM.FIELD_OPS_WRITE },
+  { methods: ['PATCH'], pattern: /^\/v1\/field-operations\/[^/]+$/, permission: PERM.FIELD_OPS_WRITE },
+  { methods: ['DELETE'], pattern: /^\/v1\/field-operations\/[^/]+$/, permission: PERM.FIELD_OPS_DELETE },
 ]
 
 export function resolveRoutePermission(method: string, path: string): Permission | null {
