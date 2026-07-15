@@ -40,3 +40,26 @@ export function useViewportTier() {
 
   return tier
 }
+
+/** @returns {boolean} */
+export function isCompactPhoneViewport() {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(max-width: 479px)').matches
+}
+
+/** @returns {boolean} */
+export function useCompactPhoneViewport() {
+  const [isCompactPhone, setIsCompactPhone] = useState(isCompactPhoneViewport)
+
+  useEffect(() => {
+    function sync() {
+      setIsCompactPhone(isCompactPhoneViewport())
+    }
+
+    sync()
+    window.addEventListener('resize', sync)
+    return () => window.removeEventListener('resize', sync)
+  }, [])
+
+  return isCompactPhone
+}

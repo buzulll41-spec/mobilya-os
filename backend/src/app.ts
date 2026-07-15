@@ -269,22 +269,43 @@ function resolveCorsOrigin():
   | string
   | string[]
   | ((origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => void) {
+  const isLoopbackOrigin = (value: string) => {
+    const candidate = value.trim().toLowerCase()
+    if (!candidate) return false
+    try {
+      const host = new URL(candidate).hostname.toLowerCase()
+      return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '::1'
+    } catch {
+      return /localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]/i.test(candidate)
+    }
+  }
+
   const raw = process.env.CORS_ORIGIN ?? 'http://localhost:5173'
   const list = raw
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
+
+  if (process.env.NODE_ENV === 'production') {
+    const allowed = [...new Set(list.filter((origin) => !isLoopbackOrigin(origin)))]
+    return (origin, cb) => {
+      if (!origin || allowed.includes(origin)) {
+        cb(null, true)
+        return
+      }
+      cb(null, false)
+    }
+  }
+
   const defaults = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:4173',
+    'http://127.0.0.1:4173',
     'http://localhost:5174',
     'http://127.0.0.1:5174',
   ]
   const allowed = [...new Set([...list, ...defaults])]
-
-  if (process.env.NODE_ENV === 'production' && list.length === 1) {
-    return list[0]
-  }
 
   return (origin, cb) => {
     if (!origin || allowed.includes(origin)) {

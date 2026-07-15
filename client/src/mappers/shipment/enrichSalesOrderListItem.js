@@ -30,15 +30,7 @@ function formatDec(n) {
  */
 function effectiveLineSeeds(lineSeeds, order) {
   if (lineSeeds.length) return lineSeeds
-  if (hasOrderLinesInStore(order.id)) {
-    if (import.meta.env?.DEV) {
-      console.warn('[mobilya] persisted order lines missing from seeds', order.id)
-    }
-    return []
-  }
-  if (import.meta.env?.DEV) {
-    console.warn('[mobilya] effectiveLineSeeds legacy fallback', order.id)
-  }
+  if (hasOrderLinesInStore(order.id)) return []
   return [{ id: `OL-${order.id}-1`, salesOrderId: order.id, qtyOrdered: '1.00' }]
 }
 

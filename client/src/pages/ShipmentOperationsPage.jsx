@@ -7,6 +7,7 @@ import ErpOpsWeekFilters from '../components/erp-ops/ErpOpsWeekFilters.jsx'
 import ErpOpsDetailStrip from '../components/erp-ops/ErpOpsDetailStrip.jsx'
 import ShipmentOpsPlannedTable from '../features/shipment-ops/ShipmentOpsPlannedTable.jsx'
 import ShipmentPlanningCenterModal from '../features/shipment-ops/ShipmentPlanningCenterModal.jsx'
+import ShipmentOpsMobilePlanSheet from '../features/shipment-ops/ShipmentOpsMobilePlanSheet.jsx'
 import ShipmentDispatchSheetPrint from '../features/shipment-ops/ShipmentDispatchSheetPrint.jsx'
 import ShipmentStopDetailPanel from '../features/shipment-ops/ShipmentStopDetailPanel.jsx'
 import ShipmentDeliveryConfirmModal from '../features/shipment-ops/ShipmentDeliveryConfirmModal.jsx'
@@ -55,7 +56,10 @@ import {
   isMobileDeliveredShipmentRow,
   MOBILE_SHIPMENT_PRIORITY_CHIPS,
 } from '../mappers/mobile/mobileStoreOpsModel.js'
+import { INSTALLATION_STATE_LABELS, labelFor } from '../mappers/operational/operationalStateLabelsTr.js'
+import { buildShipmentStopDetailModel } from '../mappers/shipment-ops/buildShipmentStopDetailModel.js'
 import '../styles/mos-erp-ops.css'
+import '../styles/shipment-ops-mobile-edition.css'
 
 /** @typedef {import('../data/seedOrders.js').Order} Order */
 /** @typedef {import('../contracts/v1/shipmentRowVm.js').ShipmentRowVM} ShipmentRowVM */
@@ -97,6 +101,7 @@ function ShipmentOperationsPage({
   const [postponeTarget, setPostponeTarget] = useState(/** @type {ShipmentPlannedTableRow | null} */ (null))
   const { scope, setScope, canToggle, filterItems, modeHint } = usePilotDataMode()
   const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
   const isTouchStore = viewportTier === 'phone' || viewportTier === 'tablet'
   const [lastRefresh, setLastRefresh] = useState(/** @type {string | null} */ (null))
   const [mobileShipmentChip, setMobileShipmentChip] = useState('today')
@@ -453,6 +458,17 @@ function ShipmentOperationsPage({
     if (item) setPlanItem(item)
   }
 
+  /** @param {ShipmentPlannedTableRow} row */
+  function handlePhoneDeliver(row) {
+    if (row.canConfirmDelivery) {
+      setQueueConfirmTarget(row)
+      return
+    }
+    if (row.canDeliver) {
+      handleDeliver(row)
+    }
+  }
+
   /** @param {ShipmentHorizonId} horizon */
   function selectHorizon(horizon) {
     setAgendaHorizon(horizon)
@@ -531,6 +547,194 @@ function ShipmentOperationsPage({
       </SectionErrorBoundary>
 
       <SectionErrorBoundary label="Sevk listesi">
+      {isPhone ? (
+        <div className="ship-ops-mobile">
+          <MobileStoreChipBar
+            items={mobileShipmentChips}
+            activeId={mobileShipmentChip}
+            onSelect={handleMobileShipmentChip}
+            ariaLabel="Sevk hızlı filtreler"
+          />
+          <ErpOpsWeekFilters
+            todayIso={todayIso}
+            selectedDate={selectedDate}
+            weekDays={view.weekDays}
+            onSelectDate={selectCalendarDate}
+          />
+          {displayedTableRows.length === 0 ? (
+            <MobileStoreEmptyState
+              context="shipment"
+              onPrimary={() => {
+                const item = filteredAgenda[0]
+                if (item) setPlanItem(item)
+              }}
+              onSecondary={() => selectHorizon('all')}
+            />
+          ) : (
+            <div className="ship-ops-mobile__cards" aria-label="Sevk kart listesi">
+              {displayedTableRows.map((row) => {
+                const item = agendaById.get(row.id)
+                if (!item) return null
+                const dto = item ? dtoById.get(item.orderId) : undefined
+                const order = item ? orderById.get(item.orderId) : undefined
+                const plan = item ? plansByOrderId.get(item.orderId) : undefined
+                const stopDetail = buildShipmentStopDetailModel({ item, order, listItemDto: dto, plan })
+                const installLabel = labelFor(
+                  INSTALLATION_STATE_LABELS,
+                  dto?.operationalState?.installationState ?? 'NOT_REQUIRED',
+                )
+                const riskText = item?.riskLabel ?? 'Normal'
+                const riskTone = riskText.toLowerCase().includes('normal')
+                  ? 'success'
+                  : riskText.toLowerCase().includes('kritik') || riskText.toLowerCase().includes('eksik')
+                    ? 'critical'
+                    : 'warning'
+                return (
+                  <details
+                    key={row.id}
+                    className={`ship-ops-mobile__card${selectedRow?.id === row.id ? ' is-active' : ''}`}
+                    open={selectedRow?.id === row.id}
+                    onToggle={(event) => {
+                      const target = /** @type {HTMLDetailsElement} */ (event.currentTarget)
+                      if (target.open) setSelectedRowId(row.id)
+                    }}
+                  >
+                    <summary className="ship-ops-mobile__summary" onClick={() => setSelectedRowId(row.id)}>
+                      <div className="ship-ops-mobile__card-head">
+                        <div>
+                          <p className="ship-ops-mobile__card-customer">{row.customer}</p>
+                          <span className="ship-ops-mobile__card-order">{row.orderNumber}</span>
+                        </div>
+                        <div className="ship-ops-mobile__head-right">
+                          <strong className="ship-ops-mobile__date-emphasis">{row.plannedDateLabel}</strong>
+                          <span className="ship-ops-mobile__pill">{row.statusLabel}</span>
+                        </div>
+                      </div>
+                    </summary>
+                    <div className="ship-ops-mobile__rows">
+                      <div className="ship-ops-mobile__row">
+                        <span>Teslim tarihi</span>
+                        <strong>{row.plannedDateLabel}</strong>
+                      </div>
+                      <div className="ship-ops-mobile__row">
+                        <span>Rota</span>
+                        <strong>{row.region} · {row.vehicleLabel}</strong>
+                      </div>
+                      <div className="ship-ops-mobile__row">
+                        <span>Montaj durumu</span>
+                        <strong>{installLabel}</strong>
+                      </div>
+                      <div className="ship-ops-mobile__row">
+                        <span>Risk / uyarı</span>
+                        <strong data-tone={riskTone}>{riskText}</strong>
+                      </div>
+                      <div className="ship-ops-mobile__row">
+                        <span>Adres</span>
+                        {stopDetail.mapsHref ? (
+                          <a
+                            className="ship-ops-mobile__link"
+                            href={stopDetail.mapsHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {stopDetail.address}
+                          </a>
+                        ) : (
+                          <strong>{stopDetail.address}</strong>
+                        )}
+                      </div>
+                      <div className="ship-ops-mobile__row">
+                        <span>Telefon</span>
+                        {stopDetail.phoneDialHref ? (
+                          <a
+                            className="ship-ops-mobile__link"
+                            href={stopDetail.phoneDialHref}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {stopDetail.phone}
+                          </a>
+                        ) : (
+                          <strong>{stopDetail.phone}</strong>
+                        )}
+                      </div>
+                    </div>
+                  </details>
+                )
+              })}
+            </div>
+          )}
+
+          {selectedRow ? (
+            (() => {
+              const item = agendaById.get(selectedRow.id)
+              if (!item) return null
+              const detail = buildShipmentStopDetailModel({
+                item,
+                order: orderById.get(item.orderId),
+                listItemDto: dtoById.get(item.orderId),
+                plan: plansByOrderId.get(item.orderId),
+              })
+              return (
+                <footer className="ship-ops-mobile__footer" aria-label="Sevk hızlı aksiyonlar">
+                  {detail.mapsHref ? (
+                    <a
+                      className="ship-ops-mobile__action"
+                      href={detail.mapsHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Navigasyon
+                    </a>
+                  ) : (
+                    <button type="button" className="ship-ops-mobile__action" disabled>
+                      Navigasyon
+                    </button>
+                  )}
+
+                  {detail.phoneDialHref ? (
+                    <a className="ship-ops-mobile__action" href={detail.phoneDialHref}>
+                      Ara
+                    </a>
+                  ) : (
+                    <button type="button" className="ship-ops-mobile__action" disabled>
+                      Ara
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="ship-ops-mobile__action ship-ops-mobile__action--primary"
+                    disabled={!selectedRow.canDeliver && !selectedRow.canConfirmDelivery}
+                    onClick={() => handlePhoneDeliver(selectedRow)}
+                  >
+                    Teslim Et
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ship-ops-mobile__action"
+                    onClick={() => {
+                      if (onOpenOrder) openOrderDrawerFromAgenda(item.orderId)
+                      else handleOpenAgendaItem(item)
+                    }}
+                  >
+                    Eksik Parça
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ship-ops-mobile__action"
+                    onClick={() => handleOpenAgendaItem(item)}
+                  >
+                    Fotoğraf
+                  </button>
+                </footer>
+              )
+            })()
+          ) : null}
+        </div>
+      ) : (
       <div className="mos-erp-ops__workspace">
         {isTouchStore ? (
           <div className="mos-store-ops-mobile-only mos-erp-ops__mobile-bar">
@@ -603,19 +807,33 @@ function ShipmentOperationsPage({
           </section>
         </div>
       </div>
+      )}
       </SectionErrorBoundary>
 
       <SectionErrorBoundary label="Sevk modalleri">
       {planItem && planModalInitial ? (
-        <ShipmentPlanningCenterModal
-          item={planItem}
-          initialPlan={planModalInitial}
-          allPlans={plans}
-          order={orderById.get(planItem.orderId)}
-          listItemDto={listItemDtos.find((d) => d.id === planItem.orderId)}
-          onSave={handleSavePlan}
-          onClose={() => setPlanItem(null)}
-        />
+        isPhone ? (
+          <ShipmentOpsMobilePlanSheet
+            open
+            item={planItem}
+            initialPlan={planModalInitial}
+            allPlans={plans}
+            order={orderById.get(planItem.orderId)}
+            listItemDto={listItemDtos.find((d) => d.id === planItem.orderId)}
+            onSave={handleSavePlan}
+            onClose={() => setPlanItem(null)}
+          />
+        ) : (
+          <ShipmentPlanningCenterModal
+            item={planItem}
+            initialPlan={planModalInitial}
+            allPlans={plans}
+            order={orderById.get(planItem.orderId)}
+            listItemDto={listItemDtos.find((d) => d.id === planItem.orderId)}
+            onSave={handleSavePlan}
+            onClose={() => setPlanItem(null)}
+          />
+        )
       ) : null}
 
       {dispatchSheetVehicle ? (

@@ -1,7 +1,9 @@
+import { useEffect, useMemo, useState } from 'react'
 import { PRIORITY_CALL_LIMIT } from '../../../mappers/collection/collectionCommandCenterModel.js'
 import { buildErpTableRows } from '../collectionErpTableUi.js'
 import PilotRecordBadge from '../../../components/pilot/PilotRecordBadge.jsx'
 import { getOrderPilotKind } from '../../../lib/pilotRecordHeuristics.js'
+import { formatShortDate } from '../../../utils/dates.js'
 
 /** @typedef {import('../../../mappers/collection/collectionCommandCenterModel.js').CollectionCardModel} CollectionCardModel */
 /** @typedef {import('../../../contracts/v1/collectionRowVm.js').CollectionRowVM} CollectionRowVM */
@@ -110,9 +112,69 @@ function OpsTableRow({ row, selected, onSelect, onOpenPayment }) {
 
 /**
  * @param {{
+ *   row: CollectionErpTableRow
+ *   selected: boolean
+ *   pendingApprovalCount: number
+ *   onOpen: () => void
+ * }} props
+ */
+function OpsMobileCard({ row, selected, pendingApprovalCount, onOpen }) {
+  const dueIso = row.card.row.dueDate || row.card.row.shipmentDate || ''
+  const dueLabel = dueIso ? formatShortDate(dueIso) : '—'
+  const pendingApprovalLabel =
+    pendingApprovalCount > 0 ? `${pendingApprovalCount} kayıt` : 'Bekleyen yok'
+
+  return (
+    <li className="coll-ops-mobile-list__item">
+      <button
+        type="button"
+        className={`coll-ops-mobile-card${selected ? ' is-selected' : ''}`}
+        onClick={onOpen}
+        aria-label={`${row.card.row.customer} tahsilat detayı`}
+      >
+        <div className="coll-ops-mobile-card__head">
+          <strong className="coll-ops-mobile-card__customer">{row.card.row.customer}</strong>
+          <span className={`coll-ops-mobile-card__risk coll-ops-mobile-card__risk--${row.statusBadge.level}`}>
+            {row.statusBadge.label}
+          </span>
+        </div>
+        <dl className="coll-ops-mobile-card__grid">
+          <div>
+            <dt>Müşteri</dt>
+            <dd>{row.card.row.customer}</dd>
+          </div>
+          <div>
+            <dt>Kalan borç</dt>
+            <dd>{row.remainingLabel}</dd>
+          </div>
+          <div>
+            <dt>Son ödeme tarihi</dt>
+            <dd>{dueLabel}</dd>
+          </div>
+          <div>
+            <dt>Risk durumu</dt>
+            <dd>{row.statusLabel}</dd>
+          </div>
+          <div>
+            <dt>Bekleyen onay</dt>
+            <dd>{pendingApprovalLabel}</dd>
+          </div>
+          <div>
+            <dt>Son işlem</dt>
+            <dd>{row.lastOperationLabel}</dd>
+          </div>
+        </dl>
+      </button>
+    </li>
+  )
+}
+
+/**
+ * @param {{
  *   cards: CollectionCardModel[]
  *   todayIso: string
  *   selectedRowId: string | null
+ *   dtoById?: Map<string, import('../../../contracts/v1/salesOrderListItem.js').SalesOrderListItemDto>
  *   onSelectRow: (row: CollectionRowVM) => void
  *   onOpenPayment?: (row: CollectionRowVM) => void
  * }} props
@@ -121,9 +183,21 @@ export default function CollectionOpsTable({
   cards,
   todayIso,
   selectedRowId,
+  dtoById = new Map(),
   onSelectRow,
   onOpenPayment,
 }) {
+  const [isPhoneViewport, setIsPhoneViewport] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const media = window.matchMedia('(max-width: 480px)')
+    const update = () => setIsPhoneViewport(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
   if (cards.length === 0) {
     return (
       <div className="coll-ops-tbl-empty">
@@ -132,7 +206,31 @@ export default function CollectionOpsTable({
     )
   }
 
-  const rows = buildErpTableRows(cards, todayIso, PRIORITY_CALL_LIMIT)
+  const rows = useMemo(
+    () => buildErpTableRows(cards, todayIso, PRIORITY_CALL_LIMIT),
+    [cards, todayIso],
+  )
+
+  if (isPhoneViewport) {
+    return (
+      <div className="coll-ops-tbl-wrap coll-ops-tbl-wrap--mobile">
+        <ul className="coll-ops-mobile-list" aria-label="Tahsilat kart listesi">
+          {rows.map((row) => (
+            <OpsMobileCard
+              key={row.card.row.id}
+              row={row}
+              selected={selectedRowId === row.card.row.id}
+              pendingApprovalCount={dtoById.get(row.card.row.id)?.pendingApprovalPaymentCount ?? 0}
+              onOpen={() => {
+                onSelectRow(row.card.row)
+                onOpenPayment?.(row.card.row)
+              }}
+            />
+          ))}
+        </ul>
+      </div>
+    )
+  }
 
   return (
     <div className="coll-ops-tbl-wrap">

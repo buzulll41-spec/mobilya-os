@@ -276,29 +276,10 @@ export default function CollectionCenterPanel({
                 <p className="cc-v2-readonly">Tahsilat kaydı bu rol için salt okunur.</p>
               ) : (
                 <>
-                  {!autoApprovePayments ? (
-                    <p className="cc-v2-meta" role="note">
-                      Tahsilat kaydı yönetici onayına gönderilir; onaylanana kadar sipariş bakiyesinden düşülmez.
-                    </p>
-                  ) : null}
                   {!apiMode ? (
                     <p className="cc-v2-meta">Mock mod: ödemeler oturumda saklanır.</p>
                   ) : null}
-                  <label className="cc-v2-field">
-                    <span>Tutar</span>
-                    <MosCurrencyInput
-                      className="cc-v2-input"
-                      value={payAmount}
-                      onChange={(v) => {
-                        setPayAmount(v)
-                        setPayError(null)
-                      }}
-                      disabled={mutating}
-                      integerOnly
-                    />
-                  </label>
-
-                  <fieldset className="cc-v2-methods">
+                  <fieldset className="cc-v2-methods cc-v2-field-block cc-v2-field-block--method">
                     <legend>Ödeme Türü</legend>
                     <div className="cc-v2-methods__grid">
                       {COLLECTION_PAYMENT_METHOD_OPTIONS.map((opt) => (
@@ -319,6 +300,20 @@ export default function CollectionCenterPanel({
                       ))}
                     </div>
                   </fieldset>
+
+                  <label className="cc-v2-field cc-v2-field-block cc-v2-field-block--amount">
+                    <span>Tutar</span>
+                    <MosCurrencyInput
+                      className="cc-v2-input"
+                      value={payAmount}
+                      onChange={(v) => {
+                        setPayAmount(v)
+                        setPayError(null)
+                      }}
+                      disabled={mutating}
+                      integerOnly
+                    />
+                  </label>
 
                   {isMailOrder ? (
                     <label className="cc-v2-field">
@@ -347,7 +342,7 @@ export default function CollectionCenterPanel({
                     </label>
                   ) : null}
 
-                  <label className="cc-v2-field">
+                  <label className="cc-v2-field cc-v2-field-block cc-v2-field-block--note">
                     <span>Açıklama</span>
                     <input
                       type="text"
@@ -361,6 +356,15 @@ export default function CollectionCenterPanel({
                       placeholder="Kapora, taksit, havale referansı…"
                     />
                   </label>
+
+                  <div className="cc-v2-approval-status cc-v2-field-block cc-v2-field-block--approval" role="status">
+                    <span className="cc-v2-approval-status__label">Onay durumu</span>
+                    <p className="cc-v2-meta">
+                      {autoApprovePayments
+                        ? 'Bu rolde ödeme otomatik onaylanır ve bakiyeye anında yansır.'
+                        : 'Tahsilat kaydı yönetici onayına gider; onaylanana kadar bakiyeye yansımaz.'}
+                    </p>
+                  </div>
 
                   {payError ? (
                     <p className="cc-v2-error" role="alert">

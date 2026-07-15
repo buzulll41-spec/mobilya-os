@@ -5,6 +5,7 @@ import MobileStoreEmptyState from './MobileStoreEmptyState.jsx'
  * @param {{
  *   cards: import('../../mappers/mobile/mobileStoreOpsModel.js').MobileOrderCardVm[]
  *   selectedRowId?: string | null
+ *   dense?: boolean
  *   onOpenCard?: (id: string) => void
  *   onNewOrder?: () => void
  *   onClearFilters?: () => void
@@ -13,6 +14,7 @@ import MobileStoreEmptyState from './MobileStoreEmptyState.jsx'
 export default function MobileOrderCardList({
   cards,
   selectedRowId = null,
+  dense = false,
   onOpenCard,
   onNewOrder,
   onClearFilters,
@@ -33,6 +35,7 @@ export default function MobileOrderCardList({
         <MobileOrderCard
           key={card.id}
           card={card}
+          dense={dense}
           selected={card.id === selectedRowId}
           onOpen={() => onOpenCard?.(card.id)}
         />

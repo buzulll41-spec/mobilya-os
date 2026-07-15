@@ -15,6 +15,7 @@ import {
   buildOrderPanelShipmentRiskAlerts,
   buildOrderPanelShipmentTimeline,
 } from '../../../mappers/order/orderPanelShipmentModel.js'
+import { useViewportTier } from '../../../hooks/useViewportTier.js'
 
 import '../../../styles/mos-erp-ops.css'
 import '../../../styles/order-panel-shipment.css'
@@ -34,6 +35,7 @@ import '../../../styles/order-panel-shipment.css'
  *   planBlockedMessage?: string
  *   onPlanClick?: () => void
  *   onOpenShipmentOperation?: () => void
+ *   onCompletePhoneDelivery?: () => Promise<void>
  * }} props
  */
 export default function OrderPanelShipmentOps({
@@ -45,13 +47,25 @@ export default function OrderPanelShipmentOps({
   planBlockedMessage,
   onPlanClick,
   onOpenShipmentOperation,
+  onCompletePhoneDelivery,
 }) {
+  const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
   const { lines: receivingLines } = useOrderLineReceiving(order.id, 0)
   const [orderLines, setOrderLines] = useState(/** @type {import('../../../services/ordersClient.js').OrderLineDetailDto[] | null} */ (null))
   const [openMissingLineIds, setOpenMissingLineIds] = useState(/** @type {Set<string>} */ (new Set()))
   const [shipments, setShipments] = useState(/** @type {ShipmentDto[]} */ ([]))
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(/** @type {string | null} */ (null))
+  const [phoneStep, setPhoneStep] = useState(0)
+  const [phoneBusy, setPhoneBusy] = useState(false)
+  const [phoneError, setPhoneError] = useState(/** @type {string | null} */ (null))
+
+  useEffect(() => {
+    setPhoneStep(0)
+    setPhoneBusy(false)
+    setPhoneError(null)
+  }, [order.id])
 
   useEffect(() => {
     let cancelled = false
@@ -126,6 +140,109 @@ export default function OrderPanelShipmentOps({
     : productsBlockPlan
       ? 'Sevk planı için tüm ürünlerin tedarik verilmiş, depoya gelmiş ve sevke hazır olması gerekir.'
       : undefined
+
+  async function handlePhoneComplete() {
+    if (!onCompletePhoneDelivery) return
+    setPhoneBusy(true)
+    setPhoneError(null)
+    try {
+      await onCompletePhoneDelivery()
+      setPhoneStep(2)
+    } catch (err) {
+      setPhoneError(err instanceof Error ? err.message : 'Teslim tamamlanamadi')
+    } finally {
+      setPhoneBusy(false)
+    }
+  }
+
+  if (isPhone) {
+    const canProceed = !loading && !effectivePlanBlocked
+    const canComplete = !phoneBusy && Boolean(onCompletePhoneDelivery)
+    const completed0 = phoneStep > 0
+    const completed1 = phoneStep > 1
+
+    return (
+      <div className="oop-shipment" aria-label="Sevk ve montaj operasyonu">
+        <div className="oop-shipment__panel" aria-label="Telefon teslim wizardi">
+          <section>
+            <details open={phoneStep === 0}>
+              <summary>{completed0 ? '✓' : '1.'} Teslime hazirlik kontrolu</summary>
+              {phoneStep === 0 ? (
+                <div>
+                  {planBlockReason ? <p>{planBlockReason}</p> : null}
+                  <p>Urun hazir: {notReadyForShipment ? 'Hayir' : 'Evet'}</p>
+                  <p>Kalan bakiye: {rem > 0.009 ? 'Var' : 'Yok'}</p>
+                </div>
+              ) : null}
+            </details>
+          </section>
+
+          <section>
+            <details open={phoneStep === 1}>
+              <summary>{completed1 ? '✓' : '2.'} Teslimi tamamla</summary>
+              {phoneStep === 1 ? (
+                <div>
+                  <p>Bu adim siparisi teslim edildi olarak kapatir.</p>
+                  {phoneError ? (
+                    <p className="oop-shipment__load-error" role="alert">
+                      {phoneError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </details>
+          </section>
+
+          <section>
+            <details open={phoneStep === 2}>
+              <summary>3. Tamamlandi</summary>
+              {phoneStep === 2 ? <p>Teslim tamamlandi. Operasyon haritasina donuluyor…</p> : null}
+            </details>
+          </section>
+        </div>
+
+        <div
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            zIndex: 3,
+            background: 'var(--mos-surface, #fff)',
+            borderTop: '1px solid var(--mos-border, #e5e7eb)',
+            padding: '0.75rem',
+            marginTop: '0.75rem',
+          }}
+        >
+          {phoneStep === 0 ? (
+            <button
+              type="button"
+              className="oop-shipment__btn oop-shipment__btn--primary"
+              disabled={!canProceed}
+              onClick={() => setPhoneStep(1)}
+            >
+              Devam
+            </button>
+          ) : null}
+          {phoneStep === 1 ? (
+            <button
+              type="button"
+              className="oop-shipment__btn oop-shipment__btn--primary"
+              disabled={!canComplete}
+              onClick={() => {
+                void handlePhoneComplete()
+              }}
+            >
+              {phoneBusy ? 'Tamamlaniyor…' : 'Teslimi tamamla'}
+            </button>
+          ) : null}
+          {phoneStep === 2 ? (
+            <button type="button" className="oop-shipment__btn oop-shipment__btn--primary" disabled>
+              Tamamlandi
+            </button>
+          ) : null}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="oop-shipment" aria-label="Sevk ve montaj operasyonu">

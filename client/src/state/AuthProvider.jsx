@@ -66,8 +66,12 @@ export function AuthProvider({ children }) {
     if (!apiMode) return undefined
     /** @param {CustomEvent<{ message?: string }>} ev */
     const onExpired = (ev) => {
-      authClient.logout()
-      clearAllTaskOverlayStates()
+      try {
+        authClient.logout()
+        clearAllTaskOverlayStates()
+      } catch {
+        // ignore cleanup failures
+      }
       setUser(null)
       setSessionMessage(ev.detail?.message ?? 'Oturum süresi doldu. Lütfen tekrar giriş yapın.')
     }

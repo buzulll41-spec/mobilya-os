@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { buildRoleHomeView } from '../mappers/home/roleHomeModel.js'
 import { buildMobileStoreHomeCards } from '../mappers/mobile/mobileStoreOpsModel.js'
 import { navigateWithOpsFilter } from '../lib/opsDeepLink.js'
@@ -7,13 +7,36 @@ import { getApiBaseUrl } from '../config/dataSource.js'
 import { useOrders } from '../state/useOrders.js'
 import { useAuth } from '../state/AuthProvider.jsx'
 import { useShipmentPlans } from '../hooks/useShipmentPlans.jsx'
-import { useViewportTier } from '../hooks/useViewportTier.js'
+import { useCompactPhoneViewport, useViewportTier } from '../hooks/useViewportTier.js'
 import PageRefreshBar from '../components/PageRefreshBar.jsx'
 import MosEmptyState from '../components/standards/MosEmptyState.jsx'
 import MobileStoreHome from '../components/mobile/MobileStoreHome.jsx'
+import MobileOperationHub from '../components/mobile/MobileOperationHub.jsx'
+import MobileNotificationCenter from '../components/mobile/MobileNotificationCenter.jsx'
 import MobileQuickActions from '../components/mobile/MobileQuickActions.jsx'
 import { toastSuccess } from '../lib/toastBus.js'
+import {
+  buildMobileOperationCenterTasks,
+  buildMobileOperationHubCards,
+  buildMobileFieldPilotHubCards,
+  filterMobileOperationCenterTasks,
+} from '../mappers/mobile/mobileOperationHubModel.js'
+import { useMobileOfflineFoundationOptional } from '../state/MobileOfflineFoundationProvider.jsx'
+import {
+  appendMobileLiveNotification,
+  getMobileUnreadNotificationCount,
+  markAllMobileNotificationsRead,
+  markMobileNotificationRead,
+  readMobileNotificationHistory,
+  readMobileNotificationPreferences,
+  readMobileNotificationReadIds,
+  readMobileNotificationSignalSnapshot,
+  writeMobileNotificationPreferences,
+  writeMobileNotificationSignalSnapshot,
+} from '../services/mobile/mobileNotificationCenterStore.js'
 import '../styles/role-home.css'
+import '../styles/mobile-operation-hub.css'
+import '../styles/mobile-notification-center.css'
 
 /**
  * @param {'success' | 'warning' | 'critical' | 'neutral'} tone
@@ -36,8 +59,22 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
   const { orders, salesOrderListItemDtos, collectionRowVMs, refreshOrders, isRefreshing } = useOrders()
   const { plans, refreshPlans } = useShipmentPlans()
   const viewportTier = useViewportTier()
-  const isTouchStore = viewportTier === 'phone' || viewportTier === 'tablet'
+  const isCompactPhone = useCompactPhoneViewport()
+  const isPhone = viewportTier === 'phone'
+  const isTablet = viewportTier === 'tablet'
+  const mobileOffline = useMobileOfflineFoundationOptional()
   const [lastRefresh, setLastRefresh] = useState(/** @type {string | null} */ (null))
+  const [notificationCenterOpen, setNotificationCenterOpen] = useState(false)
+  const [taskFilter, setTaskFilter] = useState(/** @type {import('../mappers/mobile/mobileOperationHubModel.js').MobileOperationTaskFilterId} */ ('all'))
+  const [mobileNotifications, setMobileNotifications] = useState(readMobileNotificationHistory)
+  const [notificationReadIds, setNotificationReadIds] = useState(readMobileNotificationReadIds)
+  const [notificationPrefs, setNotificationPrefs] = useState(readMobileNotificationPreferences)
+
+  const effectiveListItemDtos = useMemo(() => {
+    if (!isPhone) return salesOrderListItemDtos
+    if (!mobileOffline?.usingCachedList) return salesOrderListItemDtos
+    return mobileOffline.cachedListItemDtos
+  }, [isPhone, salesOrderListItemDtos, mobileOffline])
 
   const userFirstName = useMemo(() => {
     const name = user?.fullName?.trim()
@@ -62,12 +99,142 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
     () =>
       buildMobileStoreHomeCards({
         orders,
-        listItemDtos: salesOrderListItemDtos,
+        listItemDtos: effectiveListItemDtos,
         collectionRows: collectionRowVMs,
         shipmentPlans: plans,
       }),
-    [orders, salesOrderListItemDtos, collectionRowVMs, plans],
+    [orders, effectiveListItemDtos, collectionRowVMs, plans],
   )
+
+  const mobileUnreadNotificationCount = useMemo(
+    () => getMobileUnreadNotificationCount(mobileNotifications, notificationReadIds),
+    [mobileNotifications, notificationReadIds],
+  )
+
+  const mobileOperationHubCards = useMemo(
+    () =>
+      (isCompactPhone
+        ? buildMobileOperationHubCards({
+            listItemDtos: effectiveListItemDtos,
+            collectionRows: collectionRowVMs,
+            shipmentPlans: plans,
+          })
+        : buildMobileFieldPilotHubCards({
+            listItemDtos: effectiveListItemDtos,
+            collectionRows: collectionRowVMs,
+            shipmentPlans: plans,
+            notificationUnreadCount: mobileUnreadNotificationCount,
+            offlinePendingCount: mobileOffline?.pendingSyncCount ?? 0,
+            isOffline: mobileOffline?.online === false,
+          })),
+    [
+      isCompactPhone,
+      effectiveListItemDtos,
+      collectionRowVMs,
+      plans,
+      mobileUnreadNotificationCount,
+      mobileOffline?.pendingSyncCount,
+      mobileOffline?.online,
+    ],
+  )
+
+  const mobileOperationTasks = useMemo(
+    () =>
+      buildMobileOperationCenterTasks({
+        listItemDtos: effectiveListItemDtos,
+        collectionRows: collectionRowVMs,
+        shipmentPlans: plans,
+        currentUserName: user?.fullName || '',
+      }),
+    [effectiveListItemDtos, collectionRowVMs, plans, user?.fullName],
+  )
+
+  const filteredOperationTasks = useMemo(
+    () => filterMobileOperationCenterTasks(mobileOperationTasks, taskFilter),
+    [mobileOperationTasks, taskFilter],
+  )
+
+  useEffect(() => {
+    if (!isPhone) return
+
+    const currentSignal = {
+      order: effectiveListItemDtos.length,
+      shipment: plans.filter((plan) => {
+        const status = String(plan.status ?? '').toLowerCase()
+        return !status || (!status.includes('teslim') && !status.includes('delivered'))
+      }).length,
+      service: effectiveListItemDtos.filter((dto) => (dto.openMissingItemsCount ?? 0) > 0).length,
+      missing: effectiveListItemDtos.reduce((sum, dto) => sum + (dto.openMissingItemsCount ?? 0), 0),
+      collection: effectiveListItemDtos.filter((dto) => {
+        const v = Number(dto.remainingAmount?.value ?? 0)
+        return Number.isFinite(v) && v > 0
+      }).length,
+    }
+
+    const previousSignal = readMobileNotificationSignalSnapshot()
+    if (!previousSignal) {
+      writeMobileNotificationSignalSnapshot(currentSignal)
+      return
+    }
+
+    const definitions = [
+      { key: 'order', title: 'Sipariş', navTarget: 'orders', navFilter: /** @type {const} */ ('new') },
+      { key: 'shipment', title: 'Sevkiyat', navTarget: 'shipment-ops', navFilter: /** @type {const} */ ('today') },
+      { key: 'service', title: 'Servis', navTarget: 'ssh-service', navFilter: /** @type {const} */ ('all') },
+      { key: 'missing', title: 'Eksik Parça', navTarget: 'ssh-service', navFilter: /** @type {const} */ ('waiting') },
+      { key: 'collection', title: 'Tahsilat', navTarget: 'collection', navFilter: /** @type {const} */ ('all') },
+    ]
+
+    let changed = false
+    for (const item of definitions) {
+      const before = previousSignal[item.key]
+      const after = currentSignal[item.key]
+      if (after <= before) continue
+      const delta = after - before
+      appendMobileLiveNotification(
+        {
+          type: /** @type {any} */ (item.key),
+          title: `${item.title} icin yeni is`,
+          body: `${delta} yeni kayit geldi`,
+          navTarget: item.navTarget,
+          navFilter: item.navFilter,
+        },
+        notificationPrefs,
+      )
+      changed = true
+    }
+
+    writeMobileNotificationSignalSnapshot(currentSignal)
+    if (changed) {
+      setMobileNotifications(readMobileNotificationHistory())
+      setNotificationReadIds(readMobileNotificationReadIds())
+    }
+  }, [isPhone, effectiveListItemDtos, plans, notificationPrefs])
+
+  function handleOpenMobileNotification(item) {
+    markMobileNotificationRead(item.id)
+    setNotificationReadIds(readMobileNotificationReadIds())
+    setNotificationCenterOpen(false)
+    if (!onNavigate) return
+    if (item.navFilter) navigateWithOpsFilter(item.navTarget, item.navFilter, onNavigate)
+    else onNavigate(item.navTarget)
+  }
+
+  function handleMarkAllMobileNotificationsRead() {
+    markAllMobileNotificationsRead(mobileNotifications.map((item) => item.id))
+    setNotificationReadIds(readMobileNotificationReadIds())
+  }
+
+  function handleOpenOperationTask(task) {
+    if (!onNavigate) return
+    if (task.navFilter) navigateWithOpsFilter(task.navTarget, task.navFilter, onNavigate)
+    else onNavigate(task.navTarget)
+  }
+
+  function handleNotificationPreferenceChange(next) {
+    setNotificationPrefs(next)
+    writeMobileNotificationPreferences(next)
+  }
 
   function focusGlobalSearch() {
     document.querySelector('.mos-global-search-input')?.focus()
@@ -111,14 +278,42 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
 
   return (
     <div className="mos-role-home">
-      <PageRefreshBar
-        title="Dashboard verilerini yenile"
-        onRefresh={handleRefresh}
-        refreshing={isRefreshing}
-        updatedAt={lastRefresh}
-      />
+      {!isPhone ? (
+        <PageRefreshBar
+          title="Dashboard verilerini yenile"
+          onRefresh={handleRefresh}
+          refreshing={isRefreshing}
+          updatedAt={lastRefresh}
+        />
+      ) : null}
 
-      {isTouchStore ? (
+      {isPhone ? (
+        <>
+          <MobileOperationHub
+            cards={mobileOperationHubCards}
+            onNavigate={onNavigate}
+            pendingSyncCount={mobileOffline?.pendingSyncCount ?? 0}
+            notificationUnreadCount={mobileUnreadNotificationCount}
+            onOpenNotifications={() => setNotificationCenterOpen(true)}
+            taskFilter={taskFilter}
+            onTaskFilterChange={setTaskFilter}
+            tasks={filteredOperationTasks}
+            onOpenTask={handleOpenOperationTask}
+          />
+          <MobileNotificationCenter
+            open={notificationCenterOpen}
+            unreadCount={mobileUnreadNotificationCount}
+            notifications={mobileNotifications}
+            preferences={notificationPrefs}
+            onClose={() => setNotificationCenterOpen(false)}
+            onMarkAllRead={handleMarkAllMobileNotificationsRead}
+            onOpenNotification={handleOpenMobileNotification}
+            onPreferenceChange={handleNotificationPreferenceChange}
+          />
+        </>
+      ) : null}
+
+      {isTablet ? (
         <>
           <MobileStoreHome
             cards={mobileStoreCards}

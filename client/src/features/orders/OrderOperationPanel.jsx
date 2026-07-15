@@ -25,6 +25,7 @@ import OrderPanelPaymentsTable from './panel/OrderPanelPaymentsTable.jsx'
 import OrderPanelHistoryOps from './panel/OrderPanelHistoryOps.jsx'
 import OrderPanelLifecycleTimeline from './panel/OrderPanelLifecycleTimeline.jsx'
 import OrderPanelSshOps from './panel/OrderPanelSshOps.jsx'
+import OrderPanelFinanceCard from './panel/OrderPanelFinanceCard.jsx'
 import StatusBadge from '../../components/StatusBadge.jsx'
 import { buildRiskDrawerModel } from '../../mappers/risk/riskDrawerUi.js'
 import { formatApiErrorMessage } from '../../utils/apiErrorMessage.js'
@@ -54,6 +55,10 @@ import {
   buildInitialPlanFromAgendaItem,
 } from '../../mappers/shipment-ops/shipmentOpsAgendaViewModel.js'
 import { getApiBaseUrl } from '../../config/dataSource.js'
+import { useCompactPhoneViewport, useViewportTier } from '../../hooks/useViewportTier.js'
+import * as ordersClient from '../../services/ordersClient.js'
+import { PAYMENT_METHOD } from '../../contracts/v1/enums.js'
+import { MISSING_ITEM_STATUS } from '../../contracts/v1/missingItemStatuses.js'
 import '../../styles/order-operation-panel.css'
 
 /** @typedef {import('../../data/seedOrders.js').Order} Order */
@@ -163,6 +168,9 @@ function OrderOperationPanelSurface({
   onGoNext,
   queuePositionLabel = null,
 }) {
+  const viewportTier = useViewportTier()
+  const isCompactPhone = useCompactPhoneViewport()
+  const isPhone = viewportTier === 'phone'
   const { user } = useAuth()
   const { goToNextOrderWithDtos, canGoNext: queueCanGoNext } = useOrderDrawer()
   const {
@@ -189,9 +197,14 @@ function OrderOperationPanelSurface({
   const [paymentRefresh, setPaymentRefresh] = useState(0)
   const [activeTab, setActiveTab] = useState(initialActiveTab)
   const [customerDrawerOpen, setCustomerDrawerOpen] = useState(false)
+  const [phoneScenarioBusy, setPhoneScenarioBusy] = useState(false)
+  const [phoneScenarioCursor, setPhoneScenarioCursor] = useState(0)
+  const [phoneScenarioClosed, setPhoneScenarioClosed] = useState(false)
 
   useEffect(() => {
     setCustomerDrawerOpen(false)
+    setPhoneScenarioCursor(0)
+    setPhoneScenarioClosed(false)
   }, [order.id])
 
   const listItemDto = useMemo(
@@ -356,9 +369,378 @@ function OrderOperationPanelSurface({
 
   const openMissing = (listItemDto?.openMissingItemsCount ?? 0) > 0
 
+  const phoneScenarioSteps = useMemo(() => {
+    const steps = [
+      { id: 'kapora', label: 'Kapora', tab: 'payments' },
+      { id: 'production', label: 'Üretim', tab: 'products' },
+      { id: 'supply', label: 'Tedarik', tab: 'products' },
+      { id: 'shipment', label: 'Sevk', tab: 'shipment' },
+      { id: 'delivery', label: 'Teslim', tab: 'shipment' },
+    ]
+    if ((listItemDto?.openMissingItemsCount ?? 0) > 0) {
+      steps.push({ id: 'ssh', label: 'SSH', tab: 'ssh' })
+    }
+    steps.push({ id: 'service', label: 'Servis', tab: 'ssh' })
+    steps.push({ id: 'missing_part', label: 'Eksik Parça', tab: 'ssh' })
+    steps.push({ id: 'close', label: 'Operasyonu kapat', tab: undefined })
+    return steps
+  }, [listItemDto])
+
+  const phoneScenarioCurrent = phoneScenarioSteps[Math.min(phoneScenarioCursor, phoneScenarioSteps.length - 1)]
+
+  useEffect(() => {
+    if (!isPhone || !isCompactPhone) return
+    if (!phoneScenarioCurrent?.tab) return
+    const target = resolveOrderPanelTab(phoneScenarioCurrent.tab, undefined)
+    if (target !== activeTab && canViewDrawerTab(user?.role, /** @type {any} */ (target))) {
+      setActiveTab(target)
+    }
+  }, [isPhone, isCompactPhone, phoneScenarioCurrent, activeTab, user?.role])
+
+  function handlePanelClose() {
+    if (isPhone) {
+      window.location.hash = '#/operation-map'
+    }
+    onClose()
+  }
+
+  useEffect(() => {
+    if (!isPhone || !isCompactPhone) return
+    if (phoneScenarioBusy) return
+    if (phoneScenarioClosed) return
+    if (phoneScenarioCurrent?.id !== 'close') return
+    setPhoneScenarioClosed(true)
+    window.location.hash = '#/operation-map'
+    onClose()
+  }, [isPhone, isCompactPhone, phoneScenarioBusy, phoneScenarioClosed, phoneScenarioCurrent, onClose])
+
+  const phoneScenarioActionLabel = useMemo(() => {
+    if (!phoneScenarioCurrent) return 'Devam'
+    switch (phoneScenarioCurrent.id) {
+      case 'kapora':
+        return 'Kaporayi kaydet'
+      case 'production':
+        return 'Uretime al'
+      case 'supply':
+        return 'Tedarigi tamamla'
+      case 'shipment':
+        return 'Sevki planla'
+      case 'delivery':
+        return 'Teslime gec'
+      case 'ssh':
+        return 'SSH kapat'
+      case 'service':
+        return 'Servis oluştur'
+      case 'missing_part':
+        return 'Eksik parça oluştur'
+      case 'close':
+        return 'Operasyonu kapat'
+      default:
+        return 'Devam'
+    }
+  }, [phoneScenarioCurrent])
+
+  async function handlePhoneScenarioAdvance() {
+    if (!phoneScenarioCurrent) return
+    setPhoneScenarioBusy(true)
+    try {
+      switch (phoneScenarioCurrent.id) {
+        case 'kapora': {
+          if (rem > 0.009) {
+            const depositAmount = Math.min(rem, Math.max(1_000, Math.round(order.amount * 0.1)))
+            await postOrderPayment(order.id, {
+              amount: depositAmount,
+              method: PAYMENT_METHOD.CASH,
+              note: 'Mobil operasyon tek akis kapora',
+            })
+            setPaymentRefresh((k) => k + 1)
+          }
+          goToTab('products')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        }
+        case 'production':
+          await handleStatusChange('Üretimde')
+          goToTab('products')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        case 'supply':
+          await handleStatusChange('Sevke Hazır')
+          goToTab('shipment')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        case 'shipment': {
+          if (!shipmentPlan) {
+            const autoPlan = {
+              ...planModalInitial,
+              plannedDate: planModalInitial.plannedDate || order.shipmentDate || order.dueDate || DEMO_TODAY,
+              plannedTime: planModalInitial.plannedTime || '10:00',
+              note: planModalInitial.note || 'Mobil operasyon tek akis otomatik sevk plani',
+            }
+            await upsertPlan(autoPlan)
+            if (getApiBaseUrl()) {
+              await refreshOrders()
+            }
+          }
+          await handleStatusChange('Sevk Planlandı')
+          goToTab('shipment')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        }
+        case 'delivery':
+          await handleStatusChange('Teslim Edildi')
+          goToTab('ssh')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        case 'ssh': {
+          const missingItems = await ordersClient.getOrderMissingItems(order.id)
+          const openItems = missingItems.filter((item) => item.status !== MISSING_ITEM_STATUS.RESOLVED)
+          for (const item of openItems) {
+            await patchMissingItemStatus(order.id, item.id, {
+              status: MISSING_ITEM_STATUS.RESOLVED,
+              resolutionNote: 'Mobil operasyon tek akis SSH kapanisi',
+            })
+          }
+          goToTab('overview')
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        }
+        case 'service': {
+          const openServiceItem = (listItemDto?.openMissingItemsCount ?? 0) === 0
+            ? null
+            : (await ordersClient.getOrderMissingItems(order.id)).find((item) => item.status !== MISSING_ITEM_STATUS.RESOLVED) ?? null
+          if (openServiceItem) {
+            await patchMissingItemStatus(order.id, openServiceItem.id, {
+              status: MISSING_ITEM_STATUS.ORDERED,
+              supplierNote: 'Servis için yönlendirildi',
+            })
+          }
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        }
+        case 'missing_part': {
+          const missingItems = await ordersClient.getOrderMissingItems(order.id)
+          const target = missingItems.find((item) => item.status !== MISSING_ITEM_STATUS.RESOLVED)
+          if (target) {
+            await patchMissingItemStatus(order.id, target.id, {
+              status: MISSING_ITEM_STATUS.ARRIVED,
+              resolutionNote: 'Eksik parça süreci ilerletildi',
+            })
+            await markMissingItemReadyForShipment(order.id, target.id, {
+              note: 'Eksik parça sevke hazır',
+            })
+          }
+          setPhoneScenarioCursor((value) => Math.min(value + 1, phoneScenarioSteps.length - 1))
+          break
+        }
+        case 'close':
+          setPhoneScenarioClosed(true)
+          window.location.hash = '#/operation-map'
+          onClose()
+          break
+        default:
+          break
+      }
+    } finally {
+      setPhoneScenarioBusy(false)
+    }
+  }
+
+  function MobileAccordionCard({ id, title, subtitle, children }) {
+    const open = activeTab === id
+    return (
+      <section className={`oop-mobile-card${open ? ' is-open' : ''}`} aria-label={title}>
+        <button
+          type="button"
+          className="oop-mobile-card__head"
+          onClick={() => setActiveTab(open ? 'overview' : id)}
+          aria-expanded={open}
+        >
+          <div className="oop-mobile-card__head-copy">
+            <span className="oop-mobile-card__title">{title}</span>
+            {subtitle ? <span className="oop-mobile-card__sub">{subtitle}</span> : null}
+          </div>
+          <span className="oop-mobile-card__chev" aria-hidden>
+            {open ? '−' : '+'}
+          </span>
+        </button>
+        {open ? <div className="oop-mobile-card__body">{children}</div> : null}
+      </section>
+    )
+  }
+
+  if (isCompactPhone) {
+    const financialLines = [
+      { label: 'Toplam', value: order.amount, format: 'money' },
+      { label: 'Tahsilat', value: order.amount - rem, format: 'money' },
+      { label: 'Kalan', value: rem, format: 'money', accent: true },
+    ]
+
+    return (
+      <div className="oop-root oop-root--mobile" role="presentation">
+        <button type="button" className="oop-backdrop" aria-label="Kapat" onClick={handlePanelClose} />
+        <aside className="oop-panel oop-panel--mobile" aria-label="Sipariş operasyon paneli" role="dialog" aria-modal="true">
+          <header className="oop-mobile-head">
+            <div className="oop-mobile-head__copy">
+              <button
+                type="button"
+                className="oop-mobile-head__customer"
+                onClick={() => setCustomerDrawerOpen(true)}
+              >
+                {drawerHeader.customerName}
+              </button>
+              <p className="oop-mobile-head__meta">
+                <span>{drawerHeader.orderNumber}</span>
+                {queuePositionLabel ? <span>· {queuePositionLabel}</span> : null}
+              </p>
+              <p className="oop-mobile-head__contact">
+                {customerPhones || 'Telefon yok'}{customerIdentity ? ` · ${customerIdentity}` : ''}
+              </p>
+              {addressLine ? <p className="oop-mobile-head__address">{addressLine}</p> : null}
+            </div>
+            <button type="button" className="oop-close" onClick={handlePanelClose} aria-label="Kapat">
+              <IconClose />
+            </button>
+          </header>
+
+          <div className="oop-mobile-body">
+            <section className="oop-mobile-hero" aria-label="Sipariş durumu">
+              <div className="oop-mobile-hero__row">
+                <span className={`oop-risk-pill oop-risk-pill--${drawerHeader.riskSeverity.toLowerCase()}`}>
+                  {drawerHeader.riskLabel}
+                </span>
+                <StatusBadge status={drawerHeader.displayStatus} />
+              </div>
+              <p className="oop-mobile-hero__milestone">{drawerHeader.milestoneLabel}</p>
+              <OrderDrawerSummaryStrip cells={drawerHeader.summaryCells} />
+            </section>
+
+            <div className="oop-mobile-stack">
+              <MobileAccordionCard id="overview" title="Sipariş özeti" subtitle="Özet ve durum bilgileri">
+                <OperationCommandKpis cards={headerKpis} />
+                <OperationNextActionCard action={nextAction} onCta={handleNextActionCta} />
+                <OrderDrawerLockBanner
+                  locks={operationLocks}
+                  onGoSsh={openMissing ? () => setActiveTab('ssh') : undefined}
+                />
+              </MobileAccordionCard>
+
+              <MobileAccordionCard id="products" title="Ürün kartları" subtitle="Sipariş kalemleri">
+                <OrderPanelProductsTable
+                  orderId={order.id}
+                  customerName={order.customer ?? ''}
+                  orderNotes={order.notes ?? ''}
+                  refreshKey={receivingRefresh}
+                  canReceive={canEditDrawerTab(user?.role, 'products')}
+                  canViewIncomingLink={canViewDrawerTab(user?.role, 'products')}
+                  onReceivingSaved={() => {
+                    setReceivingRefresh((k) => k + 1)
+                    void refreshOrders()
+                  }}
+                />
+              </MobileAccordionCard>
+
+              <MobileAccordionCard id="payments" title="Ödeme özeti" subtitle="Tahsilat ve bakiye">
+                <OrderPanelFinanceCard lines={financialLines} paidPct={paidPct} remaining={rem} />
+                <OrderPanelPaymentsTable
+                  order={order}
+                  rem={rem}
+                  paidPct={paidPct}
+                  mutating={mutating}
+                  readOnly={paymentsReadOnly}
+                  refreshKey={paymentRefresh}
+                  domainEvents={domainEvents}
+                  showSaveAndNext={drawerSource === 'collection' && queueCanGoNext}
+                  onPostPayment={async (body) => {
+                    await postOrderPayment(order.id, body)
+                    setPaymentRefresh((k) => k + 1)
+                  }}
+                  onPaymentsChanged={() => {
+                    setPaymentRefresh((k) => k + 1)
+                    void refreshOrders()
+                  }}
+                  onSaveAndNext={async (body) => {
+                    await postOrderPayment(order.id, body)
+                    setPaymentRefresh((k) => k + 1)
+                    goToNextOrderWithDtos(salesOrderListItemDtos)
+                  }}
+                />
+              </MobileAccordionCard>
+
+              <MobileAccordionCard id="shipment" title="Sevkiyat durumu" subtitle="Planlama ve teslim akışı">
+                <OrderPanelShipmentOps
+                  order={order}
+                  listItemDto={listItemDto}
+                  shipmentPlan={shipmentPlan}
+                  rem={rem}
+                  planBlocked={shipmentPlanBlocked}
+                  planBlockedMessage={operationLocks.find((l) => l.blocks)?.message}
+                  onCompletePhoneDelivery={async () => {
+                    await handleStatusChange('Teslim Edildi')
+                    setActiveTab('ssh')
+                  }}
+                  onPlanClick={() => {
+                    setSshPlanTarget(null)
+                    setPlanModalOpen(true)
+                  }}
+                  onOpenShipmentOperation={
+                    onOpenShipmentOperation ? () => onOpenShipmentOperation(order.id) : undefined
+                  }
+                />
+              </MobileAccordionCard>
+
+              <MobileAccordionCard id="risk" title="Risk durumu" subtitle="Uyarılar ve özet">
+                <p className="oop-mobile-risk__summary">{riskModel.summary ?? 'Risk değerlendiriliyor'}</p>
+                <ul className="oop-mobile-risk__list">
+                  {riskModel.bullets.slice(0, 4).map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              </MobileAccordionCard>
+
+              <MobileAccordionCard id="ssh" title="Servis / SSH" subtitle="Eksik parça ve servis kayıtları">
+                <OrderPanelSshOps
+                  order={order}
+                  listItemDto={listItemDto}
+                  mutating={mutating}
+                  domainEvents={domainEvents}
+                  canPlanShipment={canEditDrawerTab(user?.role, 'shipment') || canEditDrawerTab(user?.role, 'ssh')}
+                  onPlanShipment={(item) => {
+                    setSshPlanTarget({ id: item.id, title: item.title })
+                    setPlanModalOpen(true)
+                  }}
+                  onPostMissingItem={(body) => postOrderMissingItem(order.id, body)}
+                  onPatchMissingItemStatus={(id, body) => patchMissingItemStatus(order.id, id, body)}
+                  onMarkMissingItemReadyForShipment={(id, body) =>
+                    markMissingItemReadyForShipment(order.id, id, body)
+                  }
+                />
+              </MobileAccordionCard>
+            </div>
+          </div>
+
+          <footer className="oop-mobile-actions" aria-label="Hızlı işlemler">
+            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('overview')}>
+              Düzenle
+            </button>
+            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('payments')}>
+              Tahsilat
+            </button>
+            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('shipment')}>
+              Sevk
+            </button>
+            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('ssh')}>
+              Servis
+            </button>
+          </footer>
+        </aside>
+      </div>
+    )
+  }
+
   return (
     <div className="oop-root" role="presentation">
-      <button type="button" className="oop-backdrop" aria-label="Kapat" onClick={onClose} />
+      <button type="button" className="oop-backdrop" aria-label="Kapat" onClick={handlePanelClose} />
       <aside className="oop-panel" aria-label="Sipariş operasyon paneli" role="dialog" aria-modal="true">
         <header className="oop-head">
           <div className="oop-head__main">
@@ -464,6 +846,18 @@ function OrderOperationPanelSurface({
                         {s}
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="oop-actions-item"
+                      disabled={statusSaving || mutating}
+                      onClick={() => {
+                        setActionsOpen(false)
+                        handlePanelClose()
+                      }}
+                    >
+                      Operasyonu kapat
+                    </button>
                     {statusError ? (
                       <p className="oop-error oop-error--inline" role="alert">
                         {statusError}
@@ -473,10 +867,10 @@ function OrderOperationPanelSurface({
                 ) : null}
               </div>
             ) : null}
-            <button type="button" className="oop-btn oop-btn--ghost oop-btn--close-text" onClick={onClose}>
+            <button type="button" className="oop-btn oop-btn--ghost oop-btn--close-text" onClick={handlePanelClose}>
               Kapat
             </button>
-            <button type="button" className="oop-close" onClick={onClose} aria-label="Kapat">
+            <button type="button" className="oop-close" onClick={handlePanelClose} aria-label="Kapat">
               <IconClose />
             </button>
           </div>
@@ -510,6 +904,23 @@ function OrderOperationPanelSurface({
         </nav>
 
         <div className={`oop-body${activeTab === 'overview' ? ' oop-body--overview' : ''}`}>
+          {isPhone ? (
+            <div className="oop-ssh-banner" role="status" aria-label="Operasyon tek akış">
+              <p>
+                <strong>{phoneScenarioCurrent?.label}</strong> adımı aktif.
+              </p>
+              <button
+                type="button"
+                className="oop-btn oop-btn--ghost oop-btn--sm"
+                disabled={phoneScenarioBusy}
+                onClick={() => {
+                  void handlePhoneScenarioAdvance()
+                }}
+              >
+                {phoneScenarioBusy ? 'Calisiyor…' : phoneScenarioActionLabel}
+              </button>
+            </div>
+          ) : null}
           <OrderDrawerLockBanner
             locks={operationLocks}
             onGoSsh={openMissing && activeTab !== 'ssh' ? () => goToTab('ssh') : undefined}
@@ -594,6 +1005,10 @@ function OrderOperationPanelSurface({
                 rem={rem}
                 planBlocked={shipmentPlanBlocked}
                 planBlockedMessage={operationLocks.find((l) => l.blocks)?.message}
+                onCompletePhoneDelivery={async () => {
+                  await handleStatusChange('Teslim Edildi')
+                  goToTab('ssh')
+                }}
                 onPlanClick={() => {
                   setSshPlanTarget(null)
                   setPlanModalOpen(true)

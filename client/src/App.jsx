@@ -1,12 +1,12 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import NewOrderWizard from './features/orders/NewOrderWizard.jsx'
+import OrderOperationPanel from './features/orders/OrderOperationPanel.jsx'
 import SalesContractPrint from './features/orders/SalesContractPrint.jsx'
 import { getApiBaseUrl } from './config/dataSource.js'
-import { isDemoMode, isProductionMode } from './config/appMode.js'
+import { isDemoMode } from './config/appMode.js'
 import { projectLegacyOrderToListItemDto } from './services/orderListItemProjection.js'
 import { buildSshMissingPartsQueue } from './mappers/ssh/sshMissingPartsModel.js'
 import { getAllMissingItemsSnapshot } from './services/mockMissingItemStore.js'
-const OrderOperationPanel = lazy(() => import('./features/orders/OrderOperationPanel.jsx'))
 const ExecutiveCommandCenterPage = lazy(() => import('./pages/ExecutiveCommandCenterPage.jsx'))
 const DigitalWorkforcePage = lazy(() => import('./pages/DigitalWorkforcePage.jsx'))
 const ExecutiveCenterPage = lazy(() => import('./pages/ExecutiveCenterPage.jsx'))
@@ -29,7 +29,7 @@ import ShipmentOperationsPage from './pages/ShipmentOperationsPage.jsx'
 import { MAIN_NAV, normalizePageId } from './constants/navigation.js'
 import { canAccessPage, filterNavForRole } from './constants/roleAccess.js'
 import { canCreateSalesOrder } from './constants/orderDrawerPermissions.js'
-import { resolveDefaultHomePage } from './constants/roleDefaults.js'
+import { resolveDefaultHomePage, resolveMobileFieldPilotHomePage } from './constants/roleDefaults.js'
 import { setOpsDeepLink } from './lib/opsDeepLink.js'
 import { USER_ROLE } from './contracts/v1/user.js'
 import { useAuth } from './state/AuthProvider.jsx'
@@ -84,17 +84,17 @@ import { useOrderWorkspace } from './hooks/useOrderWorkspace.js'
 import { useShipmentPlans } from './hooks/useShipmentPlans.jsx'
 import DeliveryConfirmationBanner from './components/DeliveryConfirmationBanner.jsx'
 import OfflineBanner from './components/OfflineBanner.jsx'
-import MobileTestFlowPanel from './components/mobile/MobileTestFlowPanel.jsx'
 import PwaInstallPrompt from './components/mobile/PwaInstallPrompt.jsx'
 import DeveloperPerformancePanel from './components/dev/DeveloperPerformancePanel.jsx'
 import DeveloperOfflinePanel from './components/dev/DeveloperOfflinePanel.jsx'
 import PendingActionsPanel from './components/offline/PendingActionsPanel.jsx'
 import ConflictCenterPanel from './components/offline/ConflictCenterPanel.jsx'
 import { useOfflineFirst } from './state/OfflineFirstProvider.jsx'
+import { MobileOfflineFoundationProvider } from './state/MobileOfflineFoundationProvider.jsx'
 import { onOfflineSyncDrainComplete } from './services/offline/offlineSyncEngine.js'
 import { toastInfo } from './lib/toastBus.js'
 import { buildGlobalSearchResults } from './utils/globalSearchExperience.js'
-import { useViewportTier } from './hooks/useViewportTier.js'
+import { useCompactPhoneViewport, useViewportTier } from './hooks/useViewportTier.js'
 import PaymentApprovalBanner from './components/PaymentApprovalBanner.jsx'
 import { countPendingDeliveryConfirmations } from './mappers/shipment/deliveryConfirmationQueue.js'
 import { useOrderDrawer, useOrderDrawerDtoSync } from './state/OrderDrawerProvider.jsx'
@@ -125,6 +125,7 @@ import './styles/mobile-edition-faz112.css'
 import './styles/touch-first-erp-faz113.css'
 import './styles/offline-first-faz114.css'
 import './styles/mobile-store-ops-faz115.css'
+import './styles/mobile-enterprise-polish-v3.css'
 
 /** @typedef {import('./data/seedOrders.js').Order} Order */
 /** @typedef {import('./contracts/v1/orderListRowVm.js').OrderListRowVM} OrderListRowVM */
@@ -170,9 +171,9 @@ export default function App() {
   } = useOrders()
 
   const viewportTier = useViewportTier()
+  const isCompactPhone = useCompactPhoneViewport()
   const { forceSync } = useOfflineFirst()
   const isTouchViewport = viewportTier === 'phone' || viewportTier === 'tablet'
-  const showMobileTestFlow = isTouchViewport && !isProductionMode()
 
   const { plans, refreshPlans } = useShipmentPlans()
   const pendingDeliveryConfirmCount = useMemo(
@@ -274,6 +275,16 @@ export default function App() {
       window.history.replaceState(null, '', resolveNavigateHash(home))
     }
   }, [user?.role])
+
+  useEffect(() => {
+    if (viewportTier !== 'phone') return
+    if (!user?.role) return
+    if (window.location.hash && window.location.hash !== '#/dashboard') return
+    const mobileHome = resolveMobileFieldPilotHomePage(user.role)
+    if (page === mobileHome) return
+    setPage(mobileHome)
+    window.history.replaceState(null, '', resolveNavigateHash(mobileHome))
+  }, [viewportTier, user?.role, page])
 
   const [ruleTesterCtx, setRuleTesterCtx] = useState(/** @type {{ code?: string, value?: string }} */ ({ code: '', value: '' }))
   const [shipmentOpsInitialView, setShipmentOpsInitialView] = useState(
@@ -636,7 +647,12 @@ export default function App() {
 
   function handleLoggedIn() {
     const session = loadAuthSession()
-    const home = resolveDefaultHomePage(session?.user?.role ?? user?.role)
+    const role = session?.user?.role ?? user?.role
+    const home = isCompactPhone
+      ? 'dashboard'
+      : viewportTier === 'phone'
+        ? resolveMobileFieldPilotHomePage(role)
+        : resolveDefaultHomePage(role)
     setPage(home)
     window.history.replaceState(null, '', resolveNavigateHash(home))
   }
@@ -695,7 +711,14 @@ export default function App() {
         onOpenOrderModal={openOrderModal}
         onNotificationNavigate={handleNotificationNavigate}
         notifications={notificationItems}
+        suspendMobileDock={Boolean(orderModalOpen || drawerOrder || postCreateContract || listContractOrder || shipmentModal)}
       >
+        <MobileOfflineFoundationProvider
+          isPhoneViewport={viewportTier === 'phone'}
+          currentPage={page}
+          liveListItemDtos={salesOrderListItemDtos}
+          onRestorePage={(restoredPage) => navigateTo(restoredPage)}
+        >
         {isRefreshing && orders.length > 0 ? (
           <div className="mos-refresh-strip" aria-hidden />
         ) : null}
@@ -706,13 +729,11 @@ export default function App() {
 
         <ConflictCenterPanel />
 
-        <PwaInstallPrompt />
+        {isTouchViewport ? <PwaInstallPrompt /> : null}
 
-        <MobileTestFlowPanel page={page} onNavigate={navigateTo} visible={showMobileTestFlow} />
+        {!isTouchViewport ? <DeveloperPerformancePanel /> : null}
 
-        <DeveloperPerformancePanel />
-
-        <DeveloperOfflinePanel />
+        {!isTouchViewport ? <DeveloperOfflinePanel /> : null}
 
         {error ? (
           viewportTier === 'phone' || viewportTier === 'tablet' ? (
@@ -882,6 +903,7 @@ export default function App() {
             {page === 'orders' && (
               <OrdersPage
                 orderRows={searchedOrderRows}
+                orders={orders}
                 listItemDtos={salesOrderListItemDtos}
                 todayIso={getOperationalToday()}
                 canCreateOrder={canCreateOrder}
@@ -889,6 +911,10 @@ export default function App() {
                 onOrderSelect={openOrderDetail}
                 onQuickAction={handleOrdersQuickAction}
                 highlightOrderId={highlightOrderId}
+                globalSearch={globalSearch}
+                onGlobalSearchChange={setGlobalSearch}
+                onSearchSelect={handleGlobalSearchSelect}
+                onCommitSearch={handleGlobalSearchCommit}
               />
             )}
             {page === 'shipment-ops' && (
@@ -943,6 +969,7 @@ export default function App() {
             )}
           </>
         )}
+        </MobileOfflineFoundationProvider>
       </AppLayout>
 
       {!loading ? (
@@ -963,24 +990,22 @@ export default function App() {
             />
           ) : null}
 
-          <Suspense fallback={<LoadingBlock title="Sipariş paneli yükleniyor" variant="block" />}>
-            <OrderOperationPanel
-              order={drawerOrder}
-              open={Boolean(drawerOrder)}
-              onClose={closeOrderDrawer}
-              initialTab={drawerTab}
-              drawerSource={drawerSource}
-              canGoPrev={canGoPrev}
-              canGoNext={canGoNext}
-              onGoPrev={goToPrevOrder}
-              onGoNext={goToNextOrder}
-              queuePositionLabel={
-                queue
-                  ? `${queue.activeIndex + 1} / ${queue.rowIds.length}`
-                  : null
-              }
-            />
-          </Suspense>
+          <OrderOperationPanel
+            order={drawerOrder}
+            open={Boolean(drawerOrder)}
+            onClose={closeOrderDrawer}
+            initialTab={drawerTab}
+            drawerSource={drawerSource}
+            canGoPrev={canGoPrev}
+            canGoNext={canGoNext}
+            onGoPrev={goToPrevOrder}
+            onGoNext={goToNextOrder}
+            queuePositionLabel={
+              queue
+                ? `${queue.activeIndex + 1} / ${queue.rowIds.length}`
+                : null
+            }
+          />
 
           <ShipmentOperationModal
             key={shipmentModal?.orderId ?? 'shipment-closed'}

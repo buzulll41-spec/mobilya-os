@@ -19,10 +19,13 @@ import { missingItemStatusOrOpen } from '../missingItems/missingItemStatusLabel.
  *   orderId: string
  *   orderNumber: string
  *   customer: string
+ *   customerPhone?: string
  *   partTitle: string
  *   quantityLabel: string
  *   estimatedArrivalLabel: string
  *   locksShipment: boolean
+ *   sshTypeLabel: string
+ *   openingDateLabel: string
  *   statusLabel: string
  *   uiStatus: SshMissingUiStatus
  *   riskLabel: string
@@ -115,8 +118,11 @@ export function buildSshMissingPartCard(item, order, dto, todayIso) {
     orderId: item.orderId,
     orderNumber: dto?.orderNumber ?? item.orderId,
     customer: order?.customer ?? dto?.customerDisplayName ?? item.orderId,
+    customerPhone: order?.phone?.trim() || dto?.customerPhone?.trim() || undefined,
     partTitle: item.title,
+    sshTypeLabel: item.reason?.trim() || item.title,
     quantityLabel: `${item.quantity} adet`,
+    openingDateLabel: formatOpenedLabel(item.createdAt?.slice(0, 10) ?? todayIso),
     estimatedArrivalLabel: formatArrivalLabel(arrivalIso, todayIso),
     locksShipment: open,
     statusLabel: sshMissingItemStatusLabelTr(wire),
@@ -142,6 +148,29 @@ function formatArrivalLabel(arrivalIso, todayIso) {
   if (!arrivalIso) return '—'
   if (arrivalIso < todayIso) return 'Gecikmiş'
   const [, m, d] = arrivalIso.split('-').map(Number)
+  const months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ]
+  return `${d} ${months[m - 1]}`
+}
+
+/**
+ * @param {string} dateIso
+ */
+function formatOpenedLabel(dateIso) {
+  if (!dateIso) return '—'
+  const [, m, d] = dateIso.split('-').map(Number)
   const months = [
     'Ocak',
     'Şubat',
@@ -198,8 +227,11 @@ export function buildSshMissingPartsQueue({ orders, listItemDtos, missingItems, 
       orderId: dto.id,
       orderNumber: dto.orderNumber ?? dto.id,
       customer: order?.customer ?? dto.customerDisplayName ?? dto.id,
+      customerPhone: order?.phone?.trim() || dto.customerPhone?.trim() || undefined,
       partTitle: categoryLabel,
+      sshTypeLabel: 'Eksik Parça / SSH',
       quantityLabel: open === 1 ? '1 kayıt' : `${open} kayıt`,
+      openingDateLabel: formatOpenedLabel(placedIso),
       estimatedArrivalLabel: '—',
       locksShipment: true,
       statusLabel: 'Bekleniyor',
@@ -216,6 +248,7 @@ export function buildSshMissingPartsQueue({ orders, listItemDtos, missingItems, 
       }),
     })
   }
+
   return cards.sort((a, b) => a.customer.localeCompare(b.customer, 'tr'))
 }
 

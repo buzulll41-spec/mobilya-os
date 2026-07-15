@@ -846,6 +846,175 @@
   }
 }
 
+@media (max-width: 599px) {
+  .mos-erp-ops--shipment .mos-erp-ops__head {
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-ops__head-copy {
+    min-width: 0;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-ops__head-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-erp-ops--shipment .mos-erp-summary__item {
+    padding: 0.45rem 0.5rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-summary__label {
+    font-size: 0.62rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-summary__value {
+    font-size: 0.95rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-ops__workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-filters,
+  .mos-erp-ops--shipment .mos-erp-ops__main,
+  .mos-erp-ops--shipment .mos-erp-ops__table-panel {
+    min-width: 0;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-filters {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.45rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-detail__actions {
+    border-left: 0;
+    border-top: 1px solid var(--mos-erp-border);
+    padding: 0.55rem;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-detail__action {
+    width: 100%;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-wrap {
+    overflow-x: visible;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl thead {
+    display: none;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl tbody tr {
+    display: block;
+    margin-bottom: 0.6rem;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid #d5dce4;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl tbody td {
+    display: block;
+    padding: 0.22rem 0;
+    border: 0;
+    font-size: 0.82rem;
+    white-space: normal;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.1rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #64748b;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-td--customer {
+    max-width: none;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-customer-name {
+    white-space: normal;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-ops {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-ops .mos-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-tbl-td.is-ops {
+    width: 100%;
+    text-align: left;
+  }
+
+  .sops-v3-modal-backdrop {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .sops-v3-modal {
+    width: 100%;
+    max-height: calc(100vh - 1rem);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .sops-v3-modal__head,
+  .sops-v3-modal__body,
+  .sops-v3-modal__foot {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .sops-v3-modal__foot,
+  .sops-v3-modal__foot--split {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .sops-v3-modal__foot .mos-btn,
+  .sops-v3-modal__foot .mos-btn-primary,
+  .sops-v3-modal__foot .mos-btn--ghost {
+    width: 100%;
+  }
+
+  .sops-v4-form {
+    grid-template-columns: 1fr;
+  }
+
+  .sops-v4-field input,
+  .sops-v4-field select,
+  .sops-v4-field textarea {
+    font-size: 0.9rem;
+  }
+
+  .sops-v4-conflicts {
+    margin-top: 0.65rem;
+  }
+}
+
 /* V8 — Operasyon tavsiyeleri */
 .sops-v8-advisor {
   border: 1px solid #c7d2fe;

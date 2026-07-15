@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from '../config/dataSource.js'
+import { ApiClientError } from '../lib/apiClient.js'
 import {
   createShipmentGroupInApi,
   fetchShipmentPlansFromApi,
@@ -19,7 +20,14 @@ import { createShipmentGroup, loadAllShipmentGroups } from '../state/shipmentGro
  */
 export async function listShipmentPlans(query) {
   const base = getApiBaseUrl()
-  if (base) return fetchShipmentPlansFromApi(base, query)
+  if (base) {
+    try {
+      return await fetchShipmentPlansFromApi(base, query)
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 403) return []
+      throw err
+    }
+  }
   return loadAllShipmentPlans()
 }
 

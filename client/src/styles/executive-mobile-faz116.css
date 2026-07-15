@@ -448,3 +448,141 @@
     margin-bottom: 0;
   }
 }
+
+@media (max-width: 599px) {
+  .mos-viewport-phone .exec-mobile-dashboard {
+    overflow-x: hidden;
+    padding: 0 0.85rem calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__head {
+    gap: 0.65rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__title {
+    font-size: 1.2rem;
+    line-height: 1.15;
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__health {
+    min-width: 5.5rem;
+    padding: 0.45rem 0.6rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__kpis {
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-kpi {
+    min-height: 4.9rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
+  }
+
+  .mos-viewport-phone .exec-mobile-kpi__label {
+    font-size: 0.75rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-kpi__value {
+    font-size: 1.2rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-kpi__trend {
+    font-size: 1rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__alerts-opps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-dashboard__alerts,
+  .mos-viewport-phone .exec-mobile-dashboard__opps,
+  .mos-viewport-phone .exec-mobile-dashboard__approvals,
+  .mos-viewport-phone .exec-mobile-dashboard__timeline {
+    margin-bottom: 0;
+  }
+
+  .mos-viewport-phone .exec-mobile-alert,
+  .mos-viewport-phone .exec-mobile-opp,
+  .mos-viewport-phone .exec-mobile-approval,
+  .mos-viewport-phone .exec-mobile-timeline-list li {
+    border-radius: 12px;
+  }
+
+  .mos-viewport-phone .exec-mobile-opp {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mos-viewport-phone .exec-mobile-opp strong {
+    white-space: normal;
+  }
+
+  .mos-viewport-phone .exec-mobile-approval {
+    padding: 0.7rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-approval__actions {
+    gap: 0.45rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-approval__actions button {
+    flex: 1 1 calc(50% - 0.225rem);
+    min-height: 44px;
+  }
+
+  .mos-viewport-phone .exec-mobile-approval__actions .is-review {
+    flex-basis: 100%;
+  }
+
+  .mos-viewport-phone .exec-mobile-timeline-tabs {
+    gap: 0.3rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-timeline-tabs button {
+    min-height: 42px;
+    font-size: 0.75rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-timeline-list li {
+    padding: 0.55rem 0.6rem;
+    border: 1px solid var(--mos-border, #e2e8f0);
+    background: #fff;
+  }
+
+  .mos-viewport-phone .exec-mobile-timeline-list__msg {
+    line-height: 1.4;
+  }
+
+  .mos-viewport-phone .exec-mobile-copilot-bar {
+    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    padding: 0.8rem 0.85rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-copilot-bar__line {
+    font-size: 0.875rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-ceo-fab {
+    right: 0.85rem;
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-viewport-phone .exec-mobile-ceo-fab__btn {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.5rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-ceo-fab__menu {
+    min-width: 9.5rem;
+  }
+
+  .mos-viewport-phone .exec-mobile-ceo-fab__menu button {
+    min-height: 44px;
+  }
+}

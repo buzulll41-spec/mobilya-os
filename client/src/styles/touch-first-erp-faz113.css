@@ -267,6 +267,15 @@
 }
 
 @media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone button,
+  .mos-mobile-pwa.mos-viewport-phone a,
+  .mos-mobile-pwa.mos-viewport-phone [role='button'],
+  .mos-mobile-pwa.mos-viewport-phone input,
+  .mos-mobile-pwa.mos-viewport-phone select,
+  .mos-mobile-pwa.mos-viewport-phone textarea {
+    min-height: 44px;
+  }
+
   .mos-mobile-pwa.mos-viewport-phone .mos-mobile-save-bar,
   .mos-mobile-pwa.mos-viewport-phone .cc-v2-foot,
   .mos-mobile-pwa.mos-viewport-phone .now-foot--sticky,

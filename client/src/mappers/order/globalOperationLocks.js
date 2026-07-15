@@ -71,7 +71,7 @@ export function computeGlobalOperationLocks(order, dto, todayIso) {
       id: OPERATION_LOCK_ID.BALANCE_BLOCKS_SHIPMENT,
       severity: 'warning',
       message: 'Tahsilat tamamlanmadan sevk planı riskli',
-      blocks: balanceRatio > 0.4 && !order.paid,
+      blocks: false,
       scopes: ['shipment_plan'],
     })
   }

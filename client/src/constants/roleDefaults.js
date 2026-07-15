@@ -31,3 +31,16 @@ export function resolveDefaultHomePage(role) {
   if (!role) return 'dashboard'
   return ROLE_HOME_PAGE[role] ?? 'dashboard'
 }
+
+/**
+ * Field pilot (phone) role landing pages.
+ * @param {UserRole | undefined} role
+ */
+export function resolveMobileFieldPilotHomePage(role) {
+  if (!role) return 'dashboard'
+  if (role === USER_ROLE.OPERATION) return 'shipment-ops'
+  if (role === USER_ROLE.WAREHOUSE) return 'shipment-ops'
+  if (role === USER_ROLE.SERVICE) return 'ssh-service'
+  if (role === USER_ROLE.FINANCE) return 'collection'
+  return 'dashboard'
+}

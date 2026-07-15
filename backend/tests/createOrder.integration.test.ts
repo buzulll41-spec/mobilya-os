@@ -116,6 +116,36 @@ describe('assertValidCreateOrderRequest', () => {
     expect(normalized.totalAmount).toBe(1000)
   })
 
+  it('telefon alanını normalize edip korur', () => {
+    const normalized = assertValidCreateOrderRequest({
+      customerName: 'Telefonlu Müşteri',
+      phone: ' 0555 000 00 00 ',
+      paidAmount: 0,
+      status: 'Bekleniyor',
+      lines: [{ title: 'A', quantity: 1, unitPrice: 1000, sortOrder: 0 }],
+    })
+    expect(normalized.phone).toBe('0555 000 00 00')
+  })
+
+  it('mevcut sipariş meta alanlarını normalize edip korur', () => {
+    const normalized = assertValidCreateOrderRequest({
+      customerName: 'Meta Müşteri',
+      paidAmount: 0,
+      status: 'Bekleniyor',
+      lines: [{ title: 'A', quantity: 1, unitPrice: 1000, sortOrder: 0 }],
+      salesPerson: 'Ali Veli',
+      dueDate: '2026-06-01',
+      shipmentDate: '2026-06-05',
+      notes: 'Teslimat 2. kat',
+      cost: 700,
+    })
+    expect(normalized.salesPerson).toBe('Ali Veli')
+    expect(normalized.dueDate).toBe('2026-06-01')
+    expect(normalized.shipmentDate).toBe('2026-06-05')
+    expect(normalized.notes).toBe('Teslimat 2. kat')
+    expect(normalized.cost).toBe(700)
+  })
+
   it('paidAmount > totalAmount ise 400 fırlatır', () => {
     expect(() =>
       assertValidCreateOrderRequest({
@@ -244,6 +274,88 @@ describe.skipIf(!hasDb)('POST /v1/orders integration', () => {
 
     await prisma.domainEvent.deleteMany({ where: { aggregateId: multiId } })
     await prisma.salesOrder.delete({ where: { id: multiId } }).catch(() => undefined)
+  })
+
+  it('salesPerson/dueDate/shipmentDate/notes/cost alanlarını persist eder', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/orders',
+      payload: {
+        customerName: 'Meta Persist',
+        paidAmount: 0,
+        status: 'Bekleniyor',
+        productTitle: 'Meta Ürün',
+        totalAmount: 4200,
+        salesPerson: 'Satış 1',
+        dueDate: '2026-06-10',
+        shipmentDate: '2026-06-12',
+        notes: 'Asansör yok',
+        cost: 2100,
+      },
+    })
+    expect(createRes.statusCode).toBe(201)
+    const body = createRes.json() as { id: string }
+
+    const dbOrder = await prisma.salesOrder.findUnique({ where: { id: body.id } })
+    expect(dbOrder).toBeTruthy()
+    expect(dbOrder?.salesPerson).toBe('Satış 1')
+    expect(dbOrder?.notes).toBe('Asansör yok')
+    expect(dbOrder?.lineCostAmount?.toString()).toBe('2100')
+    expect(dbOrder?.dueDate?.toISOString().slice(0, 10)).toBe('2026-06-10')
+    expect(dbOrder?.shipmentDate?.toISOString().slice(0, 10)).toBe('2026-06-12')
+
+    await prisma.domainEvent.deleteMany({ where: { aggregateId: body.id } })
+    await prisma.salesOrder.delete({ where: { id: body.id } }).catch(() => undefined)
+  })
+
+  it('phone alanı create -> read -> projection zincirinde korunur', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/orders',
+      payload: {
+        customerName: 'Phone Persist Test',
+        paidAmount: 0,
+        status: 'Bekleniyor',
+        productTitle: 'Telefonlu Ürün',
+        totalAmount: 3500,
+        phone: '0555 123 45 67',
+      },
+    })
+    expect(createRes.statusCode).toBe(201)
+    const body = createRes.json() as { id: string }
+
+    const dbOrder = await prisma.salesOrder.findUnique({ where: { id: body.id } })
+    expect(dbOrder).toBeTruthy()
+    expect(dbOrder?.customerPhone).toBe('0555 123 45 67')
+
+    const listRes = await app.inject({ method: 'GET', url: '/v1/orders' })
+    expect(listRes.statusCode).toBe(200)
+    const rows = listRes.json() as Array<{
+      id: string
+      customerDisplayName: string
+      customerPhone: string | null
+      lineSummaryTitle: string
+      displayStatus: string
+    }>
+    const row = rows.find((r) => r.id === body.id)
+    expect(row).toBeTruthy()
+    expect(row?.customerPhone).toBe('0555 123 45 67')
+    expect({
+      customerDisplayName: row?.customerDisplayName,
+      customerPhone: row?.customerPhone,
+      lineSummaryTitle: row?.lineSummaryTitle,
+      displayStatus: row?.displayStatus,
+    }).toMatchInlineSnapshot(`
+      {
+        "customerDisplayName": "Phone Persist Test",
+        "customerPhone": "0555 123 45 67",
+        "displayStatus": "Bekleniyor",
+        "lineSummaryTitle": "Telefonlu Ürün",
+      }
+    `)
+
+    await prisma.domainEvent.deleteMany({ where: { aggregateId: body.id } })
+    await prisma.salesOrder.delete({ where: { id: body.id } }).catch(() => undefined)
   })
 
   it('ürün konfigürasyonu order_lines ve order-lines API ile persist edilir', async () => {

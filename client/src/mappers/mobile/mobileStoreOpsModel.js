@@ -181,8 +181,11 @@ export function buildMobileOrderCardVm(row, dto, todayIso) {
     statusLabel: row.status,
     terminLabel: row.dueDate ? formatShortDate(row.dueDate) : '—',
     terminOverdue: isTerminOverdue(row, todayIso),
+    amountLabel: formatTry(Number(row.amount ?? 0)),
     balanceLabel: buildCollectionLabel(row, dto),
     shipmentLabel: buildShipmentLabel(row, dto),
+    riskLabel: tableRow.riskLabel,
+    riskTone: tableRow.riskTone,
     tone: tableRow.tone,
   }
 }

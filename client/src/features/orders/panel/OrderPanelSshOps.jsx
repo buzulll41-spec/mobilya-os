@@ -84,20 +84,28 @@ export default function OrderPanelSshOps({
   const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
-    try {
-      const [missingRows, caseResult] = await Promise.all([
-        ordersClient.getOrderMissingItems(order.id),
-        getOperationCases({}),
-      ])
-      setItems(sanitizeMissingItemsList(missingRows))
-      setCases(
-        (caseResult.cases ?? []).filter((c) => c.orderIds?.includes(order.id)),
-      )
-    } catch (e) {
-      setError(formatApiErrorMessage(e))
-    } finally {
-      setLoading(false)
+    const [missingRes, casesRes] = await Promise.allSettled([
+      ordersClient.getOrderMissingItems(order.id),
+      getOperationCases({}),
+    ])
+
+    if (missingRes.status === 'fulfilled') {
+      setItems(sanitizeMissingItemsList(missingRes.value))
+    } else {
+      setItems([])
+      setError(formatApiErrorMessage(missingRes.reason))
     }
+
+    if (casesRes.status === 'fulfilled') {
+      setCases((casesRes.value.cases ?? []).filter((c) => c.orderIds?.includes(order.id)))
+    } else {
+      setCases([])
+      if (missingRes.status === 'fulfilled') {
+        setError(null)
+      }
+    }
+
+    setLoading(false)
   }, [order.id])
 
   useEffect(() => {
@@ -209,6 +217,7 @@ export default function OrderPanelSshOps({
   async function handleCreate(e) {
     e.preventDefault()
     setFormError(null)
+    setSuccessMessage(null)
     const qty = Number.parseFloat(quantity.replace(',', '.'))
     if (!title.trim() || !reason.trim()) {
       setFormError('Parça adı ve gerekçe zorunlu.')
@@ -230,6 +239,8 @@ export default function OrderPanelSshOps({
       setReason('')
       setSupplierNote('')
       setShowAddForm(false)
+      setCategoryFilter('all')
+      setSuccessMessage('SSH / eksik parça kaydı oluşturuldu.')
       await loadData()
     } catch (err) {
       setFormError(formatApiErrorMessage(err))

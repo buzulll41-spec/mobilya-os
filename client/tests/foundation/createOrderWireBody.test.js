@@ -36,6 +36,11 @@ describe('toCreateOrderWireBody', () => {
       totalAmount: 13_000,
       paidAmount: 2000,
       status: 'Bekleniyor',
+      phone: '0532',
+      salesPerson: 'Ali',
+      dueDate: '2026-06-01',
+      notes: 'Adres: İzmir',
+      cost: 5000,
       lines: [
         {
           title: 'Dolap',

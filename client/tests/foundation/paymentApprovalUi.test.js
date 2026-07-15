@@ -26,11 +26,11 @@ describe('payment approval UI helpers', () => {
     )
   })
 
-  it('RBAC — yalnız admin/manager/finance onaylayabilir', () => {
+  it('RBAC — admin/manager/finance/operation onaylayabilir', () => {
     expect(canApprovePayments('ADMIN')).toBe(true)
     expect(canApprovePayments('FINANCE')).toBe(true)
     expect(canApprovePayments('SALES')).toBe(false)
-    expect(canApprovePayments('OPERATION')).toBe(false)
+    expect(canApprovePayments('OPERATION')).toBe(true)
   })
 
   it('order panel row — pending approval işaretlenir', () => {

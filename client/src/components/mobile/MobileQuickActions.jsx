@@ -1,5 +1,6 @@
 import { MOBILE_STORE_QUICK_ACTIONS } from '../../mappers/mobile/mobileStoreOpsModel.js'
 import { navigateWithOpsFilter } from '../../lib/opsDeepLink.js'
+import { memo } from 'react'
 
 /**
  * @param {{
@@ -9,7 +10,7 @@ import { navigateWithOpsFilter } from '../../lib/opsDeepLink.js'
  *   className?: string
  * }} props
  */
-export default function MobileQuickActions({
+function MobileQuickActions({
   onNavigate,
   onNewOrder,
   onFocusSearch,
@@ -54,3 +55,5 @@ export default function MobileQuickActions({
     </section>
   )
 }
+
+export default memo(MobileQuickActions)

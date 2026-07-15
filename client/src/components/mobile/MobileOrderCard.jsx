@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 /**
  * @param {'success' | 'warning' | 'critical' | 'neutral'} tone
  */
@@ -11,17 +13,18 @@ function toneClass(tone) {
 /**
  * @param {{
  *   card: import('../../mappers/mobile/mobileStoreOpsModel.js').MobileOrderCardVm
+ *   dense?: boolean
  *   selected?: boolean
  *   onOpen?: () => void
  * }} props
  */
-export default function MobileOrderCard({ card, selected = false, onOpen }) {
+function MobileOrderCard({ card, dense = false, selected = false, onOpen }) {
   return (
     <button
       type="button"
-      className={`mos-mobile-order-card ${toneClass(card.tone)} ${selected ? 'is-selected' : ''}`.trim()}
+      className={`mos-mobile-order-card ${dense ? 'mos-mobile-order-card--dense' : ''} ${toneClass(card.tone)} ${selected ? 'is-selected' : ''}`.trim()}
       data-order-row-id={card.id}
-      aria-label={`${card.customer}, ${card.orderNo}, ${card.statusLabel}`}
+      aria-label={`${card.customer}, ${card.orderNo}, ${card.statusLabel}, ${card.riskLabel}`}
       onClick={onOpen}
     >
       <div className="mos-mobile-order-card__head">
@@ -36,16 +39,41 @@ export default function MobileOrderCard({ card, selected = false, onOpen }) {
           <dt>Termin</dt>
           <dd className={card.terminOverdue ? 'is-overdue' : ''}>{card.terminLabel}</dd>
         </div>
-        <div>
-          <dt>Bakiye</dt>
-          <dd>{card.balanceLabel}</dd>
-        </div>
-        <div>
-          <dt>Sevk</dt>
-          <dd>{card.shipmentLabel}</dd>
-        </div>
+        {dense ? (
+          <>
+            <div>
+              <dt>Tutar</dt>
+              <dd>{card.amountLabel}</dd>
+            </div>
+            <div>
+              <dt>Kalan ödeme</dt>
+              <dd>{card.balanceLabel}</dd>
+            </div>
+            <div>
+              <dt>Sevk durumu</dt>
+              <dd>{card.shipmentLabel}</dd>
+            </div>
+            <div>
+              <dt>Risk</dt>
+              <dd data-tone={card.riskTone ?? 'neutral'}>{card.riskLabel}</dd>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <dt>Bakiye</dt>
+              <dd>{card.balanceLabel}</dd>
+            </div>
+            <div>
+              <dt>Sevk</dt>
+              <dd>{card.shipmentLabel}</dd>
+            </div>
+          </>
+        )}
       </dl>
       <span className="mos-mobile-order-card__order-no">{card.orderNo}</span>
     </button>
   )
 }
+
+export default memo(MobileOrderCard)

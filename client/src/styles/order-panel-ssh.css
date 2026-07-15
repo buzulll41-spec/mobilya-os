@@ -456,3 +456,103 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 599px) {
+  .oop-ssh__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .oop-ssh__kpi-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex: 1 1 auto;
+  }
+
+  .oop-ssh__actions {
+    width: 100%;
+  }
+
+  .oop-ssh__btn,
+  .oop-ssh__row-btn,
+  .oop-ssh__btn--primary,
+  .oop-ssh__row-btn--primary {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .oop-ssh__filters {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.15rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .oop-ssh__filter {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .oop-ssh__table-panel {
+    border-radius: 10px;
+  }
+
+  .oop-ssh__tbl-wrap {
+    overflow-x: visible;
+    max-height: none;
+  }
+
+  .oop-ssh__tbl thead {
+    display: none;
+  }
+
+  .oop-ssh-row {
+    display: block;
+    margin: 0 0 0.6rem;
+  }
+
+  .oop-ssh-row td {
+    display: block;
+    padding: 0.2rem 0;
+    border-bottom: 0;
+    white-space: normal;
+    font-size: 0.82rem;
+  }
+
+  .oop-ssh-row td.is-ops {
+    width: 100%;
+  }
+
+  .oop-ssh__row-ops {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .oop-ssh__row-btn,
+  .oop-ssh__row-btn--primary {
+    width: 100%;
+  }
+
+  .oop-ssh__note {
+    max-width: none;
+  }
+
+  .oop-ssh__add-form {
+    padding: 0.7rem;
+  }
+
+  .oop-ssh__form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oop-ssh__input {
+    min-height: 44px;
+  }
+
+  .oop-ssh__inline-note {
+    align-items: stretch;
+  }
+
+  .oop-ssh__inline-note .oop-ssh__input {
+    flex: 1 1 auto;
+  }
+}

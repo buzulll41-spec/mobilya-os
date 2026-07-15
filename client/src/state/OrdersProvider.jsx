@@ -133,10 +133,17 @@ export function OrdersProvider({ children }) {
         await cacheOrders(salesOrderListItemDtos)
       } catch (e) {
         if (isOfflineMode()) {
-          const cached = await readCachedOrders()
-          if (cached.length) setSalesOrderListItemDtos(cached)
+          try {
+            const cached = await readCachedOrders()
+            if (cached.length) setSalesOrderListItemDtos(cached)
+          } catch {
+            // ignore cache fallback failures
+          }
         }
-        setError(new Error(formatApiErrorMessage(e)))
+        const message = formatApiErrorMessage(e)
+        if (!message.includes('Backend çalışmıyor') && !message.includes('zaman aşımına')) {
+          setError(new Error(message))
+        }
       } finally {
         setIsRefreshing(false)
       }

@@ -31,6 +31,7 @@ import {
   PAYMENT_TX_STATUS,
   paymentAutoApprovesForRole,
 } from '../lib/paymentApprovalPolicy.js'
+import { USER_ROLE } from '../constants/userRoles.js'
 import { finalizeOrderPaymentPosting } from './finalizeOrderPaymentPosting.js'
 import { resolveMailOrderSupplierFields } from './resolveMailOrderSupplierFields.js'
 import { createPendingMailOrderSupplierLedger } from './appendMailOrderSupplierLedger.js'
@@ -48,6 +49,24 @@ const PAYMENT_APPROVED_EVENT = 'payment.approved'
 
 function parseOrderDate(iso: string): Date {
   return new Date(`${iso}T00:00:00.000Z`)
+}
+
+function parseOptionalIsoDate(raw: unknown, field: 'dueDate' | 'shipmentDate'): Date | undefined {
+  if (typeof raw !== 'string') return undefined
+  const value = raw.trim()
+  if (!value) return undefined
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new AppHttpError(400, 'Validation failed', 'Bad Request', {
+      [field]: 'Must be YYYY-MM-DD',
+    })
+  }
+  const dt = parseOrderDate(value)
+  if (Number.isNaN(dt.getTime())) {
+    throw new AppHttpError(400, 'Validation failed', 'Bad Request', {
+      [field]: 'Invalid date',
+    })
+  }
+  return dt
 }
 
 function addDaysUtc(d: Date, days: number): Date {
@@ -141,6 +160,22 @@ function resolveCommerceFromBody(
 
 export function normalizeCreateOrderRequest(body: CreateOrderRequest): NormalizedCreateOrderRequest {
   const customerName = body.customerName.trim()
+  const phone = typeof body.phone === 'string' && body.phone.trim() ? body.phone.trim() : undefined
+  const salesPerson =
+    typeof body.salesPerson === 'string' && body.salesPerson.trim()
+      ? body.salesPerson.trim()
+      : undefined
+  const dueDate =
+    typeof body.dueDate === 'string' && body.dueDate.trim() ? body.dueDate.trim() : undefined
+  const shipmentDate =
+    typeof body.shipmentDate === 'string' && body.shipmentDate.trim()
+      ? body.shipmentDate.trim()
+      : undefined
+  const notes = typeof body.notes === 'string' && body.notes.trim() ? body.notes.trim() : undefined
+  const cost =
+    typeof body.cost === 'number' && Number.isFinite(body.cost) && body.cost >= 0
+      ? roundMoney(body.cost)
+      : undefined
   const status = body.status
 
   let lines: CreateOrderLineInput[] = []
@@ -185,6 +220,12 @@ export function normalizeCreateOrderRequest(body: CreateOrderRequest): Normalize
 
   return {
     customerName,
+    ...(phone ? { phone } : {}),
+    ...(salesPerson ? { salesPerson } : {}),
+    ...(dueDate ? { dueDate } : {}),
+    ...(shipmentDate ? { shipmentDate } : {}),
+    ...(notes ? { notes } : {}),
+    ...(cost != null ? { cost } : {}),
     productTitle,
     subtotalAmount: commerce.subtotalAmount,
     discountAmount: commerce.discountAmount,
@@ -223,6 +264,12 @@ export function assertValidCreateOrderRequest(body: unknown): NormalizedCreateOr
     customerName,
     paidAmount,
     status: status as CreateOrderRequest['status'],
+    ...(typeof o.phone === 'string' ? { phone: o.phone } : {}),
+    ...(typeof o.salesPerson === 'string' ? { salesPerson: o.salesPerson } : {}),
+    ...(typeof o.dueDate === 'string' ? { dueDate: o.dueDate } : {}),
+    ...(typeof o.shipmentDate === 'string' ? { shipmentDate: o.shipmentDate } : {}),
+    ...(typeof o.notes === 'string' ? { notes: o.notes } : {}),
+    ...(typeof o.cost === 'number' ? { cost: o.cost } : {}),
     ...(typeof o.productTitle === 'string' ? { productTitle: o.productTitle } : {}),
     ...(typeof o.subtotalAmount === 'number' ? { subtotalAmount: o.subtotalAmount } : {}),
     ...(typeof o.discountAmount === 'number' ? { discountAmount: o.discountAmount } : {}),
@@ -235,6 +282,8 @@ export function assertValidCreateOrderRequest(body: unknown): NormalizedCreateOr
   }
 
   const normalized = normalizeCreateOrderRequest(request)
+  parseOptionalIsoDate(normalized.dueDate, 'dueDate')
+  parseOptionalIsoDate(normalized.shipmentDate, 'shipmentDate')
   const commercial = parseCreateOrderCommercialFields(o, normalized)
   return { ...normalized, ...commercial }
 }
@@ -279,13 +328,17 @@ export async function createSalesOrder(
 
   const todayIso = process.env.DEMO_TODAY ?? '2026-05-14'
   const orderDate = parseOrderDate(todayIso)
-  const dueDate = addDaysUtc(orderDate, 14)
+  const dueDate = parseOptionalIsoDate(body.dueDate, 'dueDate') ?? addDaysUtc(orderDate, 14)
+  const shipmentDate =
+    parseOptionalIsoDate(body.shipmentDate, 'shipmentDate') ?? addDaysUtc(dueDate, 5)
   const orderId = newOrderId()
   const lineIds = buildOrderLineIds(orderId, resolvedLines.length)
   const now = new Date()
   const isMailOrder = body.paymentMethod === PAYMENT_METHOD.MAIL_ORDER
   const paymentKind = isMailOrder ? 'MAIL_ORDER' : 'CAPTURE'
-  const autoApprove = paymentAutoApprovesForRole(options?.authUser?.role)
+  const autoApprove =
+    paymentAutoApprovesForRole(options?.authUser?.role) ||
+    (!isMailOrder && options?.authUser?.role === USER_ROLE.SALES)
   const hasInitialPayment = body.paidAmount > 0
   const initialPaymentStatus = autoApprove ? PAYMENT_TX_STATUS.POSTED : PAYMENT_TX_STATUS.PENDING_APPROVAL
   const ledgerPaidAtCreate = autoApprove && hasInitialPayment ? body.paidAmount : 0
@@ -324,7 +377,10 @@ export async function createSalesOrder(
         isFullyPaid: remainingAtCreate <= 0.009,
         orderDate,
         dueDate,
-        shipmentDate: addDaysUtc(dueDate, 5),
+        shipmentDate,
+        ...(body.salesPerson ? { salesPerson: body.salesPerson } : {}),
+        ...(body.notes ? { notes: body.notes } : {}),
+        ...(body.cost != null ? { lineCostAmount: new Prisma.Decimal(body.cost) } : {}),
         version: 1,
         lines: {
           create: resolvedLines.map((ln, i) => {

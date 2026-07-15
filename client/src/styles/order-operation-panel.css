@@ -716,6 +716,247 @@
   border-bottom: 1px solid #f1f5f9;
 }
 
+@media (max-width: 479px) {
+  .oop-root--mobile {
+    align-items: stretch;
+  }
+
+  .oop-panel--mobile {
+    min-width: 100%;
+    width: 100%;
+    background: #f8fafc;
+    overflow: hidden;
+  }
+
+  .oop-mobile-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem 0.75rem;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .oop-mobile-head__copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .oop-mobile-head__customer {
+    padding: 0;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 1.08rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #0f172a;
+  }
+
+  .oop-mobile-head__meta,
+  .oop-mobile-head__contact,
+  .oop-mobile-head__address,
+  .oop-mobile-hero__milestone,
+  .oop-mobile-risk__summary {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .oop-mobile-head__contact,
+  .oop-mobile-head__address {
+    color: #64748b;
+  }
+
+  .oop-mobile-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .oop-mobile-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #dbe3ec;
+    border-radius: 16px;
+    background: #fff;
+  }
+
+  .oop-mobile-hero__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .oop-mobile-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .oop-mobile-card {
+    border: 1px solid #dbe3ec;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .oop-mobile-card__head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 0.95rem;
+    border: 0;
+    background: #f8fafc;
+    text-align: left;
+  }
+
+  .oop-mobile-card.is-open .oop-mobile-card__head {
+    background: #eef4ff;
+  }
+
+  .oop-mobile-card__head-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .oop-mobile-card__title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .oop-mobile-card__sub {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .oop-mobile-card__chev {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #334155;
+  }
+
+  .oop-mobile-card__body {
+    padding: 0.85rem 0.9rem 0.95rem;
+  }
+
+  .oop-mobile-risk__list {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    color: #334155;
+    font-size: 0.8125rem;
+  }
+
+  .oop-mobile-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(248, 250, 252, 0.96);
+    border-top: 1px solid #dbe3ec;
+    backdrop-filter: blur(8px);
+  }
+
+  .oop-mobile-actions__btn {
+    min-height: 3.4rem;
+    padding: 0.5rem 0.35rem;
+    border: 1px solid #cfd6df;
+    border-radius: 14px;
+    background: #fff;
+    color: #0f172a;
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-history .mos-erp-tbl-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl thead,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl thead,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl thead,
+  .oop-panel--mobile .oop-history .mos-erp-tbl thead {
+    display: none;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl tbody tr,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl tbody tr,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl tbody tr,
+  .oop-panel--mobile .oop-history .mos-erp-tbl tbody tr {
+    display: block;
+    margin: 0 0 0.6rem;
+    border: 1px solid #dbe3ec;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl tbody td,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl tbody td,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl tbody td,
+  .oop-panel--mobile .oop-history .mos-erp-tbl tbody td {
+    display: block;
+    width: 100%;
+    border: none;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl tbody td:first-child,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl tbody td:first-child,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl tbody td:first-child,
+  .oop-panel--mobile .oop-history .mos-erp-tbl tbody td:first-child {
+    padding-top: 0.7rem;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl tbody td:last-child,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl tbody td:last-child,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl tbody td:last-child,
+  .oop-panel--mobile .oop-history .mos-erp-tbl tbody td:last-child {
+    padding-bottom: 0.75rem;
+  }
+
+  .oop-panel--mobile .oop-products .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-payments .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-ssh .mos-erp-tbl-wrap,
+  .oop-panel--mobile .oop-history .mos-erp-tbl-wrap {
+    border: 0;
+  }
+}
+
 .oop-flow__item:last-child {
   border-bottom: none;
 }
@@ -3369,6 +3610,105 @@
 
   .oop-body {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 599px) {
+  .oop-head {
+    padding: 0.75rem 0.75rem 0.65rem;
+    gap: 0.45rem;
+  }
+
+  .oop-head__main {
+    min-width: 0;
+  }
+
+  .oop-head__title-row {
+    gap: 0.3rem 0.45rem;
+  }
+
+  .oop-title {
+    font-size: 1.08rem;
+    line-height: 1.15;
+  }
+
+  .oop-sub {
+    gap: 0.3rem;
+  }
+
+  .oop-milestone,
+  .oop-risk-pill {
+    font-size: 0.64rem;
+  }
+
+  .oop-summary-strip {
+    margin-top: 0.18rem;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .oop-summary-strip__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oop-head__meta-row {
+    grid-template-columns: 3.4rem minmax(0, 1fr);
+    font-size: 0.74rem;
+  }
+
+  .oop-head__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .oop-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .oop-btn--close-text {
+    display: none;
+  }
+
+  .oop-close {
+    width: 44px;
+    height: 44px;
+    justify-self: end;
+  }
+
+  .oop-tabs {
+    padding: 0 0.6rem;
+    gap: 0.15rem;
+    scrollbar-width: none;
+  }
+
+  .oop-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .oop-tab {
+    padding: 0.42rem 0.55rem;
+    font-size: 0.66rem;
+    gap: 0.3rem;
+  }
+
+  .oop-tab__label {
+    white-space: nowrap;
+  }
+
+  .oop-body {
+    padding: 0.85rem 0.75rem 1.1rem;
+    scroll-padding-bottom: 1.25rem;
+  }
+
+  .oop-body--overview {
+    padding: 0.72rem 0.75rem 1rem;
+  }
+
+  .oop-kpis {
+    padding: 0.75rem 0.75rem;
   }
 }
 

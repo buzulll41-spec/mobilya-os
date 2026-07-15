@@ -19,6 +19,17 @@ export interface ProductionConfigIssue {
   type: ProductionConfigIssueType
 }
 
+function isLoopbackOrigin(origin: string): boolean {
+  const value = origin.trim().toLowerCase()
+  if (!value) return false
+  try {
+    const host = new URL(value).hostname.toLowerCase()
+    return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '::1'
+  } catch {
+    return /localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]/i.test(value)
+  }
+}
+
 export class ProductionConfigError extends Error {
   readonly issues: ProductionConfigIssue[]
   constructor(issues: ProductionConfigIssue[]) {
@@ -71,6 +82,14 @@ export function collectProductionConfigIssues(
   const cors = env.CORS_ORIGIN?.trim()
   if (!cors) {
     issues.push({ variable: 'CORS_ORIGIN', type: 'missing' })
+  } else {
+    const origins = cors
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (origins.some((origin) => isLoopbackOrigin(origin))) {
+      issues.push({ variable: 'CORS_ORIGIN', type: 'invalid' })
+    }
   }
 
   return issues

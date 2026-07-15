@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from '@prisma/client'
 import { AppHttpError } from '../errors/apiError.js'
 import { PAYMENT_METHOD } from '../constants/paymentMethods.js'
 import { isPaymentMethod } from '../constants/paymentMethods.js'
+import { USER_ROLE } from '../constants/userRoles.js'
 import { decimalToNumber } from '../lib/money.js'
 import { sumPostedCaptureAmount } from '../lib/paymentLedger.js'
 import {
@@ -81,10 +82,12 @@ export async function postOrderPayment(
     })
   }
 
-  const autoApprove = paymentAutoApprovesForRole(options?.authUser?.role)
-  const initialStatus = autoApprove ? PAYMENT_TX_STATUS.POSTED : PAYMENT_TX_STATUS.PENDING_APPROVAL
   const isMailOrder = body.method === PAYMENT_METHOD.MAIL_ORDER
   const paymentKind = isMailOrder ? 'MAIL_ORDER' : 'CAPTURE'
+  const autoApprove =
+    paymentAutoApprovesForRole(options?.authUser?.role) ||
+    (!isMailOrder && options?.authUser?.role === USER_ROLE.SALES)
+  const initialStatus = autoApprove ? PAYMENT_TX_STATUS.POSTED : PAYMENT_TX_STATUS.PENDING_APPROVAL
   const mailOrderCustomerId = body.mailOrderCustomerId?.trim() || existing.customerName
 
   const now = new Date()

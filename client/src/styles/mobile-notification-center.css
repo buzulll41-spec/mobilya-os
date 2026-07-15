@@ -1,0 +1,79 @@
+@media (max-width: 480px) {
+  .mos-mobile-notification-center {
+    display: grid;
+    gap: 12px;
+  }
+
+  .mos-mobile-notification-center__prefs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mos-mobile-notification-center__prefs label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 0.78rem;
+    color: #334155;
+  }
+
+  .mos-mobile-notification-center__prefs button {
+    margin-left: auto;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    border-radius: 10px;
+    min-height: 2rem;
+    padding: 0 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .mos-mobile-notification-center__empty {
+    margin: 0;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+
+  .mos-mobile-notification-center__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    max-height: 48vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .mos-mobile-notification-center__item {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+    text-align: left;
+    display: grid;
+    gap: 4px;
+  }
+
+  .mos-mobile-notification-center__item strong {
+    font-size: 0.82rem;
+    color: #0f172a;
+  }
+
+  .mos-mobile-notification-center__item span {
+    font-size: 0.78rem;
+    color: #334155;
+  }
+
+  .mos-mobile-notification-center__item small {
+    font-size: 0.7rem;
+    color: #64748b;
+  }
+}

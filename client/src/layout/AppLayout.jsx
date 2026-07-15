@@ -37,6 +37,7 @@ import Sidebar from './Sidebar.jsx'
  *   userRoleKey?: import('../contracts/v1/user.js').UserRole
  *   userInitials?: string
  *   onLogout?: () => void
+ *   suspendMobileDock?: boolean
  *   children: import('react').ReactNode
  * }} props
  */
@@ -65,11 +66,14 @@ export default function AppLayout({
   userRoleKey,
   userInitials,
   onLogout,
+  suspendMobileDock = false,
   children,
 }) {
   const viewportTier = useViewportTier()
-  const isPhone = viewportTier === 'phone'
-  const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet'
+  const isPhoneWidth =
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 479px)').matches : false
+  const isPhone = viewportTier === 'phone' || isPhoneWidth
+  const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet' || isPhoneWidth
   const showStoreQuickDock = isPhone && isMobileStoreOpsPage(page) && page !== 'dashboard'
   const tabletSidebarCollapsed = viewportTier === 'tablet' ? true : sidebarCollapsed
   const viewportClass =
@@ -152,14 +156,16 @@ export default function AppLayout({
               <>
                 <MobileSwipeEnhancer />
                 <MobileLongPressEnhancer />
-                <MobileFab page={page} onFabIntent={handleFabIntent} />
-                <MobileTabBar
-                  page={page}
-                  sidebarOpen={sidebarOpen}
-                  onNavigate={onNavigate}
-                  onOpenMenu={() => setSidebarOpen(true)}
-                />
-                {showStoreQuickDock ? (
+                {!suspendMobileDock ? <MobileFab page={page} onFabIntent={handleFabIntent} /> : null}
+                {!suspendMobileDock ? (
+                  <MobileTabBar
+                    page={page}
+                    sidebarOpen={sidebarOpen}
+                    onNavigate={onNavigate}
+                    onOpenMenu={() => setSidebarOpen(true)}
+                  />
+                ) : null}
+                {showStoreQuickDock && !suspendMobileDock ? (
                   <MobileQuickActions
                     className="mos-mobile-quick-actions--dock"
                     onNavigate={onNavigate}

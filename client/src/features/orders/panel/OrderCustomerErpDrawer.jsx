@@ -28,6 +28,30 @@ function riskBadgeClass(severity) {
 }
 
 /**
+ * @param {string | null | undefined} phone
+ */
+function normalizePhoneDigits(phone) {
+  return String(phone ?? '').replace(/\D/g, '')
+}
+
+/**
+ * @param {string | null | undefined} phone
+ */
+function resolveTelHref(phone) {
+  const raw = String(phone ?? '').trim()
+  return raw ? `tel:${raw.replace(/\s/g, '')}` : null
+}
+
+/**
+ * @param {string | null | undefined} phone
+ */
+function resolveWhatsAppHref(phone) {
+  const digits = normalizePhoneDigits(phone)
+  if (!digits) return null
+  return `https://wa.me/${digits.replace(/^0/, '90')}`
+}
+
+/**
  * Müşteri Kartı ERP V1 — sipariş paneli içi sağ drawer.
  *
  * @param {{
@@ -91,6 +115,9 @@ export default function OrderCustomerErpDrawer({
 
   const riskSeverity = listItemDto?.currentRiskSeverity ?? 'NONE'
   const riskLabel = riskSeverityBadgeLabelTr(riskSeverity)
+  const primaryPhone = phone?.trim() || phone2?.trim() || null
+  const telHref = resolveTelHref(primaryPhone)
+  const whatsappHref = resolveWhatsAppHref(primaryPhone)
 
   const stats = useMemo(
     () => buildCustomerDrawerStats(customer, orders, salesOrderListItemDtos ?? []),
@@ -234,6 +261,25 @@ export default function OrderCustomerErpDrawer({
             <h3 id="cust-sec-contact" className="cust-erp-drawer__section-title">
               İletişim Bilgileri
             </h3>
+            {telHref || whatsappHref ? (
+              <div className="cust-erp-drawer__actions" aria-label="Hızlı iletişim aksiyonları">
+                {telHref ? (
+                  <a className="cust-erp-drawer__action cust-erp-drawer__action--call" href={telHref}>
+                    Ara
+                  </a>
+                ) : null}
+                {whatsappHref ? (
+                  <a
+                    className="cust-erp-drawer__action cust-erp-drawer__action--whatsapp"
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    WhatsApp
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
             <dl className="cust-erp-drawer__kv">
               <div className="cust-erp-drawer__kv-row">
                 <dt>Telefon</dt>

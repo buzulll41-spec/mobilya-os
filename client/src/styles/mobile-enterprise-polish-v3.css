@@ -1,0 +1,269 @@
+/* MOBILE OPERATION CENTER v3 - Enterprise Polish (presentation only) */
+
+:root {
+  --mos-mobile-space-8: 8px;
+  --mos-mobile-space-12: 12px;
+  --mos-mobile-space-16: 16px;
+  --mos-mobile-space-20: 20px;
+  --mos-mobile-space-24: 24px;
+  --mos-mobile-card-radius: var(--mos-radius-lg, 12px);
+  --mos-mobile-card-shadow: var(--mos-shadow-md, 0 4px 12px rgba(17, 24, 39, 0.07));
+  --mos-mobile-card-padding: var(--mos-mobile-space-16);
+  --mos-mobile-head-height: 48px;
+  --mos-mobile-control-height: 48px;
+  --mos-mobile-icon-size: 20px;
+  --mos-mobile-icon-box: 32px;
+  --mos-mobile-motion: 200ms;
+}
+
+@media (max-width: 480px) {
+  .mos-mobile-pwa.mos-viewport-phone {
+    --mos-pad-cell-y: var(--mos-mobile-space-8);
+    --mos-pad-cell-x: var(--mos-mobile-space-12);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    padding-inline: var(--mos-mobile-space-12);
+    overscroll-behavior-y: contain;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(
+    .mos-mobile-store-home__card,
+    .mos-mobile-order-card,
+    .mos-mobile-card-shell,
+    .mos-mobile-operation-hub__task,
+    .mos-supply-incoming__mobile-card,
+    .mos-supply-incoming__mobile-inline-card,
+    .mos-supply-mobile-wizard,
+    .mos-supply-mobile-wizard__record,
+    .service-mobile-page__card,
+    .service-mobile-sheet__grid article,
+    .ssh-mobile-sheet__grid article,
+    .mos-mobile-store-empty,
+    .mos-mobile-store-error
+  ) {
+    border-radius: var(--mos-mobile-card-radius);
+    box-shadow: var(--mos-mobile-card-shadow);
+    padding: var(--mos-mobile-card-padding);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(
+    .mos-mobile-store-home__head,
+    .mos-mobile-operation-hub__head,
+    .service-mobile-sheet__head,
+    .ssh-mobile-sheet__head,
+    .mos-supply-mobile-wizard__head,
+    .mos-bottom-sheet-head
+  ) {
+    min-height: var(--mos-mobile-head-height);
+    gap: var(--mos-mobile-space-12);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(
+    .mos-mobile-tabbar__btn,
+    .mos-mobile-quick-actions__btn,
+    .mos-mobile-store-chips__chip,
+    .mos-mobile-operation-hub__filter,
+    .mos-mobile-notification-center__prefs button,
+    .mos-mobile-store-empty__btn,
+    .mos-mobile-store-error__retry,
+    .service-mobile-sheet__action,
+    .service-mobile-sheet__inline-save,
+    .service-mobile-sheet__inline-close,
+    .ssh-mobile-sheet__action,
+    .mos-supply-mobile-wizard__action,
+    .mos-btn,
+    .mos-erp-ops__btn,
+    .mos-icon-btn,
+    .mos-mobile-fab
+  ) {
+    min-height: var(--mos-mobile-control-height);
+    border-radius: var(--mos-mobile-card-radius);
+    transition: transform var(--mos-mobile-motion) ease, background-color var(--mos-mobile-motion) ease, box-shadow var(--mos-mobile-motion) ease;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(
+    input,
+    select,
+    textarea,
+    .mos-input,
+    .cc-v2-input,
+    .service-mobile-sheet__field input,
+    .service-mobile-sheet__field select,
+    .service-mobile-sheet__field textarea,
+    .mos-supply-mobile-wizard__field textarea,
+    .ssh-mobile-sheet__field input,
+    .ssh-mobile-sheet__field select,
+    .ssh-mobile-sheet__field textarea
+  ) {
+    min-height: var(--mos-mobile-control-height);
+    border: 1px solid var(--mos-line, #e5e7eb);
+    border-radius: var(--mos-mobile-card-radius);
+    background: var(--mos-surface, #ffffff);
+    color: var(--mos-ink, #111827);
+    padding: 0 var(--mos-mobile-space-12);
+    transition: border-color var(--mos-mobile-motion) ease, box-shadow var(--mos-mobile-motion) ease;
+    scroll-margin-top: calc(var(--mos-mobile-space-24) * 2);
+    scroll-margin-bottom: calc(var(--mos-mobile-space-24) * 4 + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(input, select, textarea):focus-visible {
+    outline: none;
+    border-color: var(--mos-accent, #111827);
+    box-shadow: 0 0 0 3px var(--mos-accent-soft, rgba(17, 24, 39, 0.06));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(input, select, textarea)[aria-invalid='true'] {
+    border-color: var(--mos-danger, #c0392b);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mos-danger, #c0392b) 15%, transparent);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-tabbar {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--mos-mobile-space-8));
+    border-top: 1px solid var(--mos-line, #e5e7eb);
+    animation: mos-mobile-fade-up var(--mos-mobile-motion) ease;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-tabbar__icon {
+    width: var(--mos-mobile-icon-box);
+    height: var(--mos-mobile-icon-box);
+    font-size: var(--mos-mobile-icon-size);
+  }
+
+  .mos-mobile-accordion {
+    display: grid;
+    gap: var(--mos-mobile-space-12);
+  }
+
+  .mos-mobile-accordion__section {
+    border: 1px solid var(--mos-line, #e5e7eb);
+    border-radius: var(--mos-mobile-card-radius);
+    background: var(--mos-surface, #ffffff);
+    overflow: clip;
+    box-shadow: var(--mos-mobile-card-shadow);
+  }
+
+  .mos-mobile-accordion__section summary {
+    list-style: none;
+    min-height: var(--mos-mobile-control-height);
+    padding: var(--mos-mobile-space-12) var(--mos-mobile-space-16);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mos-mobile-space-12);
+    font-weight: 700;
+    color: var(--mos-ink, #111827);
+    cursor: pointer;
+  }
+
+  .mos-mobile-accordion__section summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mos-mobile-accordion__chevron {
+    font-size: 14px;
+    line-height: 1;
+    color: var(--mos-muted, #6b7280);
+    transition: transform var(--mos-mobile-motion) ease;
+  }
+
+  .mos-mobile-accordion__section[open] .mos-mobile-accordion__chevron {
+    transform: rotate(180deg);
+  }
+
+  .mos-mobile-accordion__content {
+    padding: 0 var(--mos-mobile-space-16) var(--mos-mobile-space-16);
+    display: grid;
+    gap: var(--mos-mobile-space-12);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-store-empty, .mos-mobile-store-error) {
+    gap: var(--mos-mobile-space-12);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-store-empty__title, .mos-mobile-store-error__title) {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--mos-ink, #111827);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-store-empty__body, .mos-mobile-store-error__text) {
+    margin: 0;
+    color: var(--mos-muted, #6b7280);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-ptr__spinner, .mos-loading-spinner, .mos-spinner) {
+    animation-duration: var(--mos-mobile-motion);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-bottom-sheet-panel, .now-dialog, .mos-modal-panel) {
+    border-radius: var(--mos-mobile-card-radius) var(--mos-mobile-card-radius) 0 0;
+    box-shadow: var(--mos-mobile-card-shadow);
+    animation-duration: var(--mos-mobile-motion);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.toastify, .mos-toast, .toast-container, .now-dialog, .mos-bottom-sheet-panel) {
+    transition-duration: var(--mos-mobile-motion);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(.mos-erp-ops__main, .coll-ops-center__main, .mos-supply-mobile-wizard__stage, .service-mobile-sheet__body, .ssh-mobile-sheet__body, .mos-mobile-notification-center__list) {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(
+    .mos-mobile-quick-actions__icon,
+    .mos-mobile-operation-hub__icon,
+    .mos-mobile-card-shell__icon,
+    .mos-mobile-tabbar__icon
+  ) {
+    font-size: var(--mos-mobile-icon-size);
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone :where(button, [role='button'], a, input, select, textarea):focus-visible {
+    outline: 2px solid var(--mos-accent, #111827);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 480px) and (orientation: landscape) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-store-home__grid,
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-operation-hub__task-list,
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-quick-actions__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-tabbar__btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 390px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    padding-inline: var(--mos-mobile-space-8);
+  }
+}
+
+@media (min-width: 391px) and (max-width: 430px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    padding-inline: var(--mos-mobile-space-12);
+  }
+}
+
+@media (min-width: 431px) and (max-width: 480px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    padding-inline: var(--mos-mobile-space-16);
+  }
+}
+
+@keyframes mos-mobile-fade-up {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

@@ -200,6 +200,44 @@
   border-bottom-color: #cbd5e1;
 }
 
+.cust-erp-drawer__actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.45rem 0.6rem 0;
+}
+
+.cust-erp-drawer__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.32rem 0.72rem;
+  border: 1px solid var(--cust-border);
+  border-radius: var(--cust-radius);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--cust-ink);
+  background: #fff;
+}
+
+.cust-erp-drawer__action--call {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cust-erp-drawer__action--whatsapp {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.cust-erp-drawer__action:hover {
+  filter: brightness(0.98);
+}
+
 .cust-erp-drawer__kv {
   margin: 0;
 }
@@ -483,5 +521,73 @@
 
   .cust-erp-preview__row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 599px) {
+  .cust-erp-drawer__hero {
+    padding: 0.7rem 0.72rem;
+  }
+
+  .cust-erp-drawer__head-row {
+    gap: 0.4rem;
+  }
+
+  .cust-erp-drawer__hero-title {
+    font-size: 1.08rem;
+  }
+
+  .cust-erp-drawer__close {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .cust-erp-drawer__hero-grid {
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  .cust-erp-drawer__hero-item dd {
+    font-size: 0.76rem;
+  }
+
+  .cust-erp-drawer__body {
+    padding: 0.5rem 0.55rem 0.7rem;
+    gap: 0.45rem;
+  }
+
+  .cust-erp-drawer__section-title {
+    padding: 0.38rem 0.55rem;
+  }
+
+  .cust-erp-drawer__kv-row {
+    padding: 0.35rem 0.55rem;
+  }
+
+  .cust-erp-drawer__timeline {
+    padding: 0.45rem 0.55rem 0.5rem;
+  }
+
+  .cust-erp-drawer__note-form {
+    padding: 0.42rem 0.55rem 0.38rem;
+    gap: 0.45rem;
+  }
+
+  .cust-erp-drawer__note-field {
+    flex-basis: 100%;
+  }
+
+  .cust-erp-drawer__note-btn {
+    width: 100%;
+    min-height: 2.5rem;
+    font-size: 0.8rem;
+  }
+
+  .cust-erp-drawer__notes-list {
+    padding: 0.35rem 0.55rem 0.45rem;
+  }
+
+  .cust-erp-drawer__note-item {
+    font-size: 0.75rem;
   }
 }

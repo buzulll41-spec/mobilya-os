@@ -70,6 +70,42 @@ export function toCreateOrderWireBody(body) {
 
   }
 
+  if (typeof body.phone === 'string' && body.phone.trim()) {
+
+    wire.phone = body.phone.trim()
+
+  }
+
+  if (typeof body.salesPerson === 'string' && body.salesPerson.trim()) {
+
+    wire.salesPerson = body.salesPerson.trim()
+
+  }
+
+  if (typeof body.dueDate === 'string' && body.dueDate.trim()) {
+
+    wire.dueDate = body.dueDate.trim()
+
+  }
+
+  if (typeof body.shipmentDate === 'string' && body.shipmentDate.trim()) {
+
+    wire.shipmentDate = body.shipmentDate.trim()
+
+  }
+
+  if (typeof body.notes === 'string' && body.notes.trim()) {
+
+    wire.notes = body.notes.trim()
+
+  }
+
+  if (typeof body.cost === 'number' && Number.isFinite(body.cost)) {
+
+    wire.cost = body.cost
+
+  }
+
 
 
   if (typeof body.paymentMethod === 'string' && body.paymentMethod.trim()) {

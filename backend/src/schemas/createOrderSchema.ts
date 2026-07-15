@@ -59,7 +59,13 @@ export const createOrderBodySchema = {
   required: ['customerName', 'paidAmount', 'status'],
   properties: {
     customerName: { type: 'string', minLength: 1, maxLength: 200 },
+    phone: { type: 'string', minLength: 1, maxLength: 32 },
+    salesPerson: { type: 'string', minLength: 1, maxLength: 120 },
     productTitle: { type: 'string', minLength: 1, maxLength: 500 },
+    dueDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+    shipmentDate: { type: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+    notes: { type: 'string', maxLength: 5000 },
+    cost: { type: 'number', minimum: 0 },
     subtotalAmount: { type: 'number', minimum: 0 },
     discountAmount: { type: 'number', minimum: 0 },
     discountType: { type: 'string', enum: ['NONE', 'PERCENTAGE', 'FIXED', 'COMBINED'] },

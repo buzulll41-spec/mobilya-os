@@ -46,6 +46,8 @@ export default function LoadingBlock({
 
       {hint ? <p className="mos-loading-hint">{hint}</p> : null}
 
+      <p className="mos-loading-hint">Lütfen bekleyin, veriler hazırlanıyor.</p>
+
       <MosSkeletonStandard variant={skeletonVariant} label={displayTitle} />
 
     </div>

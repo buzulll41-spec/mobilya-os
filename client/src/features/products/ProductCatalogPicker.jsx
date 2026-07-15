@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CATALOG_PICKER_PAGE_SIZE } from '../../constants/productCatalog.js'
+import { formatTry } from '../../data/dashboardHelpers.js'
 import { useModalDismiss } from '../../hooks/useModalDismiss.js'
 import CatalogPickerCategoryNav from './catalogPicker/CatalogPickerCategoryNav.jsx'
 import CatalogPickerFooter from './catalogPicker/CatalogPickerFooter.jsx'
@@ -172,6 +173,14 @@ export default function ProductCatalogPicker({
                   selectedIds={selectedIdSet}
                 />
 
+                <CatalogPickerMobileCardList
+                  items={data?.items ?? []}
+                  loading={loading}
+                  emptyMessage="Bu filtrede ürün bulunamadı"
+                  onToggle={handleToggle}
+                  selectedIds={selectedIdSet}
+                />
+
                 {data && data.total > 0 ? (
                   <CatalogPickerPagination
                     page={page}
@@ -208,4 +217,72 @@ export default function ProductCatalogPicker({
   )
 
   return createPortal(modal, document.body)
+}
+
+/**
+ * @param {{
+ *   items: ProductListItemDto[]
+ *   loading: boolean
+ *   emptyMessage?: string
+ *   onToggle: (product: ProductListItemDto) => void
+ *   selectedIds: Set<string>
+ * }} props
+ */
+function CatalogPickerMobileCardList({
+  items,
+  loading,
+  emptyMessage = 'Bu kategoride ürün yok.',
+  onToggle,
+  selectedIds,
+}) {
+  if (loading && items.length === 0) {
+    return <p className="catalog-picker-list__loading mos-muted">Yükleniyor…</p>
+  }
+
+  if (!loading && items.length === 0) {
+    return <p className="catalog-picker-list__empty mos-muted">{emptyMessage}</p>
+  }
+
+  return (
+    <div className="catalog-picker-mobile-cards" aria-label="Ürün kartları">
+      {items.map((product) => {
+        const isSelected = selectedIds.has(product.id)
+
+        return (
+          <button
+            key={product.id}
+            type="button"
+            className={`catalog-picker-mobile-card${isSelected ? ' catalog-picker-mobile-card--selected' : ''}`}
+            onClick={() => onToggle(product)}
+            aria-pressed={isSelected}
+            aria-label={`${product.productName} seç`}
+          >
+            <div className="catalog-picker-mobile-card__head">
+              <div className="catalog-picker-mobile-card__title-wrap">
+                <strong className="catalog-picker-mobile-card__title">{product.productName}</strong>
+                <span className="catalog-picker-mobile-card__code">{product.productCode}</span>
+              </div>
+              <span
+                className={`catalog-picker-mobile-card__badge${isSelected ? ' catalog-picker-mobile-card__badge--selected' : ''}`}
+              >
+                {isSelected ? 'Seçildi' : 'Seç'}
+              </span>
+            </div>
+
+            <div className="catalog-picker-mobile-card__meta">
+              <span>{product.suiteType ?? '—'}</span>
+              <span>{product.defaultSupplierName ?? '—'}</span>
+            </div>
+
+            <div className="catalog-picker-mobile-card__price-row">
+              <span className="catalog-picker-mobile-card__price-label">Satış fiyatı</span>
+              <strong className="catalog-picker-mobile-card__price">
+                {formatTry(Number.parseFloat(product.defaultSalePrice) || 0)}
+              </strong>
+            </div>
+          </button>
+        )
+      })}
+    </div>
+  )
 }

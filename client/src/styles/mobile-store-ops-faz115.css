@@ -238,6 +238,10 @@
   margin: 0;
 }
 
+.mos-mobile-order-card--dense .mos-mobile-order-card__meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .mos-mobile-order-card__meta dt {
   margin: 0;
   font-size: 0.6875rem;
@@ -379,6 +383,10 @@
   display: none !important;
 }
 
+.mos-viewport-phone .mos-erp-ops--orders-phone .mos-mobile-order-card-list {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+}
+
 .mos-viewport-phone .coll-ops-center .coll-ops-center__workspace .coll-ops-left-panel,
 .mos-viewport-phone .coll-ops-center .coll-ops-center__main .coll-ops-customer-card {
   display: none !important;
@@ -387,6 +395,124 @@
 .mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__workspace .mos-erp-left-filters,
 .mos-viewport-phone .mos-erp-ops--shipment .mos-erp-week-filters {
   display: none !important;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__workspace {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__main,
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-filters,
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__table-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head {
+  align-items: stretch;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head-actions {
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-detail__grid {
+  grid-template-columns: 1fr;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-detail__actions {
+  border-left: 0;
+  border-top: 1px solid var(--mos-erp-border);
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl-wrap {
+  overflow-x: visible;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl thead {
+  display: none;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl tbody tr {
+  display: block;
+  margin-bottom: 0.6rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid #d5dce4;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl tbody td {
+  display: block;
+  padding: 0.22rem 0;
+  border: 0;
+  font-size: 0.82rem;
+  white-space: normal;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl tbody td[data-label]::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.1rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl-customer-name {
+  white-space: normal;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl-ops {
+  width: 100%;
+  justify-content: stretch;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl-ops .mos-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-tbl-td.is-ops {
+  width: 100%;
+  text-align: left;
+}
+
+.mos-viewport-phone .sops-v3-modal-backdrop {
+  align-items: flex-end;
+  padding: 0.5rem;
+}
+
+.mos-viewport-phone .sops-v3-modal {
+  width: 100%;
+  max-height: calc(100vh - 1rem);
+  border-radius: 16px 16px 0 0;
+}
+
+.mos-viewport-phone .sops-v4-form {
+  grid-template-columns: 1fr;
+}
+
+.mos-viewport-phone .sops-v3-modal__foot,
+.mos-viewport-phone .sops-v3-modal__foot--split {
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+}
+
+.mos-viewport-phone .sops-v3-modal__foot .mos-btn,
+.mos-viewport-phone .sops-v3-modal__foot .mos-btn-primary,
+.mos-viewport-phone .sops-v3-modal__foot .mos-btn--ghost {
+  width: 100%;
 }
 
 .mos-viewport-phone .mos-content {

@@ -637,3 +637,142 @@
 
 }
 
+@media (max-width: 599px) {
+  .opmap-page {
+    padding: 0 0.75rem calc(5.75rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.75rem;
+  }
+
+  .opmap-page--kanban {
+    height: auto;
+    max-height: none;
+  }
+
+  .opmap-page__head {
+    gap: 0.5rem;
+  }
+
+  .opmap-page__title {
+    font-size: 1.2rem;
+    line-height: 1.15;
+  }
+
+  .opmap-page__subtitle {
+    font-size: 0.82rem;
+    max-width: none;
+  }
+
+  .opmap-toolbar {
+    gap: 0.5rem;
+  }
+
+  .opmap-toolbar__row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .opmap-toolbar__filters {
+    width: 100%;
+  }
+
+  .opmap-toolbar__chip {
+    min-height: 44px;
+    padding: 0.38rem 0.7rem;
+    font-size: 0.76rem;
+  }
+
+  .opmap-toolbar__count {
+    font-size: 0.72rem;
+  }
+
+  .opmap-toolbar__search {
+    max-width: none;
+    width: 100%;
+  }
+
+  .opmap-toolbar__search-input {
+    min-height: 44px;
+    font-size: 0.85rem;
+  }
+
+  .opmap-kanban__columns {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .opmap-column {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .opmap-column__head {
+    padding: 0.6rem 0.7rem;
+  }
+
+  .opmap-column__title {
+    font-size: 0.8rem;
+  }
+
+  .opmap-column__body,
+  .opmap-column__body--virtual,
+  .opmap-column__body--phone {
+    overflow: visible;
+    max-height: none;
+    min-height: 0;
+    padding: 0.55rem;
+  }
+
+  .opmap-column__cards {
+    gap: 0.45rem;
+  }
+
+  .opmap-kanban-card {
+    padding: 0.5rem 0.55rem 0.55rem;
+    border-radius: 10px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .opmap-kanban-card__top {
+    gap: 0.1rem;
+  }
+
+  .opmap-kanban-card__customer {
+    font-size: 0.82rem;
+    line-height: 1.22;
+  }
+
+  .opmap-kanban-card__order-no {
+    font-size: 0.7rem;
+  }
+
+  .opmap-kanban-card__badges {
+    gap: 0.2rem;
+    margin-top: 0.35rem;
+  }
+
+  .opmap-kanban-card__badge {
+    font-size: 0.6rem;
+    padding: 0.06rem 0.3rem;
+  }
+
+  .opmap-kanban-card__meta {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.28rem 0.4rem;
+    font-size: 0.68rem;
+    margin-top: 0.35rem;
+  }
+
+  .opmap-kanban-card__meta dd {
+    line-height: 1.25;
+  }
+
+  .opmap-kanban-card__meta-risk {
+    grid-column: 1 / -1;
+  }
+}
+

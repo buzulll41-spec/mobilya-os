@@ -29,6 +29,7 @@ function FieldError({ fieldErrors, name }) {
 
 /**
  * @param {{
+ *   mode?: 'full' | 'pricing' | 'payment' | 'schedule'
  *   form: NewOrderWizardForm
  *   locked: boolean
  *   totals: ReturnType<import('./newOrderWizardModel.js').computeOrderTotals>
@@ -39,6 +40,7 @@ function FieldError({ fieldErrors, name }) {
  * }} props
  */
 export default function WizardPaymentStep({
+  mode = 'full',
   form,
   locked,
   totals,
@@ -50,6 +52,9 @@ export default function WizardPaymentStep({
   const mailOrderPanelId = useId()
   const isMailOrder = isMailOrderPayment(form.paymentMethod)
   const hasDiscount = totals.totalDiscount > 0
+  const showDiscountSection = mode === 'full' || mode === 'pricing'
+  const showPaymentFields = mode === 'full' || mode === 'payment'
+  const showScheduleFields = mode === 'full' || mode === 'schedule'
 
   const [suppliers, setSuppliers] = useState(/** @type {{ id: string, companyName: string }[]} */ ([]))
   const [suppliersLoading, setSuppliersLoading] = useState(false)
@@ -92,6 +97,7 @@ export default function WizardPaymentStep({
     <div className="now-payment-step">
       <div className="now-payment-layout">
         <div className="now-payment-main">
+          {showDiscountSection ? (
           <section className="now-discount-section" aria-labelledby="now-discount-heading">
             <h3 id="now-discount-heading" className="now-payment-section-title">
               İskonto
@@ -125,11 +131,12 @@ export default function WizardPaymentStep({
             </div>
             <p className="now-discount-hint">Yüzde ve TL iskonto birlikte kullanılabilir.</p>
           </section>
+          ) : null}
 
           <div className="now-grid now-payment-fields">
-            {!isMailOrder ? (
+            {showPaymentFields && !isMailOrder ? (
               <label className={`now-field${fieldErrors.kapora ? ' now-field--invalid' : ''}`}>
-                <span className="now-label">Kapora / tahsil edilen (₺)</span>
+                <span className="now-label">Kapora / tahsil edilen (₺) - opsiyonel</span>
                 <MosCurrencyInput
                   className="now-input"
                   value={form.kapora}
@@ -142,6 +149,7 @@ export default function WizardPaymentStep({
                 <span className="now-hint">Kalan bakiye otomatik hesaplanır</span>
               </label>
             ) : null}
+            {showPaymentFields ? (
             <label className={`now-field${fieldErrors.paymentMethod ? ' now-field--invalid' : ''}`}>
               <span className="now-label">Ödeme yöntemi</span>
               <select
@@ -163,7 +171,9 @@ export default function WizardPaymentStep({
               </select>
               <FieldError fieldErrors={fieldErrors} name="paymentMethod" />
             </label>
+            ) : null}
 
+            {showScheduleFields ? (
             <label className="now-field now-field--full">
               <span className="now-label">Açıklama / Not</span>
               <textarea
@@ -177,7 +187,9 @@ export default function WizardPaymentStep({
                 }
               />
             </label>
+            ) : null}
 
+            {showScheduleFields ? (
             <MobileDateField
               label="Tahmini teslim tarihi"
               className={fieldErrors.dueDate ? ' now-field--invalid' : ''}
@@ -186,7 +198,9 @@ export default function WizardPaymentStep({
               disabled={locked}
               required
             />
+            ) : null}
             <FieldError fieldErrors={fieldErrors} name="dueDate" />
+            {showPaymentFields ? (
             <label className="now-field">
               <span className="now-label now-label-req">Satış danışmanı</span>
               <select
@@ -202,8 +216,10 @@ export default function WizardPaymentStep({
                 ))}
               </select>
             </label>
+            ) : null}
           </div>
 
+          {showPaymentFields ? (
           <div
             id={mailOrderPanelId}
             className={`now-mail-order-panel${isMailOrder ? ' now-mail-order-panel--open' : ''}`}
@@ -288,8 +304,10 @@ export default function WizardPaymentStep({
               </div>
             </div>
           </div>
+          ) : null}
         </div>
 
+        {(showDiscountSection || showPaymentFields) ? (
         <aside className="now-payment-finance" aria-label="Finansal özet">
           <div className="now-finance-card">
             <div className="now-finance-row">
@@ -319,6 +337,7 @@ export default function WizardPaymentStep({
             </div>
           </div>
         </aside>
+        ) : null}
       </div>
     </div>
   )

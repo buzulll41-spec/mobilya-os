@@ -296,3 +296,138 @@
     flex-direction: column;
   }
 }
+
+@media (max-width: 599px) {
+  .spc-v2-overlay {
+    overscroll-behavior: contain;
+  }
+
+  .spc-v2-head {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    align-items: flex-start;
+    padding: 0.85rem 0.85rem 0.75rem;
+    gap: 0.65rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  }
+
+  .spc-v2-title {
+    margin-bottom: 0.45rem;
+    font-size: 1.12rem;
+    line-height: 1.15;
+  }
+
+  .spc-v2-head-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem 0.75rem;
+  }
+
+  .spc-v2-head-meta dt {
+    font-size: 0.64rem;
+  }
+
+  .spc-v2-head-meta dd {
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .spc-v2-close {
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 auto;
+  }
+
+  .spc-v2-body {
+    gap: 0.8rem;
+    padding: 0.85rem 0.85rem calc(8.5rem + env(safe-area-inset-bottom));
+  }
+
+  .spc-v2-left,
+  .spc-v2-right {
+    padding: 0.95rem 0.9rem;
+    border-radius: 0.85rem;
+  }
+
+  .spc-v2-section-title {
+    margin-bottom: 0.75rem;
+  }
+
+  .spc-v2-subtitle {
+    margin-top: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .spc-v2-field {
+    gap: 0.28rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .spc-v2-field span {
+    font-size: 0.76rem;
+  }
+
+  .spc-v2-field input,
+  .spc-v2-field select,
+  .spc-v2-field textarea {
+    min-height: 48px;
+    padding: 0.78rem 0.85rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .spc-v2-field--full textarea {
+    min-height: 6.5rem;
+  }
+
+  .spc-v2-date-row {
+    gap: 0.6rem;
+  }
+
+  .spc-v2-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .spc-v2-summary-card {
+    padding: 0.8rem;
+  }
+
+  .spc-v2-delivery-card {
+    padding: 0.8rem 0.85rem;
+  }
+
+  .spc-v2-delivery-list li {
+    font-size: 0.88rem;
+  }
+
+  .spc-v2-check {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.88rem;
+  }
+
+  .spc-v2-conflicts {
+    margin-top: 0.85rem;
+    font-size: 0.84rem;
+  }
+
+  .spc-v2-foot {
+    position: sticky;
+    bottom: env(safe-area-inset-bottom);
+    z-index: 6;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.85rem;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+  }
+
+  .spc-v2-cancel,
+  .spc-v2-submit {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.9rem 1rem;
+    border-radius: 0.8rem;
+    font-size: 0.95rem;
+  }
+}

@@ -356,6 +356,10 @@
   background: #f1f5f9;
 }
 
+.catalog-picker-mobile-cards {
+  display: none;
+}
+
 /* Alt bar */
 .catalog-picker-footer {
   display: flex;
@@ -566,5 +570,112 @@
 
   .catalog-picker-table {
     min-width: 680px;
+  }
+}
+
+@media (max-width: 599px) {
+  .catalog-picker-main {
+    padding-inline: 0.75rem;
+  }
+
+  .catalog-picker-table-wrap {
+    display: none;
+  }
+
+  .catalog-picker-mobile-cards {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .catalog-picker-mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .catalog-picker-mobile-card--selected {
+    border-color: #93c5fd;
+    background: #eff6ff;
+  }
+
+  .catalog-picker-mobile-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .catalog-picker-mobile-card__title-wrap {
+    min-width: 0;
+  }
+
+  .catalog-picker-mobile-card__title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .catalog-picker-mobile-card__code {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  .catalog-picker-mobile-card__badge {
+    flex-shrink: 0;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: #e2e8f0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .catalog-picker-mobile-card__badge--selected {
+    background: #2563eb;
+    color: #fff;
+  }
+
+  .catalog-picker-mobile-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  .catalog-picker-mobile-card__price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .catalog-picker-mobile-card__price-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .catalog-picker-mobile-card__price {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #059669;
+  }
+
+  .catalog-picker-list-pager {
+    padding-top: 0.55rem;
   }
 }

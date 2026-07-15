@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: mobilya-os-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm ci ; npm run db:generate ; npm run build
+    startCommand: npm run db:migrate ; npm run start
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: AUTH_DISABLED
+        value: "false"
+      - key: DEMO_TODAY
+        value: "2026-05-14"
+      - key: AI_WORKER_ENABLED
+        value: "false"
+      - key: AI_LLM_PROVIDER
+        value: mock
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: WOO_STORE_URL
+        sync: false
+      - key: WOO_CONSUMER_KEY
+        sync: false
+      - key: WOO_CONSUMER_SECRET
+        sync: false

@@ -31,9 +31,11 @@ import { listWarehouseEntries } from '../services/warehouseEntriesClient.js'
 import { formatApiErrorMessage } from '../utils/apiErrorMessage.js'
 import { formatShortDate } from '../utils/dates.js'
 import { parseSupplyIncomingDeepLink, navigateSupplyIncomingTab } from '../lib/supplyIncomingNavigation.js'
+import { useViewportTier } from '../hooks/useViewportTier.js'
 import MosButton from '../components/MosButton.jsx'
 import SectionErrorBoundary from '../components/SectionErrorBoundary.jsx'
 import SupplierLedgerCenterSection from '../features/supply/SupplierLedgerCenterSection.jsx'
+import SupplierOpsMobileWizardPanel from '../features/supply/SupplierOpsMobileWizardPanel.jsx'
 import { useOrders } from '../state/useOrders.js'
 import '../styles/mos-erp-ops.css'
 import '../styles/supplier-ledger-center.css'
@@ -45,11 +47,29 @@ import '../styles/supplier-ledger-center.css'
 /** @typedef {import('../contracts/v1/supplierOperations.js').SupplyOperationsKpisDto} SupplyOperationsKpisDto */
 /** @typedef {import('../contracts/v1/supplierOperations.js').SupplierOperationsDetailDto} SupplierOperationsDetailDto */
 
+/**
+ * @param {string | null | undefined} qty
+ */
+function formatQtyLabel(qty) {
+  const value = Number.parseFloat(String(qty ?? '0'))
+  if (!Number.isFinite(value)) return '—'
+  return value.toLocaleString('tr-TR', {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })
+}
+
 export default function SupplyIncomingPage() {
   const [activeTab, setActiveTab] = useState(() => parseSupplyIncomingDeepLink().tab)
+  const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
   const [suppliers, setSuppliers] = useState(/** @type {SupplierOpsListItemDto[]} */ ([]))
   const [kpis, setKpis] = useState(/** @type {SupplyOperationsKpisDto | null} */ (null))
   const [selectedId, setSelectedId] = useState(/** @type {string | null} */ (null))
+  const [mobileSelectedId, setMobileSelectedId] = useState(/** @type {string | null} */ (null))
+  const [mobileCardOpsBySupplier, setMobileCardOpsBySupplier] = useState(
+    /** @type {Map<string, SupplierOperationsDetailDto>} */ (new Map()),
+  )
   const [detail, setDetail] = useState(/** @type {SupplierDetailDto | null} */ (null))
   const [operations, setOperations] = useState(/** @type {SupplierOperationsDetailDto | null} */ (null))
   const [ledger, setLedger] = useState(/** @type {SupplierLedgerEntryDto[]} */ ([]))
@@ -76,6 +96,7 @@ export default function SupplyIncomingPage() {
 
   const dataSource = getDataSourceDisplay()
   const { refreshOrders, orders, salesOrderListItemDtos } = useOrders()
+  const activeSupplierId = isPhone ? mobileSelectedId : selectedId
 
   const aiProcurementOrderIds = useMemo(() => {
     const assessments = evaluateProcurementSpecialist(
@@ -161,12 +182,19 @@ export default function SupplyIncomingPage() {
   }, [loadBoard, loadIncoming])
 
   useEffect(() => {
-    if (!selectedId) return
+    if (!activeSupplierId) {
+      setDetail(null)
+      setLedger([])
+      setOperations(null)
+      setWarehouseEntries([])
+      setDetailLoading(false)
+      return
+    }
     let cancelled = false
     ;(async () => {
       setDetailLoading(true)
       try {
-        await loadDetail(selectedId)
+        await loadDetail(activeSupplierId)
       } catch (err) {
         if (!cancelled) setError(formatApiErrorMessage(err))
       } finally {
@@ -176,14 +204,51 @@ export default function SupplyIncomingPage() {
     return () => {
       cancelled = true
     }
-  }, [selectedId, loadDetail])
-
-  const selectedListItem = suppliers.find((s) => s.id === selectedId) ?? null
+  }, [activeSupplierId, loadDetail])
 
   const displaySuppliers = useMemo(
     () => filterSuppliersByHealth(suppliers, healthFilterId),
     [suppliers, healthFilterId],
   )
+
+  useEffect(() => {
+    if (!isPhone || activeTab !== 'operasyon') return
+    if (displaySuppliers.length === 0) {
+      setMobileCardOpsBySupplier(new Map())
+      return
+    }
+
+    let cancelled = false
+    ;(async () => {
+      try {
+        const ids = displaySuppliers.map((supplier) => supplier.id)
+        const batches = await Promise.all(
+          ids.map(async (id) => {
+            try {
+              const ops = await supplyOpsClient.getSupplierOperations(id)
+              return [id, ops]
+            } catch {
+              return [id, null]
+            }
+          }),
+        )
+        if (cancelled) return
+        const next = new Map()
+        for (const [id, ops] of batches) {
+          if (ops) next.set(id, ops)
+        }
+        setMobileCardOpsBySupplier(next)
+      } catch {
+        if (!cancelled) setMobileCardOpsBySupplier(new Map())
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isPhone, activeTab, displaySuppliers])
+
+  const selectedListItem = suppliers.find((s) => s.id === activeSupplierId) ?? null
 
   const tableRows = useMemo(
     () => displaySuppliers.map(supplierToErpTableRow),
@@ -205,8 +270,8 @@ export default function SupplyIncomingPage() {
   }, [suppliers])
 
   const selectedRow = useMemo(
-    () => tableRows.find((r) => r.id === selectedId) ?? tableRows[0] ?? null,
-    [tableRows, selectedId],
+    () => tableRows.find((r) => r.id === activeSupplierId) ?? tableRows[0] ?? null,
+    [tableRows, activeSupplierId],
   )
 
   const listSuppliersForModal = useMemo(
@@ -241,15 +306,15 @@ export default function SupplyIncomingPage() {
   }
 
   async function handlePayment(body) {
-    if (!selectedId) return
+    if (!activeSupplierId) return
     setFormError(null)
     setActionBusy(true)
     try {
-      const result = await suppliersClient.postSupplierPayment(selectedId, body)
+      const result = await suppliersClient.postSupplierPayment(activeSupplierId, body)
       setPayOpen(false)
       setDetail(result.supplier)
-      setLedger(await suppliersClient.listSupplierLedger(selectedId))
-      await Promise.all([loadBoard(), loadDetail(selectedId)])
+      setLedger(await suppliersClient.listSupplierLedger(activeSupplierId))
+      await Promise.all([loadBoard(), loadDetail(activeSupplierId)])
     } catch (err) {
       setFormError(formatApiErrorMessage(err))
     } finally {
@@ -264,7 +329,7 @@ export default function SupplyIncomingPage() {
       await incomingGoodsClient.createIncomingGoods(body)
       setIncomingOpen(false)
       await Promise.all([loadIncoming(), loadBoard(), refreshOrders()])
-      if (selectedId) await loadDetail(selectedId)
+      if (activeSupplierId) await loadDetail(activeSupplierId)
     } catch (err) {
       setFormError(formatApiErrorMessage(err))
     } finally {
@@ -292,7 +357,7 @@ export default function SupplyIncomingPage() {
         title="Tedarik verilerini yenile"
         onRefresh={async () => {
           await Promise.all([loadBoard(), loadIncoming(), refreshOrders()])
-          if (selectedId) await loadDetail(selectedId)
+          if (activeSupplierId) await loadDetail(activeSupplierId)
           setLastRefresh(new Date().toLocaleTimeString('tr-TR'))
           toastSuccess('Tedarik ekranı yenilendi')
         }}
@@ -345,7 +410,179 @@ export default function SupplyIncomingPage() {
         </button>
       </nav>
 
-      {activeTab === 'cari' ? (
+      {isPhone && activeTab === 'operasyon' ? (
+        <>
+          {error ? (
+            <p className="mos-erp-ops__alert" role="alert">
+              {error}
+            </p>
+          ) : null}
+
+          <SectionErrorBoundary label="Operasyon özeti">
+            <ErpOpsSummaryStrip
+              metrics={summaryMetrics}
+              ariaLabel="Tedarik operasyon özeti"
+              onMetricClick={(id) => {
+                if (id === 'critical') setHealthFilterId('critical')
+              }}
+            />
+          </SectionErrorBoundary>
+
+          <section className="mos-supply-incoming__mobile-filters" aria-label="Tedarik filtreleri">
+            <input
+              type="search"
+              className="mos-erp-filters__search"
+              placeholder="Firma, kod, telefon…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Tedarikçi ara"
+            />
+            <input
+              type="text"
+              className="mos-erp-filters__field"
+              placeholder="Şehir"
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+              aria-label="Şehir filtresi"
+            />
+            <select
+              className="mos-erp-filters__field"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              aria-label="Sıralama"
+            >
+              <option value="balance_desc">Bakiye ↓</option>
+              <option value="balance_asc">Bakiye ↑</option>
+              <option value="name">İsim A–Z</option>
+            </select>
+            <label className="mos-erp-filters__check">
+              <input
+                type="checkbox"
+                checked={showInactive}
+                onChange={(e) => setShowInactive(e.target.checked)}
+              />
+              Pasifleri göster
+            </label>
+            <ErpOpsLeftFilters
+              embedded
+              groups={[{ title: 'Sağlık', options: SUPPLY_HEALTH_FILTERS }]}
+              activeFilter={healthFilterId}
+              filterCounts={filterCounts}
+              onFilterChange={setHealthFilterId}
+            />
+          </section>
+
+          {!incomingLoading && incomingToday.length > 0 ? (
+            <section className="mos-supply-incoming__mobile-inline" aria-label="Bugünkü gelen ürünler">
+              <p className="mos-supply-incoming__mobile-section-title">Bugünkü gelen ürünler</p>
+              <div className="mos-supply-incoming__mobile-card-stack">
+                {incomingToday.map((row) => (
+                  <article key={row.id} className="mos-supply-incoming__mobile-inline-card">
+                    <strong>{row.supplierName}</strong>
+                    <p>{row.productTitle}</p>
+                    <p>
+                      {row.orderNumber ? `${row.customerName ?? ''} · ${row.orderNumber}`.trim() : '—'}
+                    </p>
+                    <p>{formatShortDate(row.receivedAt)}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="mos-supply-incoming__mobile-cards" aria-label="Tedarik kartları">
+            {loading ? (
+              <LoadingBlock title="Tedarikçiler" hint="GET /v1/supply/operations-board" />
+            ) : displaySuppliers.length === 0 ? (
+              <p className="mos-supply-incoming__mobile-empty">Kayıt yok.</p>
+            ) : (
+              displaySuppliers.map((supplier) => {
+                const isActiveCard = activeSupplierId === supplier.id
+                const opsPreview = mobileCardOpsBySupplier.get(supplier.id)
+                const primaryOpenProduct = opsPreview?.openProducts?.[0] ?? null
+                const primaryPending = opsPreview?.pendingOrders?.[0] ?? null
+                const orderNumber = primaryOpenProduct?.orderNumber ?? primaryPending?.orderNumber ?? '—'
+                const productTitle = primaryOpenProduct?.productTitle ?? '—'
+                const qtyLabel = primaryOpenProduct
+                  ? `${formatQtyLabel(primaryOpenProduct.qtyMissing)} / ${formatQtyLabel(primaryOpenProduct.qtyOrdered)}`
+                  : '—'
+                const expectedDate = primaryOpenProduct?.dueDate
+                  ? formatShortDate(primaryOpenProduct.dueDate)
+                  : '—'
+                const delayStatus = opsPreview?.openProducts?.some((row) => row.isOverdue)
+                  ? 'Gecikmiş'
+                  : 'Planında'
+                const lastAction = supplier.lastActivityLabel || opsPreview?.lastActivityLabel || '—'
+                return (
+                  <button
+                    key={supplier.id}
+                    type="button"
+                    className={`mos-supply-incoming__mobile-card${isActiveCard ? ' is-active' : ''}`}
+                    onClick={() => {
+                      setSelectedId(supplier.id)
+                      setMobileSelectedId(supplier.id)
+                    }}
+                    aria-pressed={isActiveCard}
+                  >
+                    <span className="mos-supply-incoming__mobile-card-kicker">Tedarikçi</span>
+                    <strong className="mos-supply-incoming__mobile-card-title">{supplier.companyName}</strong>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Sipariş numarası</span>
+                      <strong>{orderNumber}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Ürün</span>
+                      <strong>{productTitle}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Adet</span>
+                      <strong>{qtyLabel}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Beklenen geliş tarihi</span>
+                      <strong>{expectedDate}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Gecikme durumu</span>
+                      <strong data-tone={delayStatus === 'Gecikmiş' ? 'critical' : 'success'}>{delayStatus}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Açık bakiye</span>
+                      <strong>{supplier.openBalance}</strong>
+                    </span>
+                    <span className="mos-supply-incoming__mobile-card-row">
+                      <span>Son İşlem</span>
+                      <strong>{lastAction}</strong>
+                    </span>
+                  </button>
+                )
+              })
+            )}
+          </section>
+
+          {activeSupplierId ? (
+            <SupplierOpsMobileWizardPanel
+              detail={detail}
+              operations={operations}
+              ledger={ledger}
+              warehouseEntries={warehouseEntries}
+              loading={detailLoading}
+              actionBusy={actionBusy}
+              onPay={() => {
+                setFormError(null)
+                setPayOpen(true)
+              }}
+              onOpenIncomingGoods={() => {
+                setFormError(null)
+                setIncomingOpen(true)
+              }}
+              onClose={() => setMobileSelectedId(null)}
+            />
+          ) : (
+            <p className="mos-supply-incoming__mobile-hint">Bir kart seçin.</p>
+          )}
+        </>
+      ) : activeTab === 'cari' ? (
         <SectionErrorBoundary label="Tedarikçi cari">
           <SupplierLedgerCenterSection />
         </SectionErrorBoundary>
@@ -522,7 +759,7 @@ export default function SupplyIncomingPage() {
       <IncomingGoodsFormModal
         open={incomingOpen}
         suppliers={listSuppliersForModal}
-        defaultSupplierId={selectedId}
+        defaultSupplierId={activeSupplierId}
         pendingSearch={incomingDeepLink.q}
         pendingOrderId={incomingDeepLink.orderId}
         preferredLineId={incomingDeepLink.lineId}

@@ -1015,6 +1015,129 @@ button.mos-erp-summary__item.is-active {
   }
 }
 
+@media (max-width: 599px) {
+  .mos-erp-ops--ssh .mos-erp-ops__head {
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-ops__head-copy,
+  .mos-erp-ops--ssh .mos-erp-ops__head-actions,
+  .mos-erp-ops--ssh .mos-erp-ops__workspace,
+  .mos-erp-ops--ssh .mos-erp-ops__main,
+  .mos-erp-ops--ssh .mos-erp-ops__table-panel {
+    min-width: 0;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-ops__head-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-erp-ops--ssh .mos-erp-summary__item {
+    padding: 0.45rem 0.5rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-summary__label {
+    font-size: 0.62rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-summary__value {
+    font-size: 0.95rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-ops__workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-filters {
+    display: grid;
+    gap: 0.45rem;
+    overflow: visible;
+    padding: 0.45rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-filters__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-filters__btn {
+    width: 100%;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-detail__actions {
+    border-left: 0;
+    border-top: 1px solid var(--mos-erp-border);
+    padding: 0.55rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-detail__action {
+    width: 100%;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl-wrap {
+    overflow-x: visible;
+    max-height: none;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl thead {
+    display: none;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl tbody tr {
+    display: block;
+    margin-bottom: 0.6rem;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid #d5dce4;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl tbody td {
+    display: block;
+    padding: 0.18rem 0;
+    border: 0;
+    white-space: normal;
+    font-size: 0.82rem;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl tbody td.is-ops {
+    width: 100%;
+    text-align: left;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl-ops {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl-ops .mos-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl-td--customer {
+    max-width: none;
+  }
+
+  .mos-erp-ops--ssh .mos-erp-tbl-customer-name {
+    white-space: normal;
+  }
+}
+
 .mos-erp-panel {
   border: 1px solid var(--mos-erp-border);
   border-radius: var(--mos-erp-radius);

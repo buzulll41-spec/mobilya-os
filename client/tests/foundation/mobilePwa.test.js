@@ -13,7 +13,11 @@ import { MOBILE_TAB_ITEMS } from '../../src/constants/mobileNavigation.js'
 import { MOBILE_TEST_FLOW_STEPS } from '../../src/constants/mobileTestFlowSteps.js'
 import {
   buildMobileTestFlowState,
+  getMobileTestFlowInitializedAt,
+  markMobileTestStepComplete,
+  markMobileTestStepsComplete,
   resetMobileTestFlowForTests,
+  resolveMobileTestStepsFromDomainEvents,
 } from '../../src/services/mobile/mobileTestFlow.js'
 import { formatApiErrorMessage } from '../../src/utils/apiErrorMessage.js'
 import { ApiClientError } from '../../src/lib/apiClient.js'
@@ -160,6 +164,68 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
       const initial = buildMobileTestFlowState()
       expect(initial.nextStep?.id).toBe('create-order')
       expect(initial.progressPct).toBe(0)
+    })
+
+    it('yalnızca sayfa ziyareti create-order adımını tamamlamaz', () => {
+      const state = buildMobileTestFlowState()
+      expect(state.completed.has('create-order')).toBe(false)
+      expect(state.nextStep?.id).toBe('create-order')
+    })
+
+    it('order.placed domain event ile create-order tamamlanır', () => {
+      const eventAt = new Date(Date.now() + 500).toISOString()
+      const matched = resolveMobileTestStepsFromDomainEvents([
+        {
+          id: 'evt-order-1',
+          type: 'order.placed',
+          occurredAt: eventAt,
+        },
+      ])
+      expect(matched).toContain('create-order')
+
+      const added = markMobileTestStepsComplete(matched, 'test:domain-event')
+      expect(added).toContain('create-order')
+
+      const state = buildMobileTestFlowState()
+      expect(state.completed.has('create-order')).toBe(true)
+    })
+
+    it('401/403/500 benzeri başarısız yanıtlar adım tamamlamaz (event eşleşmesi yok)', () => {
+      const matched = resolveMobileTestStepsFromDomainEvents([
+        {
+          id: 'evt-fail-1',
+          type: 'http.401',
+          occurredAt: new Date(Date.now() + 500).toISOString(),
+        },
+        {
+          id: 'evt-fail-2',
+          type: 'http.500',
+          occurredAt: new Date(Date.now() + 500).toISOString(),
+        },
+      ])
+      expect(matched).toHaveLength(0)
+      expect(buildMobileTestFlowState().completed.size).toBe(0)
+    })
+
+    it('aynı adımı iki kez tamamlamak idempotent kalır', () => {
+      const first = markMobileTestStepComplete('create-order', 'test:first')
+      const second = markMobileTestStepComplete('create-order', 'test:second')
+      expect(first).toBe(true)
+      expect(second).toBe(false)
+      expect(buildMobileTestFlowState().completed.has('create-order')).toBe(true)
+    })
+
+    it('initializedAt öncesi eski domain eventler tamamlanma üretmez', () => {
+      const initAt = getMobileTestFlowInitializedAt()
+      const past = new Date(Date.parse(initAt) - 60_000).toISOString()
+      const matched = resolveMobileTestStepsFromDomainEvents([
+        {
+          id: 'evt-old-1',
+          type: 'order.placed',
+          occurredAt: past,
+        },
+      ])
+      expect(matched).toHaveLength(0)
     })
 
     it('MobileTestFlowPanel bileşeni export edilir', () => {

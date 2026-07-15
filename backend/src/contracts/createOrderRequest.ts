@@ -49,6 +49,11 @@ export type CreateOrderRequest = {
   mailOrderCommissionRate?: number
   mailOrderAmount?: number
   phone?: string
+  salesPerson?: string
+  dueDate?: string
+  shipmentDate?: string
+  notes?: string
+  cost?: number
 }
 
 export type NormalizedCreateOrderRequest = {
@@ -73,4 +78,9 @@ export type NormalizedCreateOrderRequest = {
   mailOrderCommissionRate?: number
   mailOrderAmount?: number
   phone?: string
+  salesPerson?: string
+  dueDate?: string
+  shipmentDate?: string
+  notes?: string
+  cost?: number
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useViewportTier } from '../../hooks/useViewportTier.js'
 import OperationMapKanbanCard from './OperationMapKanbanCard.jsx'
 
 /** @typedef {import('../../mappers/operation-map/operationMapKanbanModel.js').KanbanCard} KanbanCard */
@@ -13,6 +14,8 @@ const OVERSCAN = 4
  * }} props
  */
 export default function OperationMapVirtualColumn({ cards, onOpenOrder }) {
+  const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
   const bodyRef = useRef(/** @type {HTMLDivElement | null} */ (null))
   const [range, setRange] = useState({ start: 0, end: 24 })
 
@@ -43,6 +46,22 @@ export default function OperationMapVirtualColumn({ cards, onOpenOrder }) {
       ro.disconnect()
     }
   }, [updateRange])
+
+  if (isPhone) {
+    return (
+      <div className="opmap-column__body opmap-column__body--virtual opmap-column__body--phone" data-droppable="true">
+        <div className="opmap-column__cards">
+          {cards.length === 0 ? (
+            <p className="opmap-column__empty">Kayıt yok</p>
+          ) : (
+            cards.map((card) => (
+              <OperationMapKanbanCard key={card.orderId} card={card} onOpen={onOpenOrder} />
+            ))
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (cards.length === 0) {
     return (

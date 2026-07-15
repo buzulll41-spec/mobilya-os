@@ -7,6 +7,7 @@ import OrdersOpsDetailStrip from '../components/erp-ops/OrdersOpsDetailStrip.jsx
 import OrdersOpsTable from '../components/erp-ops/OrdersOpsTable.jsx'
 import MobileOrderCardList from '../components/mobile/MobileOrderCardList.jsx'
 import MobileStoreChipBar from '../components/mobile/MobileStoreChipBar.jsx'
+import MobileStoreSearch from '../components/mobile/MobileStoreSearch.jsx'
 import PilotScopeToggle from '../components/pilot/PilotScopeToggle.jsx'
 import { IconPlus } from '../components/Icons.jsx'
 import PageRefreshBar from '../components/PageRefreshBar.jsx'
@@ -14,7 +15,7 @@ import { useOrders } from '../state/useOrders.js'
 import { toastSuccess } from '../lib/toastBus.js'
 import { usePilotDataMode } from '../hooks/usePilotDataMode.js'
 import { useSmartFilter } from '../hooks/useSmartFilter.js'
-import { useViewportTier } from '../hooks/useViewportTier.js'
+import { useCompactPhoneViewport, useViewportTier } from '../hooks/useViewportTier.js'
 import { getOrderPilotKind } from '../lib/pilotRecordHeuristics.js'
 import { DEFAULT_ORDER_LIST_SORT, sortOrderListRows } from '../utils/orderListSort.js'
 import { buildDrawerQueue } from '../application/orderDrawerOrchestration.js'
@@ -47,15 +48,21 @@ import '../styles/mos-erp-ops.css'
  */
 export default function OrdersPage({
   orderRows,
+  orders = [],
   listItemDtos = [],
   todayIso,
   canCreateOrder = true,
   onOpenOrderModal,
   onOrderSelect,
   highlightOrderId = null,
+  globalSearch = '',
+  onGlobalSearchChange,
+  onSearchSelect,
+  onCommitSearch,
 }) {
   const { refreshOrders, isRefreshing } = useOrders()
   const viewportTier = useViewportTier()
+  const isCompactPhone = useCompactPhoneViewport()
   const isTouchStore = viewportTier === 'phone' || viewportTier === 'tablet'
   const [lastRefresh, setLastRefresh] = useState(/** @type {string | null} */ (null))
   const { value: activeFilter, setValue: setActiveFilter } = useSmartFilter(
@@ -182,101 +189,147 @@ export default function OrdersPage({
   }
 
   return (
-    <div className="mos-page mos-erp-ops mos-erp-ops--orders">
-      <PageRefreshBar
-        title="Sipariş listesini yenile"
-        onRefresh={async () => {
-          await refreshOrders()
-          setLastRefresh(new Date().toLocaleTimeString('tr-TR'))
-          toastSuccess('Siparişler yenilendi')
-        }}
-        refreshing={isRefreshing}
-        updatedAt={lastRefresh}
-      />
-      <header className="mos-erp-ops__head">
-        <div className="mos-erp-ops__head-copy">
-          <h1 className="mos-erp-ops__title">Siparişler</h1>
-          <span className="mos-erp-ops__sub">
-            Operasyon merkezi · {tableRows.length} kayıt listede
-          </span>
-        </div>
-        <div className="mos-erp-ops__head-actions">
-          <PilotScopeToggle
-            scope={scope}
-            onScopeChange={setScope}
-            canToggle={canToggle}
-            hint={modeHint}
-          />
+    <div className={`mos-page mos-erp-ops mos-erp-ops--orders${isCompactPhone ? ' mos-erp-ops--orders-phone' : ''}`}>
+      {isCompactPhone ? (
+        <header className="mos-erp-ops__head mos-erp-ops__head--compact">
+          <div className="mos-erp-ops__head-copy">
+            <h1 className="mos-erp-ops__title">Siparişler</h1>
+            <span className="mos-erp-ops__sub">Telefon görünümü · {tableRows.length} kayıt</span>
+          </div>
           {canCreateOrder ? (
-            <MosButton context="head" tone="primary" label="Sipariş ekle" onClick={onOpenOrderModal}>
+            <MosButton context="head" tone="primary" label="Yeni Sipariş" onClick={onOpenOrderModal}>
               <IconPlus />
-              Sipariş ekle
+              Yeni Sipariş
             </MosButton>
           ) : null}
-        </div>
-      </header>
+        </header>
+      ) : (
+        <>
+          <PageRefreshBar
+            title="Sipariş listesini yenile"
+            onRefresh={async () => {
+              await refreshOrders()
+              setLastRefresh(new Date().toLocaleTimeString('tr-TR'))
+              toastSuccess('Siparişler yenilendi')
+            }}
+            refreshing={isRefreshing}
+            updatedAt={lastRefresh}
+          />
+          <header className="mos-erp-ops__head">
+            <div className="mos-erp-ops__head-copy">
+              <h1 className="mos-erp-ops__title">Siparişler</h1>
+              <span className="mos-erp-ops__sub">
+                Operasyon merkezi · {tableRows.length} kayıt listede
+              </span>
+            </div>
+            <div className="mos-erp-ops__head-actions">
+              <PilotScopeToggle
+                scope={scope}
+                onScopeChange={setScope}
+                canToggle={canToggle}
+                hint={modeHint}
+              />
+              {canCreateOrder ? (
+                <MosButton context="head" tone="primary" label="Sipariş ekle" onClick={onOpenOrderModal}>
+                  <IconPlus />
+                  Sipariş ekle
+                </MosButton>
+              ) : null}
+            </div>
+          </header>
 
-      <SectionErrorBoundary label="Sipariş özeti">
-      <ErpOpsSummaryStrip
-        metrics={summaryMetrics}
-        ariaLabel="Sipariş operasyon özeti"
-        onMetricClick={handleSummaryClick}
-        summaryClassName="mos-erp-summary--cols-5"
-      />
-      </SectionErrorBoundary>
+          <SectionErrorBoundary label="Sipariş özeti">
+            <ErpOpsSummaryStrip
+              metrics={summaryMetrics}
+              ariaLabel="Sipariş operasyon özeti"
+              onMetricClick={handleSummaryClick}
+              summaryClassName="mos-erp-summary--cols-5"
+            />
+          </SectionErrorBoundary>
+        </>
+      )}
 
       <SectionErrorBoundary label="Sipariş listesi">
-      <div className="mos-erp-ops__workspace">
-        <ErpOpsLeftFilters
-          groups={[{ title: 'Operasyon', options: ORDERS_OPS_FILTERS }]}
-          activeFilter={activeFilter}
-          filterCounts={filterCounts}
-          onFilterChange={(id) => setActiveFilter(/** @type {OrdersOpsFilterId} */ (id))}
-          ariaLabel="Sipariş filtreleri"
-        />
-
-        <div className="mos-erp-ops__main">
-          {isTouchStore ? (
-            <div className="mos-store-ops-mobile-only">
-              <MobileStoreChipBar
-                items={mobileFilterChips}
-                activeId={activeFilter}
-                onSelect={(id) => setActiveFilter(/** @type {OrdersOpsFilterId} */ (id))}
-                ariaLabel="Sipariş filtreleri"
-              />
-              <MobileOrderCardList
-                cards={mobileOrderCards}
-                selectedRowId={selectedOrder?.id ?? null}
-                onOpenCard={(id) => {
-                  const order = sortedOrders.find((o) => o.id === id)
-                  if (order) openOrderWithQueue(order)
-                }}
-                onNewOrder={canCreateOrder ? onOpenOrderModal : undefined}
-                onClearFilters={() => setActiveFilter('all')}
-              />
-            </div>
-          ) : null}
-
-          <OrdersOpsDetailStrip
-            view={detailView}
-            onOpen={() => {
-              if (selectedOrder) openOrderWithQueue(selectedOrder)
-            }}
-          />
-
-          <section className="mos-erp-ops__table-panel mos-store-ops-desktop-only" aria-label="Sipariş listesi">
-            <OrdersOpsTable
-              rows={tableRows}
+        {isCompactPhone ? (
+          <div className="mos-store-ops-mobile-only mos-store-ops-mobile-only--compact">
+            <MobileStoreSearch
+              value={globalSearch}
+              onChange={(value) => onGlobalSearchChange?.(value)}
+              orders={orders}
+              onSelectResult={onSearchSelect}
+              onCommitSearch={onCommitSearch}
+            />
+            <MobileStoreChipBar
+              items={mobileFilterChips}
+              activeId={activeFilter}
+              onSelect={(id) => setActiveFilter(/** @type {OrdersOpsFilterId} */ (id))}
+              ariaLabel="Sipariş durum filtresi"
+            />
+            <MobileOrderCardList
+              cards={mobileOrderCards}
               selectedRowId={selectedOrder?.id ?? null}
-              onSelectRow={(row) => setSelectedRowId(row.id)}
-              onOpenRow={(row) => {
-                const order = sortedOrders.find((o) => o.id === row.id)
+              dense
+              onOpenCard={(id) => {
+                const order = sortedOrders.find((o) => o.id === id)
                 if (order) openOrderWithQueue(order)
               }}
+              onNewOrder={canCreateOrder ? onOpenOrderModal : undefined}
+              onClearFilters={() => setActiveFilter('all')}
             />
-          </section>
-        </div>
-      </div>
+          </div>
+        ) : (
+          <div className="mos-erp-ops__workspace">
+            <ErpOpsLeftFilters
+              groups={[{ title: 'Operasyon', options: ORDERS_OPS_FILTERS }]}
+              activeFilter={activeFilter}
+              filterCounts={filterCounts}
+              onFilterChange={(id) => setActiveFilter(/** @type {OrdersOpsFilterId} */ (id))}
+              ariaLabel="Sipariş filtreleri"
+            />
+
+            <div className="mos-erp-ops__main">
+              {isTouchStore ? (
+                <div className="mos-store-ops-mobile-only">
+                  <MobileStoreChipBar
+                    items={mobileFilterChips}
+                    activeId={activeFilter}
+                    onSelect={(id) => setActiveFilter(/** @type {OrdersOpsFilterId} */ (id))}
+                    ariaLabel="Sipariş filtreleri"
+                  />
+                  <MobileOrderCardList
+                    cards={mobileOrderCards}
+                    selectedRowId={selectedOrder?.id ?? null}
+                    onOpenCard={(id) => {
+                      const order = sortedOrders.find((o) => o.id === id)
+                      if (order) openOrderWithQueue(order)
+                    }}
+                    onNewOrder={canCreateOrder ? onOpenOrderModal : undefined}
+                    onClearFilters={() => setActiveFilter('all')}
+                  />
+                </div>
+              ) : null}
+
+              <OrdersOpsDetailStrip
+                view={detailView}
+                onOpen={() => {
+                  if (selectedOrder) openOrderWithQueue(selectedOrder)
+                }}
+              />
+
+              <section className="mos-erp-ops__table-panel mos-store-ops-desktop-only" aria-label="Sipariş listesi">
+                <OrdersOpsTable
+                  rows={tableRows}
+                  selectedRowId={selectedOrder?.id ?? null}
+                  onSelectRow={(row) => setSelectedRowId(row.id)}
+                  onOpenRow={(row) => {
+                    const order = sortedOrders.find((o) => o.id === row.id)
+                    if (order) openOrderWithQueue(order)
+                  }}
+                />
+              </section>
+            </div>
+          </div>
+        )}
       </SectionErrorBoundary>
     </div>
   )

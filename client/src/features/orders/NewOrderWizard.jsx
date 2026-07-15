@@ -30,11 +30,19 @@ import {
   normalizeWizardCustomerKey,
 } from '../../mappers/order/wizardCustomerRegistryModel.js'
 import { parseE164Phone } from '../../lib/phoneInput.js'
+import { useViewportTier } from '../../hooks/useViewportTier.js'
 import '../../styles/new-order-wizard.css'
 
 /** @typedef {import('../../data/seedOrders.js').Order} Order */
 /** @typedef {import('./newOrderWizardModel.js').NewOrderWizardForm} NewOrderWizardForm */
 /** @typedef {import('./newOrderWizardModel.js').WizardProductLine} WizardProductLine */
+
+const MOBILE_WIZARD_STEPS = [
+  { id: 'customer', label: 'Musteri sec' },
+  { id: 'products', label: 'Urun sec' },
+  { id: 'payment', label: 'Odeme' },
+  { id: 'summary', label: 'Onay' },
+]
 
 /**
  * @param {{
@@ -61,6 +69,10 @@ export default function NewOrderWizard({
   onCreated,
   canCreateOrder = true,
 }) {
+  const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
+  const stepsConfig = isPhone ? MOBILE_WIZARD_STEPS : WIZARD_STEPS
+  const submitStepIndex = isPhone ? 3 : WIZARD_STEPS.length - 1
   const titleId = useId()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState(emptyWizardForm)
@@ -135,7 +147,7 @@ export default function NewOrderWizard({
   }
 
   function tryAdvance() {
-    const v = validateWizardStep(step, form)
+    const v = validateStepByFlow(step, form, isPhone)
     if (!v.ok) {
       setStepError(v.message ?? 'Eksik bilgi var.')
       setStepFieldErrors(v.fieldErrors ?? {})
@@ -143,7 +155,7 @@ export default function NewOrderWizard({
     }
     setStepError(null)
     setStepFieldErrors({})
-    setStep((s) => Math.min(WIZARD_STEPS.length - 1, s + 1))
+    setStep((s) => Math.min(stepsConfig.length - 1, s + 1))
   }
 
   /** @param {number} target */
@@ -154,7 +166,7 @@ export default function NewOrderWizard({
       return
     }
     for (let s = step; s < target; s++) {
-      const v = validateWizardStep(s, form)
+      const v = validateStepByFlow(s, form, isPhone)
       if (!v.ok) {
         setStep(s)
         setStepError(v.message ?? 'Eksik bilgi var.')
@@ -169,14 +181,11 @@ export default function NewOrderWizard({
 
   async function handleSubmit(e) {
     e.preventDefault()
-    for (let s = 0; s < 3; s++) {
-      const v = validateWizardStep(s, form)
-      if (!v.ok) {
-        setStep(s)
-        setStepError(v.message ?? 'Eksik bilgi var.')
-        setStepFieldErrors(v.fieldErrors ?? {})
-        return
-      }
+    const submitValidation = validateStepByFlow(submitStepIndex, form, isPhone)
+    if (!submitValidation.ok) {
+      setStepError(submitValidation.message ?? 'Eksik bilgi var.')
+      setStepFieldErrors(submitValidation.fieldErrors ?? {})
+      return
     }
     setSubmitting(true)
     setStepError(null)
@@ -185,7 +194,14 @@ export default function NewOrderWizard({
       const draft = mapWizardToCreateOrderRequest(form)
       const result = await Promise.resolve(onSave(draft))
       if (result && typeof result === 'object' && 'id' in result) {
-        onCreated?.(/** @type {Order} */ (result), { form: { ...form, products: form.products.map((p) => ({ ...p })) } })
+        const created = /** @type {Order} */ (result)
+        if (isPhone) {
+          onCreated?.(created)
+        } else {
+          onCreated?.(created, {
+            form: { ...form, products: form.products.map((p) => ({ ...p })) },
+          })
+        }
       } else {
         onClose()
       }
@@ -196,7 +212,10 @@ export default function NewOrderWizard({
     }
   }
 
-  const isLast = step === WIZARD_STEPS.length - 1
+  const canAdvance = useMemo(() => {
+    if (step >= submitStepIndex) return true
+    return validateStepByFlow(step, form, isPhone).ok
+  }, [form, isPhone, step, submitStepIndex])
 
   return (
     <div className="now-root" role="presentation">
@@ -215,7 +234,7 @@ export default function NewOrderWizard({
         </header>
 
         <ol className="now-stepper" aria-label="Sipariş adımları">
-          {WIZARD_STEPS.map((s, i) => {
+          {stepsConfig.map((s, i) => {
             const done = i < step
             const active = i === step
             const clickable = i < step
@@ -269,7 +288,7 @@ export default function NewOrderWizard({
                 replaceProducts={replaceProducts}
               />
             ) : null}
-            {step === 2 ? (
+            {(!isPhone && step === 2) ? (
               <WizardPaymentStep
                 form={form}
                 locked={locked}
@@ -280,7 +299,19 @@ export default function NewOrderWizard({
                 fieldErrors={stepFieldErrors}
               />
             ) : null}
-            {step === 3 ? (
+            {isPhone && step === 2 ? (
+              <WizardPaymentStep
+                mode="full"
+                form={form}
+                locked={locked}
+                totals={totals}
+                recentCustomers={recentCustomers}
+                setField={setField}
+                setForm={setForm}
+                fieldErrors={stepFieldErrors}
+              />
+            ) : null}
+            {((!isPhone && step === 3) || (isPhone && step === 3)) ? (
               <SummaryStep form={form} totals={totals} locked={locked} setField={setField} />
             ) : null}
           </div>
@@ -294,6 +325,7 @@ export default function NewOrderWizard({
                   disabled={locked}
                   onClick={() => {
                     setStepError(null)
+                    setStepFieldErrors({})
                     setStep((s) => s - 1)
                   }}
                 >
@@ -306,15 +338,20 @@ export default function NewOrderWizard({
               )}
             </div>
             <div className="now-foot-right">
-              {!isLast ? (
-                <button type="button" className="now-btn now-btn--primary" disabled={locked} onClick={tryAdvance}>
+              {step < submitStepIndex ? (
+                <button
+                  type="button"
+                  className="now-btn now-btn--primary"
+                  disabled={locked || (isPhone && !canAdvance)}
+                  onClick={tryAdvance}
+                >
                   Devam
                 </button>
               ) : (
                 <button
                   type="submit"
                   className="now-btn now-btn--primary now-btn--submit"
-                  disabled={locked || !canCreateOrder}
+                  disabled={locked || !canCreateOrder || (isPhone && step !== submitStepIndex)}
                 >
                   {submitting ? (
                     <>
@@ -332,6 +369,20 @@ export default function NewOrderWizard({
       </div>
     </div>
   )
+}
+
+/**
+ * @param {number} step
+ * @param {NewOrderWizardForm} form
+ * @param {boolean} isPhone
+ * @returns {{ ok: true } | { ok: false, message: string, fieldErrors?: Record<string, string> }}
+ */
+function validateStepByFlow(step, form, isPhone) {
+  if (!isPhone) return validateWizardStep(step, form)
+  if (step === 0) return validateWizardStep(0, form)
+  if (step === 1) return validateWizardStep(1, form)
+  if (step === 2 || step === 3) return validateWizardStep(2, form)
+  return { ok: true }
 }
 
 /**
@@ -673,6 +724,10 @@ function SummaryStep({ form, totals, locked, setField }) {
             <div>
               <dt>Durum</dt>
               <dd>{form.status}</dd>
+            </div>
+            <div>
+              <dt>Not</dt>
+              <dd>{form.paymentNote?.trim() || '—'}</dd>
             </div>
           </dl>
         </div>

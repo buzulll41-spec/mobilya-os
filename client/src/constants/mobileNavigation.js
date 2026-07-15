@@ -1,4 +1,4 @@
-/** FAZ 112 — telefon alt navigasyon (5 sekme). */
+/** FAZ 112 — telefon alt navigasyon (Field Pilot: max 4 sekme). */
 
 
 
@@ -10,15 +10,13 @@
 
 export const MOBILE_TAB_ITEMS = [
 
-  { id: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', icon: '🏠' },
+  { id: 'dashboard', label: 'Ana Sayfa', shortLabel: 'Ana Sayfa', icon: '🏠' },
 
-  { id: 'orders', label: 'Siparişler', shortLabel: 'Siparişler', icon: '📦' },
+  { id: 'orders', label: 'İşler', shortLabel: 'İşler', icon: '🧩' },
 
-  { id: 'shipment-ops', label: 'Sevk', shortLabel: 'Sevk', icon: '🚚' },
+  { id: 'notifications', label: 'Bildirimler', shortLabel: 'Bildirim', icon: '🔔' },
 
-  { id: 'collection', label: 'Tahsilat', shortLabel: 'Tahsilat', icon: '💰' },
-
-  { id: '__menu__', label: 'Menü', shortLabel: 'Menü', icon: '👤', action: 'menu' },
+  { id: 'profile', label: 'Profil', shortLabel: 'Profil', icon: '👤' },
 
 ]
 

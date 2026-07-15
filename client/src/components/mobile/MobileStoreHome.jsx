@@ -1,4 +1,5 @@
 import { navigateWithOpsFilter } from '../../lib/opsDeepLink.js'
+import { memo } from 'react'
 
 /**
  * @param {'success' | 'warning' | 'critical' | 'neutral'} tone
@@ -18,7 +19,7 @@ function toneClass(tone) {
  *   onNavigate?: (page: string, ctx?: { opsFilter?: import('../../lib/opsDeepLink.js').OpsDeepLinkFilterId }) => void
  * }} props
  */
-export default function MobileStoreHome({ cards, greeting, todayLabel, onNavigate }) {
+function MobileStoreHome({ cards, greeting, todayLabel, onNavigate }) {
   /** @param {import('../../mappers/mobile/mobileStoreOpsModel.js').MobileStoreHomeCard} card */
   function openCard(card) {
     if (!onNavigate) return
@@ -49,3 +50,5 @@ export default function MobileStoreHome({ cards, greeting, todayLabel, onNavigat
     </section>
   )
 }
+
+export default memo(MobileStoreHome)

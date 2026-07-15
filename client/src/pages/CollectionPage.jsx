@@ -235,12 +235,14 @@ export default function CollectionPage({
     if (!panelOrder || !postOrderPayment) return
     await postOrderPayment(panelOrder.id, body)
     setPaymentRefreshKey((k) => k + 1)
+    void (onRefreshOrders?.() ?? refreshOrders())
   }
 
   async function handlePanelSaveAndNext(body) {
     if (!panelOrder || !postOrderPayment || !panelQueue) return
     await postOrderPayment(panelOrder.id, body)
     setPaymentRefreshKey((k) => k + 1)
+    void (onRefreshOrders?.() ?? refreshOrders())
     if (panelCanGoNext) {
       setPanelQueue({ ...panelQueue, activeIndex: panelQueue.activeIndex + 1 })
       const nextId = panelQueue.rowIds[panelQueue.activeIndex + 1]
@@ -465,6 +467,7 @@ export default function CollectionPage({
                 cards={view.cards}
                 todayIso={todayIso}
                 selectedRowId={selectedCard?.row.id ?? null}
+                dtoById={dtoById}
                 onSelectRow={(row) => setSelectedRowId(row.id)}
                 onOpenPayment={(row) => openWithQueue(row, 'payments')}
               />
