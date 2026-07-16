@@ -70,10 +70,8 @@ export default function AppLayout({
   children,
 }) {
   const viewportTier = useViewportTier()
-  const isPhoneWidth =
-    typeof window !== 'undefined' ? window.matchMedia('(max-width: 479px)').matches : false
-  const isPhone = viewportTier === 'phone' || isPhoneWidth
-  const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet' || isPhoneWidth
+  const isPhone = viewportTier === 'phone'
+  const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet'
   const showStoreQuickDock = isPhone && isMobileStoreOpsPage(page) && page !== 'dashboard'
   const tabletSidebarCollapsed = viewportTier === 'tablet' ? true : sidebarCollapsed
   const viewportClass =
@@ -81,9 +79,7 @@ export default function AppLayout({
       ? 'mos-viewport-tablet'
       : viewportTier === 'phone'
         ? 'mos-viewport-phone'
-        : viewportTier === 'laptop'
-          ? 'mos-viewport-laptop'
-          : 'mos-viewport-desktop'
+        : 'mos-viewport-desktop'
 
   function handleFabIntent(intent) {
     if (onMobileFabIntent) {

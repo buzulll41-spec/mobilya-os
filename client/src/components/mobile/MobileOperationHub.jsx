@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { navigateWithOpsFilter } from '../../lib/opsDeepLink.js'
 import MobileCardShell from './MobileCardShell.jsx'
 import { getMobileUiIcon } from './MobileUiTokens.jsx'
@@ -42,6 +43,8 @@ export default function MobileOperationHub({
   tasks = [],
   onOpenTask,
 }) {
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
   /** @param {import('../../mappers/mobile/mobileOperationHubModel.js').MobileOperationHubCard} card */
   function openCard(card) {
     if (card.id === 'notifications') {
@@ -116,26 +119,38 @@ export default function MobileOperationHub({
       <section className="mos-mobile-operation-hub__tasks" aria-label="Mobil operasyon gorevleri">
         <header className="mos-mobile-operation-hub__tasks-head">
           <h3 className="mos-mobile-operation-hub__tasks-title">Is Listesi</h3>
-          <span className="mos-mobile-operation-hub__tasks-count">{tasks.length}</span>
+          <div className="mos-mobile-operation-hub__tasks-head-actions">
+            <span className="mos-mobile-operation-hub__tasks-count">{tasks.length}</span>
+            <button
+              type="button"
+              className="mos-mobile-operation-hub__filters-toggle"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((prev) => !prev)}
+            >
+              {filtersOpen ? 'Filtreleri Gizle' : 'Filtreler'}
+            </button>
+          </div>
         </header>
-        <div className="mos-mobile-operation-hub__filters" role="tablist" aria-label="Mobil operasyon filtreleri">
-          {MOBILE_TASK_FILTERS.map((filter) => {
-            const active = filter.id === taskFilter
-            return (
-              <button
-                key={filter.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                className="mos-mobile-operation-hub__filter"
-                data-active={active ? 'true' : 'false'}
-                onClick={() => onTaskFilterChange?.(filter.id)}
-              >
-                {filter.label}
-              </button>
-            )
-          })}
-        </div>
+        {filtersOpen ? (
+          <div className="mos-mobile-operation-hub__filters" role="tablist" aria-label="Mobil operasyon filtreleri">
+            {MOBILE_TASK_FILTERS.map((filter) => {
+              const active = filter.id === taskFilter
+              return (
+                <button
+                  key={filter.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  className="mos-mobile-operation-hub__filter"
+                  data-active={active ? 'true' : 'false'}
+                  onClick={() => onTaskFilterChange?.(filter.id)}
+                >
+                  {filter.label}
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
 
         <ul className="mos-mobile-operation-hub__task-list">
           {tasks.length === 0 ? (

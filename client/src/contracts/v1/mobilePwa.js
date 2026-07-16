@@ -23,11 +23,11 @@ export const TOUCH_FIRST_ERP = {
 
 /** Desteklenen viewport aralıkları (px). */
 export const MOBILE_BREAKPOINTS = {
+  COMPACT_PHONE_MAX: 479,
   PHONE_MAX: 767,
   TABLET_MIN: 768,
   TABLET_MAX: 1024,
-  LAPTOP_MIN: 1280,
-  DESKTOP_MIN: 1440,
+  DESKTOP_MIN: 1025,
 }
 
 /** WCAG / Apple HIG minimum dokunma alanı. */

@@ -66,7 +66,7 @@
   }
 
   .mos-mobile-pwa.mos-viewport-phone .mos-content {
-    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
   }
 }
 
@@ -78,7 +78,7 @@
   right: 0;
   bottom: calc(3.35rem + env(safe-area-inset-bottom));
   z-index: 39;
-  padding: 0.35rem 0.5rem;
+  padding: 0.28rem 0.45rem;
   background: rgba(255, 255, 255, 0.97);
   border-top: 1px solid var(--mos-line, #e2e6ed);
   box-shadow: 0 -4px 16px rgb(15 23 42 / 6%);
@@ -87,16 +87,21 @@
 
 .mos-mobile-action-bar__btn {
   flex: 1 1 0;
-  min-height: 44px;
+  min-height: 42px;
   min-width: 44px;
   padding: 0.45rem 0.55rem;
   border: 1px solid #dbeafe;
   border-radius: 10px;
   background: linear-gradient(180deg, #eff6ff 0%, #fff 100%);
   color: #1d4ed8;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
+  transition: transform 140ms ease, box-shadow 180ms ease;
+}
+
+.mos-mobile-action-bar__btn:active {
+  transform: translateY(1px);
 }
 
 .mos-mobile-action-bar__btn:first-child {
@@ -223,6 +228,14 @@
     overflow-x: hidden;
     padding-left: max(0.75rem, env(safe-area-inset-left));
     padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--orders,
+  .mos-mobile-pwa.mos-viewport-phone .mos-page.mos-erp-ops--shipment,
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-center,
+  .mos-mobile-pwa.mos-viewport-phone .mos-operation-center,
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--product-master-center {
+    padding-bottom: calc(9.25rem + env(safe-area-inset-bottom));
   }
 }
 

@@ -46,12 +46,12 @@ beforeEach(() => {
 
 describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
   describe('Responsive', () => {
-    it('breakpoint sözleşmesi telefon, tablet, laptop ve desktop kapsar', () => {
+    it('breakpoint sözleşmesi telefon, tablet ve desktop kapsar', () => {
+      expect(MOBILE_BREAKPOINTS.COMPACT_PHONE_MAX).toBe(479)
       expect(MOBILE_BREAKPOINTS.PHONE_MAX).toBe(767)
       expect(MOBILE_BREAKPOINTS.TABLET_MIN).toBe(768)
       expect(MOBILE_BREAKPOINTS.TABLET_MAX).toBe(1024)
-      expect(MOBILE_BREAKPOINTS.LAPTOP_MIN).toBe(1280)
-      expect(MOBILE_BREAKPOINTS.DESKTOP_MIN).toBe(1440)
+      expect(MOBILE_BREAKPOINTS.DESKTOP_MIN).toBe(1025)
     })
 
     it('mobile-pwa.css responsive katmanları tanımlı', () => {
@@ -111,8 +111,8 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
       expect(MOBILE_TAB_ITEMS.map((i) => i.id)).toEqual([
         'dashboard',
         'orders',
-        'notifications',
-        'profile',
+        'shipment-ops',
+        'collection',
       ])
     })
 

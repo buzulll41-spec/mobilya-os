@@ -71,7 +71,7 @@
   border-radius: var(--mos-pro-radius-sm);
   background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 45%, #eef2f7 90%);
   background-size: 200% 100%;
-  animation: mos-pro-shimmer 1.4s ease-in-out infinite;
+  animation: mos-pro-shimmer 1.15s ease-in-out infinite;
 }
 
 .mos-skeleton-block {
@@ -97,7 +97,7 @@
 
 .mos-loading-block--skeleton {
   align-items: stretch;
-  min-height: min(48vh, 380px);
+  min-height: min(42vh, 330px);
 }
 
 .mos-loading-block--skeleton .mos-loading-title {
@@ -113,7 +113,7 @@
   gap: var(--mos-pro-gap-sm);
   max-width: 26rem;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem;
+  padding: 1.9rem 1rem;
   text-align: center;
 }
 
@@ -130,16 +130,16 @@
 
 .mos-pro-empty__title {
   margin: 0;
-  font-size: var(--mos-pro-title-lg);
+  font-size: 1.03rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .mos-pro-empty__body {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--mos-muted);
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 .mos-pro-empty__actions {

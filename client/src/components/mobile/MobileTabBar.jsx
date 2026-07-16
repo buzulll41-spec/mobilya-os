@@ -14,10 +14,6 @@ export default function MobileTabBar({ page, sidebarOpen = false, onNavigate, on
       onOpenMenu?.()
       return
     }
-    if (item.id === 'notifications' || item.id === 'profile') {
-      onNavigate('dashboard')
-      return
-    }
     onNavigate(item.id)
   }
 

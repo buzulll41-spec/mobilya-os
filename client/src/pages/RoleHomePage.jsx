@@ -155,6 +155,11 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal, onDashboard
     [mobileOperationTasks, taskFilter],
   )
 
+  const criticalOperationTask = useMemo(
+    () => mobileOperationTasks.find((task) => task.isCritical) ?? null,
+    [mobileOperationTasks],
+  )
+
   useEffect(() => {
     if (!isPhone) return
 
@@ -295,6 +300,24 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal, onDashboard
 
       {isPhone ? (
         <>
+          <MobileStoreHome
+            cards={mobileStoreCards}
+            greeting={view.greeting}
+            todayLabel={view.todayLabel}
+            onNavigate={onNavigate}
+          />
+          {criticalOperationTask ? (
+            <section className="mos-role-home__mobile-sticky-critical" aria-label="Kritik aksiyon">
+              <p className="mos-role-home__mobile-sticky-critical-label">Kritik aksiyon</p>
+              <button
+                type="button"
+                className="mos-role-home__mobile-sticky-critical-btn"
+                onClick={() => handleOpenOperationTask(criticalOperationTask)}
+              >
+                {criticalOperationTask.summary}
+              </button>
+            </section>
+          ) : null}
           <MobileOperationHub
             cards={mobileOperationHubCards}
             onNavigate={onNavigate}
@@ -305,6 +328,12 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal, onDashboard
             onTaskFilterChange={setTaskFilter}
             tasks={filteredOperationTasks}
             onOpenTask={handleOpenOperationTask}
+          />
+          <MobileQuickActions
+            onNavigate={onNavigate}
+            onNewOrder={onOpenOrderModal}
+            onFocusSearch={focusGlobalSearch}
+            className="mos-mobile-quick-actions--dock"
           />
           <MobileNotificationCenter
             open={notificationCenterOpen}

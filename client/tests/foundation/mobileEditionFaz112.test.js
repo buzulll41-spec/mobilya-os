@@ -57,12 +57,12 @@ describe('FAZ 112 — Mobile Edition UX', () => {
   describe('Bottom navigation (Field Pilot: 4 sekme)', () => {
     it('telefon alt menü 4 sekme', () => {
       expect(MOBILE_TAB_ITEMS).toHaveLength(4)
-      expect(MOBILE_TAB_ITEMS.map((i) => i.icon)).toEqual(['🏠', '🧩', '🔔', '👤'])
+      expect(MOBILE_TAB_ITEMS.map((i) => i.icon)).toEqual(['🏠', '🧾', '🚚', '💳'])
       expect(MOBILE_TAB_ITEMS.map((i) => i.id)).toEqual([
         'dashboard',
         'orders',
-        'notifications',
-        'profile',
+        'shipment-ops',
+        'collection',
       ])
     })
 

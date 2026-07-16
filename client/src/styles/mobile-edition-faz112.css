@@ -72,21 +72,22 @@
 
   z-index: 41;
 
-  width: 56px;
+  width: 54px;
 
-  height: 56px;
+  height: 54px;
 
   border: none;
 
   border-radius: 999px;
 
-  background: linear-gradient(145deg, #863bff 0%, #6d28d9 100%);
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
 
   color: #fff;
 
-  box-shadow: 0 8px 24px rgb(109 40 217 / 35%);
+  box-shadow: 0 10px 24px rgb(15 23 42 / 32%);
 
   cursor: pointer;
+  transition: transform 160ms ease, box-shadow 180ms ease, background-color 180ms ease;
 
 }
 
@@ -94,11 +95,17 @@
 
 .mos-mobile-fab__icon {
 
-  font-size: 1.85rem;
+  font-size: 1.75rem;
 
-  font-weight: 300;
+  font-weight: 400;
 
   line-height: 1;
+
+}
+
+.mos-mobile-fab:active {
+
+  transform: translateY(1px) scale(0.985);
 
 }
 

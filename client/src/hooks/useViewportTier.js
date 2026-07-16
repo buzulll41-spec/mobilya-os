@@ -15,17 +15,16 @@ export function isTabletViewport() {
   ).matches
 }
 
-/** @returns {'phone' | 'tablet' | 'laptop' | 'desktop'} */
+/** @returns {'phone' | 'tablet' | 'desktop'} */
 export function resolveViewportTier() {
   if (typeof window === 'undefined') return 'desktop'
   const w = window.innerWidth
   if (w <= MOBILE_BREAKPOINTS.PHONE_MAX) return 'phone'
   if (w <= MOBILE_BREAKPOINTS.TABLET_MAX) return 'tablet'
-  if (w < MOBILE_BREAKPOINTS.DESKTOP_MIN) return 'laptop'
   return 'desktop'
 }
 
-/** @returns {'phone' | 'tablet' | 'laptop' | 'desktop'} */
+/** @returns {'phone' | 'tablet' | 'desktop'} */
 export function useViewportTier() {
   const [tier, setTier] = useState(resolveViewportTier)
 
@@ -44,7 +43,7 @@ export function useViewportTier() {
 /** @returns {boolean} */
 export function isCompactPhoneViewport() {
   if (typeof window === 'undefined') return false
-  return window.matchMedia('(max-width: 479px)').matches
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINTS.COMPACT_PHONE_MAX}px)`).matches
 }
 
 /** @returns {boolean} */

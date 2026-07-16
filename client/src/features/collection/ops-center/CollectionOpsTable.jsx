@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { PRIORITY_CALL_LIMIT } from '../../../mappers/collection/collectionCommandCenterModel.js'
 import { buildErpTableRows } from '../collectionErpTableUi.js'
 import PilotRecordBadge from '../../../components/pilot/PilotRecordBadge.jsx'
 import { getOrderPilotKind } from '../../../lib/pilotRecordHeuristics.js'
 import { formatShortDate } from '../../../utils/dates.js'
+import { useViewportTier } from '../../../hooks/useViewportTier.js'
 
 /** @typedef {import('../../../mappers/collection/collectionCommandCenterModel.js').CollectionCardModel} CollectionCardModel */
 /** @typedef {import('../../../contracts/v1/collectionRowVm.js').CollectionRowVM} CollectionRowVM */
@@ -187,16 +188,8 @@ export default function CollectionOpsTable({
   onSelectRow,
   onOpenPayment,
 }) {
-  const [isPhoneViewport, setIsPhoneViewport] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-    const media = window.matchMedia('(max-width: 480px)')
-    const update = () => setIsPhoneViewport(media.matches)
-    update()
-    media.addEventListener('change', update)
-    return () => media.removeEventListener('change', update)
-  }, [])
+  const viewportTier = useViewportTier()
+  const isPhoneViewport = viewportTier === 'phone'
 
   if (cards.length === 0) {
     return (

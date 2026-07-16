@@ -38,6 +38,21 @@
   max-width: 100vw;
 }
 
+.mos button,
+.mos [role='button'] {
+  transition:
+    transform 140ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.mos button:active,
+.mos [role='button']:active {
+  transform: translateY(1px) scale(0.995);
+}
+
 .mos[data-sidebar-collapsed='true'] {
   --mos-sidebar-w: 76px;
 }
@@ -3181,22 +3196,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
-  min-height: min(52vh, 420px);
-  padding: 2rem 1.25rem;
+  gap: 0.5rem;
+  min-height: min(48vh, 380px);
+  padding: 1.4rem 1rem;
   text-align: center;
 }
 
 .mos-loading-title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: var(--mos-ink);
 }
 
 .mos-loading-hint {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: var(--mos-muted);
 }
 
@@ -3212,22 +3227,42 @@
 .mos-empty-state {
   max-width: 28rem;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem;
+  padding: 1.6rem 1rem;
   text-align: center;
 }
 
 .mos-empty-state-title {
   margin: 0 0 0.5rem;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .mos-empty-state-body {
   margin: 0 0 1.25rem;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--mos-muted);
-  line-height: 1.55;
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  .mos {
+    font-size: 13px;
+  }
+
+  .mos-content {
+    scrollbar-gutter: stable;
+  }
+
+  .mos-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .mos-content::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.35);
+    border-radius: 999px;
+  }
 }
 
 .mos-empty-state-actions {

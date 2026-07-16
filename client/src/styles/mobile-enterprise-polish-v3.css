@@ -2,18 +2,18 @@
 
 :root {
   --mos-mobile-space-8: 8px;
-  --mos-mobile-space-12: 12px;
-  --mos-mobile-space-16: 16px;
+  --mos-mobile-space-12: 10px;
+  --mos-mobile-space-16: 14px;
   --mos-mobile-space-20: 20px;
   --mos-mobile-space-24: 24px;
-  --mos-mobile-card-radius: var(--mos-radius-lg, 12px);
-  --mos-mobile-card-shadow: var(--mos-shadow-md, 0 4px 12px rgba(17, 24, 39, 0.07));
+  --mos-mobile-card-radius: 11px;
+  --mos-mobile-card-shadow: 0 6px 18px rgba(15, 23, 42, 0.09);
   --mos-mobile-card-padding: var(--mos-mobile-space-16);
-  --mos-mobile-head-height: 48px;
-  --mos-mobile-control-height: 48px;
+  --mos-mobile-head-height: 44px;
+  --mos-mobile-control-height: 46px;
   --mos-mobile-icon-size: 20px;
   --mos-mobile-icon-box: 32px;
-  --mos-mobile-motion: 200ms;
+  --mos-mobile-motion: 170ms;
 }
 
 @media (max-width: 480px) {
@@ -25,6 +25,7 @@
   .mos-mobile-pwa.mos-viewport-phone .mos-content {
     padding-inline: var(--mos-mobile-space-12);
     overscroll-behavior-y: contain;
+    line-height: 1.38;
   }
 
   .mos-mobile-pwa.mos-viewport-phone :where(
@@ -191,6 +192,7 @@
   .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-store-empty__body, .mos-mobile-store-error__text) {
     margin: 0;
     color: var(--mos-muted, #6b7280);
+    font-size: 0.78rem;
   }
 
   .mos-mobile-pwa.mos-viewport-phone :where(.mos-mobile-ptr__spinner, .mos-loading-spinner, .mos-spinner) {
