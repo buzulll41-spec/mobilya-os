@@ -4,6 +4,7 @@ import { buildApp } from '../src/app.js'
 import type { FastifyInstance } from 'fastify'
 
 const hasDb = Boolean(process.env.DATABASE_URL)
+let fixtureOrderId = ''
 
 async function login(app: FastifyInstance): Promise<string> {
   const res = await app.inject({
@@ -38,6 +39,7 @@ describe.skipIf(!hasDb)('shipment plans & groups API', () => {
     const orders = ordersRes.json() as { id: string }[]
     orderIdA = orders[0]?.id ?? ''
     orderIdB = orders[1]?.id ?? orderIdA
+    fixtureOrderId = orderIdA
   })
 
   afterAll(async () => {
@@ -161,7 +163,7 @@ describe.skipIf(!hasDb)('shipment plans RBAC', () => {
     process.env.AUTH_DISABLED = 'true'
   })
 
-  it('SALES cannot create shipment plan (403)', async () => {
+  it('SALES can create shipment plan', async () => {
     const loginRes = await app.inject({
       method: 'POST',
       url: '/v1/auth/login',
@@ -173,11 +175,11 @@ describe.skipIf(!hasDb)('shipment plans RBAC', () => {
       url: '/v1/shipment-plans',
       headers: { Authorization: `Bearer ${token}` },
       payload: {
-        salesOrderId: 'S-TEST',
+        salesOrderId: fixtureOrderId,
         plannedDate: '2026-05-20',
       },
     })
-    expect(res.statusCode).toBe(403)
+    expect(res.statusCode).toBe(201)
   })
 
   it('WAREHOUSE can read but not write plans', async () => {

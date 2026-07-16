@@ -142,8 +142,8 @@ describe('buildCases — vaka motoru', () => {
     const res = casesFrom({ listItems: items, records })
     const c = findCase(res, 'CASE-O1')
     expect(c).toBeTruthy()
-    // collection-call + shipment-ready + dq-zero-cost → 3 görev tek vakada
-    expect(c!.actionCount).toBe(3)
+    // collection-call + shipment-ready + shipment-lifecycle-ready + dq-zero-cost → 4 görev tek vakada
+    expect(c!.actionCount).toBe(4)
     expect(c!.orderIds).toEqual(['O1'])
   })
 

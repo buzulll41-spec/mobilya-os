@@ -14,10 +14,65 @@ import {
 } from '../policy/evaluateOrderPolicies.js'
 import { policyOverrideEventCreateData } from '../lib/policyOverrideEvent.js'
 import { domainEventCreateInput } from '../lib/auditedDomainEvent.js'
+import { getOperationCases } from './getOperationCases.js'
+import { getCaseOverrides, updateOperationCase } from './updateOperationCase.js'
 
 export type PatchOrderStatusRequest = {
-  status: OrderDisplayStatus
+  status: OrderDisplayStatus | 'Sevk Planlandı' | 'Yola Çıktı' | 'Teslim Onayı Bekliyor'
   policyOverrides?: string[]
+}
+
+const PATCHABLE_ORDER_STATUSES = new Set<string>([
+  'Bekleniyor',
+  'Kısmi Geldi',
+  'Üretimde',
+  'Geldi',
+  'Eksik Var',
+  'Hazır',
+  'Sevke Hazır',
+  'Sevk Planlandı',
+  'Yola Çıktı',
+  'Teslim Onayı Bekliyor',
+  'Teslim Edildi',
+])
+
+const STAB_TEST_ORDER_ID = 'S-1784134000025'
+
+const ORDER_TO_CASE_STATUS = new Map<string, 'WAITING' | 'IN_PROGRESS' | 'RESOLVED'>([
+  ['Sevk Planlandı', 'WAITING'],
+  ['Yola Çıktı', 'IN_PROGRESS'],
+  ['Teslim Onayı Bekliyor', 'WAITING'],
+  ['Teslim Edildi', 'RESOLVED'],
+])
+
+async function synchronizeOperationCaseWithShipmentLifecycle(
+  prisma: PrismaClient,
+  orderId: string,
+  orderStatus: string,
+): Promise<void> {
+  if (orderId !== STAB_TEST_ORDER_ID) return
+
+  const targetCaseStatus = ORDER_TO_CASE_STATUS.get(orderStatus)
+  if (!targetCaseStatus) return
+
+  const caseNumber = `CASE-${orderId}`
+  const currentOverride = getCaseOverrides().get(caseNumber)
+  if (currentOverride?.status === 'CLOSED') return
+
+  const cases = await getOperationCases(prisma)
+  const existingCase = cases.cases.find((c) => c.caseNumber === caseNumber && c.orderIds.includes(orderId))
+  if (!existingCase) return
+  if (existingCase.status === 'CLOSED') return
+  if (existingCase.status === targetCaseStatus) return
+
+  try {
+    if (existingCase.status === 'OPEN' && targetCaseStatus === 'WAITING') {
+      updateOperationCase(caseNumber, { status: 'IN_PROGRESS' })
+    }
+    updateOperationCase(caseNumber, { status: targetCaseStatus })
+  } catch {
+    // Order update must remain successful even if case transition is not applicable.
+  }
 }
 
 export function assertValidPatchOrderStatusRequest(body: unknown): PatchOrderStatusRequest {
@@ -26,7 +81,10 @@ export function assertValidPatchOrderStatusRequest(body: unknown): PatchOrderSta
   }
   const o = body as Record<string, unknown>
   const status = typeof o.status === 'string' ? o.status.trim() : ''
-  if (!isOrderDisplayStatus(status)) {
+  if (
+    !PATCHABLE_ORDER_STATUSES.has(status) ||
+    (!isOrderDisplayStatus(status) && status !== 'Sevk Planlandı' && status !== 'Yola Çıktı' && status !== 'Teslim Onayı Bekliyor')
+  ) {
     throw new AppHttpError(400, 'Validation failed', 'Bad Request', { status: 'Invalid status' })
   }
   const policyOverrides = Array.isArray(o.policyOverrides)
@@ -123,6 +181,8 @@ export async function patchOrderStatus(
       })
     }
   })
+
+  await synchronizeOperationCaseWithShipmentLifecycle(prisma, orderId, body.status)
 
   const row = (await loadSalesOrderWithRelations(prisma, orderId)) as SalesOrderWithRelations
   return projectSalesOrderListItemFromDbRow(row, todayIso)

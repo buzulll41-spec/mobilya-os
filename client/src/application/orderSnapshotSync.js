@@ -5,9 +5,16 @@ import { mergeDomainEventsById } from '../utils/mergeDomainEvents.js'
 /** @typedef {import('../contracts/v1/task.js').TaskDto} TaskDto */
 
 /**
+ * @param {{ includeDomainEvents?: boolean }} [options]
  * @returns {Promise<{ domainEvents: DomainEventDto[], operationalTasks: TaskDto[] }>}
  */
-export async function fetchDomainEventsAndTasks() {
+export async function fetchDomainEventsAndTasks(options = {}) {
+  if (options.includeDomainEvents === false) {
+    return {
+      domainEvents: /** @type {DomainEventDto[]} */ ([]),
+      operationalTasks: /** @type {TaskDto[]} */ ([]),
+    }
+  }
   const operationalTasks = await ordersClient.getTasks().catch(() => /** @type {TaskDto[]} */ ([]))
   const domainEvents = await ordersClient.getDomainEvents().catch(() => /** @type {DomainEventDto[]} */ ([]))
   return { domainEvents, operationalTasks }

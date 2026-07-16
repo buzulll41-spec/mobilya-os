@@ -1242,6 +1242,52 @@ button.mos-erp-summary__item.is-active {
   margin-bottom: 0.6rem;
 }
 
+/* Operation hub panes are nested inside another .mos-erp-ops shell. Avoid second viewport-height lock. */
+.mos-hub-pane.mos-erp-ops {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+}
+
+/* Operation Cases layout: fixed header blocks + scrollable table body in remaining space. */
+.mos-erp-ops--case-center {
+  min-height: 0;
+}
+
+.mos-erp-ops--case-center .mos-erp-summary,
+.mos-erp-ops--case-center .mos-erp-ops__today-focus,
+.mos-erp-ops--case-center .mos-erp-cockpit-filters {
+  flex: 0 0 auto;
+}
+
+.mos-erp-ops--case-center .mos-erp-summary {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mos-erp-ops--case-center .mos-erp-summary .mos-erp-summary__item {
+  flex: 0 0 9.75rem;
+}
+
+.mos-erp-ops--case-center .mos-erp-cockpit-filters {
+  margin-bottom: 0;
+}
+
+.mos-erp-ops__case-workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mos-erp-ops--case-center .mos-erp-ops__table-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .mos-erp-cockpit-filters__field {
   display: flex;
   flex-direction: column;
@@ -3738,10 +3784,16 @@ button.mos-erp-summary__item.is-active {
 }
 
 .mos-hub__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .mos-hub-pane {
+  flex: 1 1 auto;
+  min-height: 0;
   min-width: 0;
 }
 
@@ -3750,4 +3802,16 @@ button.mos-erp-summary__item.is-active {
   flex-wrap: wrap;
   gap: 0.35rem;
   margin-bottom: 0.55rem;
+}
+
+.mos-erp-ops--case-center .mos-erp-summary {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mos-erp-ops--case-center .mos-erp-summary .mos-erp-summary__item {
+  flex: 0 0 9.75rem;
 }

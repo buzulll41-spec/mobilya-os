@@ -1,6 +1,12 @@
 import { APP_MODE, getAppMode, getEnvAppMode, isRuntimeModeAllowed } from './appMode.js'
 import { getApiBaseUrl, isLocalhostApiBase } from './dataSource.js'
 
+function isLocalRuntimeHost() {
+  if (typeof window === 'undefined') return false
+  const host = (window.location?.hostname ?? '').toLowerCase()
+  return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '::1'
+}
+
 /**
  * Production Shield — uygulama açılışında (bootstrap) production veri kaynağını
  * kesin olarak doğrular. Fail-open KULLANILMAZ: production yanlış yapılandırılmışsa
@@ -16,6 +22,11 @@ import { getApiBaseUrl, isLocalhostApiBase } from './dataSource.js'
 
 /** @returns {ProductionShieldResult} */
 export function evaluateProductionShield() {
+  // Localhost/loopback: development ergonomisi korunur, shield kilidi uygulanmaz.
+  if (isLocalRuntimeHost()) {
+    return { ok: true, code: 'ok', production: false }
+  }
+
   // Yalnızca production DEPLOY'unda (env mode) devreye girer.
   if (getEnvAppMode() !== APP_MODE.PRODUCTION) {
     return { ok: true, code: 'ok', production: false }

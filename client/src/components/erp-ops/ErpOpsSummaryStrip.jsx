@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 /**
  * @typedef {Object} ErpSummaryMetric
  * @property {string} id
@@ -14,6 +16,7 @@
  *   onMetricClick?: (id: string) => void
  *   activeMetricId?: string | null
  *   summaryClassName?: string
+ *   style?: import('react').CSSProperties
  * }} props
  */
 export default function ErpOpsSummaryStrip({
@@ -22,12 +25,25 @@ export default function ErpOpsSummaryStrip({
   onMetricClick,
   activeMetricId,
   summaryClassName = '',
+  style,
 }) {
+  const stripRef = useRef(null)
+
+  useEffect(() => {
+    if (!style || style.display !== 'flex' || !stripRef.current) return
+    stripRef.current.style.setProperty('display', 'flex', 'important')
+    stripRef.current.style.setProperty('flex-wrap', 'nowrap', 'important')
+    stripRef.current.style.setProperty('overflow-x', 'auto', 'important')
+    stripRef.current.style.setProperty('overflow-y', 'hidden', 'important')
+  }, [style])
+
   return (
     <div
+      ref={stripRef}
       className={`mos-erp-summary${summaryClassName ? ` ${summaryClassName}` : ''}`}
       role="list"
       aria-label={ariaLabel}
+      style={style}
     >
       {metrics.map((m) => {
         const clickable = Boolean(onMetricClick)

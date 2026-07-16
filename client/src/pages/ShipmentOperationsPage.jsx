@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import SectionErrorBoundary from '../components/SectionErrorBoundary.jsx'
 import ErpOpsSummaryStrip from '../components/erp-ops/ErpOpsSummaryStrip.jsx'
 import { erpOpsButtonClass } from '../lib/actionButtonVariants.js'
@@ -105,7 +105,6 @@ function ShipmentOperationsPage({
   const isTouchStore = viewportTier === 'phone' || viewportTier === 'tablet'
   const [lastRefresh, setLastRefresh] = useState(/** @type {string | null} */ (null))
   const [mobileShipmentChip, setMobileShipmentChip] = useState('today')
-  const adviceAuditKeyRef = useRef('')
 
   useEffect(() => {
     const filter = consumeOpsDeepLink('shipment-ops')
@@ -260,45 +259,6 @@ function ShipmentOperationsPage({
       },
     )
   }
-
-  useEffect(() => {
-    if (!view.advisor) return
-    const key = `${selectedDate}-${view.advisor.health.score}-${view.advisor.savings.length}-${view.advisor.wait.length}-${view.advisor.risks.length}`
-    if (adviceAuditKeyRef.current === key) return
-    adviceAuditKeyRef.current = key
-
-    const anchorOrderId =
-      view.advisor.affectedOrderIds[0] || view.agendaItems[0]?.orderId || rows[0]?.id
-    if (!anchorOrderId) return
-
-    void recordDispatchAdviceGenerated({
-      salesOrderId: anchorOrderId,
-      selectedDate,
-      healthScore: view.advisor.health.score,
-      savingsCount: view.advisor.savings.length,
-      waitCount: view.advisor.wait.length,
-      riskCount: view.advisor.risks.length,
-      orderIds: view.advisor.affectedOrderIds,
-    })
-
-    for (const risk of view.advisor.risks) {
-      if (!risk.orderId) continue
-      void recordDispatchRiskDetected({
-        salesOrderId: risk.orderId,
-        riskType: risk.riskType ?? 'unknown',
-        title: risk.title,
-        recommendation: risk.recommendation ?? '',
-        selectedDate,
-      })
-    }
-  }, [
-    view.advisor,
-    view.agendaItems,
-    selectedDate,
-    rows,
-    recordDispatchAdviceGenerated,
-    recordDispatchRiskDetected,
-  ])
 
   /** @param {ShipmentAgendaItem} item */
   function handleOpenAgendaItem(item) {

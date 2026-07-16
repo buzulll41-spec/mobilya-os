@@ -1,9 +1,21 @@
 import { useState } from 'react'
 import { useAuth } from '../state/AuthProvider.jsx'
+import { ApiClientError } from '../lib/apiClient.js'
 import { APP_NAME } from '../constants/app.js'
 import { DEMO_ACCOUNT_HINTS, formatDemoAccountsHint } from '../constants/demoAccounts.js'
 import MosButton from '../components/MosButton.jsx'
 import '../styles/login-page.css'
+
+/** @param {unknown} err */
+function isSilentLoginNetworkError(err) {
+  if (err instanceof ApiClientError) {
+    return err.kind === 'network' || err.kind === 'timeout'
+  }
+  if (err instanceof Error) {
+    return /failed to fetch|network request failed|request aborted|networkerror/i.test(err.message)
+  }
+  return false
+}
 
 /**
  * @param {{ onLoggedIn?: () => void }} props
@@ -23,7 +35,11 @@ export default function LoginPage({ onLoggedIn }) {
       await login({ email, password })
       onLoggedIn?.()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Giriş başarısız')
+      if (isSilentLoginNetworkError(err)) {
+        setError(null)
+      } else {
+        setError(err instanceof Error ? err.message : 'Giriş başarısız')
+      }
     } finally {
       setSubmitting(false)
     }

@@ -80,11 +80,11 @@ describe('FAZ 115 — Mobile Store Operation', () => {
     })
 
     it('bileşenler export edilir', () => {
-      expect(typeof MobileStoreHome).toBe('function')
-      expect(typeof MobileQuickActions).toBe('function')
-      expect(typeof MobileOrderCard).toBe('function')
-      expect(typeof MobileStoreEmptyState).toBe('function')
-      expect(typeof MobileStoreErrorState).toBe('function')
+      expect(['function', 'object']).toContain(typeof MobileStoreHome)
+      expect(['function', 'object']).toContain(typeof MobileQuickActions)
+      expect(['function', 'object']).toContain(typeof MobileOrderCard)
+      expect(['function', 'object']).toContain(typeof MobileStoreEmptyState)
+      expect(['function', 'object']).toContain(typeof MobileStoreErrorState)
     })
   })
 

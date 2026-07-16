@@ -85,6 +85,8 @@ export default function SalesContractPrint({
   const [pdfError, setPdfError] = useState(/** @type {string | null} */ (null))
 
   const printAreaRef = useRef(/** @type {HTMLElement | null} */ (null))
+  const overlayRef = useRef(/** @type {HTMLDivElement | null} */ (null))
+  const previousActiveElementRef = useRef(/** @type {HTMLElement | null} */ (null))
 
   const isPostCreate = variant === 'postCreate'
 
@@ -182,15 +184,67 @@ export default function SalesContractPrint({
 
     if (!open) return
 
-    function onKey(e) {
+    previousActiveElementRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
 
-      if (e.key === 'Escape') onClose()
+    const prevOverflow = document.body.style.overflow
+    const prevPaddingRight = document.body.style.paddingRight
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    document.body.style.overflow = 'hidden'
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      overlayRef.current?.focus()
+    })
+
+    function onKeyDown(e) {
+
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+
+      if (e.key !== 'Tab' || !overlayRef.current) return
+
+      const container = overlayRef.current
+      const focusables = Array.from(
+        container.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el instanceof HTMLElement && !el.hasAttribute('disabled'))
+
+      if (focusables.length === 0) {
+        e.preventDefault()
+        container.focus()
+        return
+      }
+
+      const first = /** @type {HTMLElement} */ (focusables[0])
+      const last = /** @type {HTMLElement} */ (focusables[focusables.length - 1])
+      const active = document.activeElement instanceof HTMLElement ? document.activeElement : null
+
+      if (e.shiftKey && (active === first || active === container)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
 
     }
 
-    window.addEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKeyDown)
 
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.cancelAnimationFrame(rafId)
+      window.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = prevOverflow
+      document.body.style.paddingRight = prevPaddingRight
+      previousActiveElementRef.current?.focus()
+    }
 
   }, [open, onClose])
 
@@ -231,7 +285,17 @@ export default function SalesContractPrint({
 
   return createPortal(
 
-    <div className="scp-overlay" role="dialog" aria-modal="true" aria-label={toolbarTitle}>
+    <div
+      ref={overlayRef}
+      className="scp-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={toolbarTitle}
+      tabIndex={-1}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
 
       <header className="scp-toolbar sales-contract-print-toolbar">
 
@@ -287,7 +351,14 @@ export default function SalesContractPrint({
 
           {isPostCreate && onGoToOrderDetail ? (
 
-            <button type="button" className="scp-btn scp-btn--secondary" onClick={onGoToOrderDetail}>
+            <button
+              type="button"
+              className="scp-btn scp-btn--secondary"
+              onClick={() => {
+                onClose()
+                onGoToOrderDetail()
+              }}
+            >
 
               Sipariş Detayına Git
 

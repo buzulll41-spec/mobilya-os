@@ -233,6 +233,16 @@ export default function OperationCasesPage({ embedded = false }) {
           metrics={view.kpiMetrics}
           ariaLabel="Vaka KPI özeti"
           summaryClassName="mos-erp-summary--cols-6"
+          style={
+            embedded
+              ? {
+                  display: 'flex',
+                  flexWrap: 'nowrap',
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                }
+              : undefined
+          }
         />
       ) : null}
 

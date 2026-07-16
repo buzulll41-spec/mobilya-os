@@ -193,9 +193,11 @@ function enrichSalesOrderListItemWithDerivedDisplayStatus(
   storedDisplayStatus: string,
   openMissingItemsCount: number,
 ): SalesOrderListItemDto {
-  const displayStatus = deriveOrderDisplayStatusFromLines(lines, storedDisplayStatus, {
-    openMissingItemsCount,
-  })
+  const displayStatus = storedDisplayStatus.trim()
+    ? storedDisplayStatus
+    : deriveOrderDisplayStatusFromLines(lines, storedDisplayStatus, {
+        openMissingItemsCount,
+      })
   return {
     ...dto,
     displayStatus,

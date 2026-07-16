@@ -55,7 +55,7 @@ import { readCachedOrders } from '../services/offline/offlineCacheStore.js'
  * @property {boolean} isRefreshing Herhangi bir getOrders çalışıyor
  * @property {boolean} mutating create / update API çağrısı
  * @property {Error | null} error
- * @property {(options?: { mergeCreated?: SalesOrderListItemDto }) => Promise<void>} refreshOrders
+ * @property {(options?: { mergeCreated?: SalesOrderListItemDto, includeDomainEvents?: boolean }) => Promise<void>} refreshOrders
  * @property {(draft: Omit<Order, 'id' | 'orderDate'> | import('../contracts/v1/createOrderRequest.js').CreateOrderRequest) => Promise<Order>} createOrder
  * @property {(id: string, patch: Partial<Order>) => Promise<void>} updateOrder
  * @property {(orderId: string, body: { amount: number, method: string, note?: string }) => Promise<void>} postOrderPayment
@@ -108,12 +108,15 @@ export function OrdersProvider({ children }) {
   const loading = isRefreshing && salesOrderListItemDtos.length === 0
 
   const refreshOrders = useCallback(
-    async (/** @type {{ mergeCreated?: SalesOrderListItemDto } | undefined} */ options) => {
+    async (/** @type {{ mergeCreated?: SalesOrderListItemDto, includeDomainEvents?: boolean } | undefined} */ options) => {
       setError(null)
       setIsRefreshing(true)
       try {
         assertProductionDataSource()
-        const next = await withApiRetry(() => executeRefreshOrdersFlow(), { maxAttempts: 3 })
+        const next = await withApiRetry(
+          () => executeRefreshOrdersFlow({ includeDomainEvents: options?.includeDomainEvents }),
+          { maxAttempts: 3 },
+        )
         let salesOrderListItemDtos = Array.isArray(next.salesOrderListItemDtos)
           ? next.salesOrderListItemDtos
           : []
@@ -153,12 +156,12 @@ export function OrdersProvider({ children }) {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- bootstrap: mock getOrders
-    void refreshOrders()
+    void refreshOrders({ includeDomainEvents: false })
   }, [refreshOrders])
 
   useEffect(() => {
     if (!user?.id) return
-    void refreshOrders()
+    void refreshOrders({ includeDomainEvents: false })
   }, [user?.id, refreshOrders])
 
   const createOrder = useCallback(
@@ -214,19 +217,14 @@ export function OrdersProvider({ children }) {
   const updateOrder = useCallback(async (/** @type {string} */ id, /** @type {Partial<Order>} */ patch) => {
     setMutating(true)
     setError(null)
-    setSalesOrderListItemDtos((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? projectLegacyOrderToListItemDto(
-              { ...listItemDtoToLegacyOrder(d), ...patch },
-              DEMO_TODAY,
-            )
-          : d,
-      ),
-    )
     try {
       const result = await executeUpdateOrderFlow(id, patch)
-      setSalesOrderListItemDtos(result.salesOrderListItemDtos)
+      const nextDtos = Array.isArray(result.salesOrderListItemDtos) ? result.salesOrderListItemDtos : []
+      setSalesOrderListItemDtos((prev) => {
+        const serverDto = nextDtos.find((d) => d.id === id)
+        if (!serverDto) return nextDtos.length ? nextDtos : prev
+        return prev.map((d) => (d.id === id ? serverDto : d))
+      })
       setDomainEvents(result.domainEvents)
       setOperationalTasks(result.operationalTasks)
     } catch (e) {

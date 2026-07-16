@@ -22,14 +22,17 @@ import { parseCustomerExtraFromNotes } from '../features/orders/newOrderWizardMo
 
 /**
  * Liste yenileme: getOrders (içinde task rebuild) + event/task snapshot.
+ * @param {{ includeDomainEvents?: boolean }} [options]
  * @returns {Promise<OrdersRefreshResult>}
  */
-export async function executeRefreshOrdersFlow() {
+export async function executeRefreshOrdersFlow(options = {}) {
   const salesOrderListItemDtos = await ordersClient.getOrders()
   const shipmentQueueRows = await ordersClient.getShipmentQueue().catch(
     () => /** @type {import('../contracts/v1/shipmentRowVm.js').ShipmentRowVM[]} */ ([]),
   )
-  const { domainEvents, operationalTasks } = await fetchDomainEventsAndTasks()
+  const { domainEvents, operationalTasks } = await fetchDomainEventsAndTasks({
+    includeDomainEvents: options.includeDomainEvents,
+  })
   return { salesOrderListItemDtos, shipmentQueueRows, domainEvents, operationalTasks }
 }
 

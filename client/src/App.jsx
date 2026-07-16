@@ -185,6 +185,11 @@ export default function App() {
       salesOrderListItemDtos.reduce((sum, d) => sum + (d.pendingApprovalPaymentCount ?? 0), 0),
     [salesOrderListItemDtos],
   )
+  const [companyBrainArmed, setCompanyBrainArmed] = useState(false)
+  const [page, setPage] = useState(() => resolvePageFromHash(window.location.hash))
+  const [dwInitialWorkerId, setDwInitialWorkerId] = useState(() =>
+    parseDigitalWorkforceWorkerFromHash(window.location.hash),
+  )
 
   useEffect(() => {
     markInitialLoadComplete()
@@ -193,7 +198,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (loading || !orders.length) return undefined
+    if (loading || !orders.length || !companyBrainArmed || page !== 'dashboard') return undefined
     const todayIso = getOperationalToday()
     initGenesisEngine({
       demoMode: isDemoMode() || !getApiBaseUrl(),
@@ -204,16 +209,16 @@ export default function App() {
     return () => {
       stopGenesisEngine()
     }
-  }, [loading, orders, salesOrderListItemDtos])
+  }, [loading, orders, salesOrderListItemDtos, companyBrainArmed, page])
 
   useEffect(() => {
-    if (loading || !orders.length) return
+    if (loading || !orders.length || !companyBrainArmed || page !== 'dashboard') return
     updateGenesisContext({
       orders,
       dtos: salesOrderListItemDtos,
       todayIso: getOperationalToday(),
     })
-  }, [loading, orders, salesOrderListItemDtos])
+  }, [loading, orders, salesOrderListItemDtos, companyBrainArmed, page])
 
   useEffect(() => {
     if (!isDemoMode() || getApiBaseUrl() || loading || !orders.length) return
@@ -238,11 +243,6 @@ export default function App() {
   } = useOrderDrawer()
 
   useOrderDrawerDtoSync(salesOrderListItemDtos)
-
-  const [page, setPage] = useState(() => resolvePageFromHash(window.location.hash))
-  const [dwInitialWorkerId, setDwInitialWorkerId] = useState(() =>
-    parseDigitalWorkforceWorkerFromHash(window.location.hash),
-  )
 
   const prevPageRef = useRef(page)
   useEffect(() => {
@@ -416,6 +416,12 @@ export default function App() {
       setRuleTesterCtx({ code: ctx.code ?? '', value: ctx.value ?? '' })
     }
     const hubTarget = HUB_PAGE_ALIASES[target]?.hub ?? target
+    if (target === 'dashboard') {
+      setCompanyBrainArmed(true)
+    }
+    if (target === 'operation-cases' || target === 'operation-center') {
+      void refreshOrders({ includeDomainEvents: true })
+    }
     if (user?.role && !canAccessPage(user.role, target) && !canAccessPage(user.role, hubTarget)) {
       setPage(navItems[0]?.id ?? 'dashboard')
       setSidebarOpen(false)
@@ -898,7 +904,11 @@ export default function App() {
         ) : (
           <>
             {page === 'dashboard' && (
-              <RoleHomePage onNavigate={navigateTo} onOpenOrderModal={openOrderModal} />
+              <RoleHomePage
+                onNavigate={navigateTo}
+                onOpenOrderModal={openOrderModal}
+                onDashboardInteract={() => setCompanyBrainArmed(true)}
+              />
             )}
             {page === 'orders' && (
               <OrdersPage

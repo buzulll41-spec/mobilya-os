@@ -264,6 +264,34 @@ describe('buildActions — görev motoru', () => {
     expect(find(limited, 'shipment-missing:O2')).toBeFalsy()
     expect(limited.filters.limitedView).toBe(true)
   })
+
+  it('15. shipment lifecycle statüleri ilgili SHIPMENT action üretir', () => {
+    const items = [
+      li({ id: 'SR1', displayStatus: 'Hazır' }),
+      li({ id: 'SP1', displayStatus: 'Sevk Planlandı' }),
+      li({ id: 'SS1', displayStatus: 'Yola Çıktı' }),
+      li({ id: 'SD1', displayStatus: 'Teslim Edildi' }),
+    ]
+
+    const res = setup({ listItems: items })
+
+    const ready = find(res, 'shipment-lifecycle-ready:SR1')
+    const planned = find(res, 'shipment-lifecycle-planned:SP1')
+    const started = find(res, 'shipment-lifecycle-started:SS1')
+    const delivered = find(res, 'shipment-lifecycle-delivered:SD1')
+
+    expect(ready?.category).toBe('SHIPMENT')
+    expect(ready?.title).toBe('ShipmentReadyAction')
+
+    expect(planned?.category).toBe('SHIPMENT')
+    expect(planned?.title).toBe('ShipmentPlannedAction')
+
+    expect(started?.category).toBe('SHIPMENT')
+    expect(started?.title).toBe('ShipmentStartedAction')
+
+    expect(delivered?.category).toBe('SHIPMENT')
+    expect(delivered?.title).toBe('ShipmentDeliveredAction')
+  })
 })
 
 /* ── Canlı smoke (app.inject) ── */

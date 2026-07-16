@@ -96,6 +96,32 @@ export type BuildActionsArgs = {
   query: ActionCenterQuery
 }
 
+const SHIPMENT_LIFECYCLE_ACTIONS: Record<
+  string,
+  { idPrefix: string; title: string; recommendedAction: string }
+> = {
+  'Hazır': {
+    idPrefix: 'shipment-lifecycle-ready',
+    title: 'ShipmentReadyAction',
+    recommendedAction: 'Sevke hazır siparişi günlük sevk planına alıp müşteri bilgilendirmesini tamamlayın.',
+  },
+  'Sevk Planlandı': {
+    idPrefix: 'shipment-lifecycle-planned',
+    title: 'ShipmentPlannedAction',
+    recommendedAction: 'Planlanan sevk için araç/ekip teyidini kesinleştirip operasyon takibini başlatın.',
+  },
+  'Yola Çıktı': {
+    idPrefix: 'shipment-lifecycle-started',
+    title: 'ShipmentStartedAction',
+    recommendedAction: 'Yolda sevki canlı izleyip müşteri teslimat penceresi bilgisini doğrulayın.',
+  },
+  'Teslim Edildi': {
+    idPrefix: 'shipment-lifecycle-delivered',
+    title: 'ShipmentDeliveredAction',
+    recommendedAction: 'Teslimat kapanışını doğrulayın ve operasyon kaydını teslim tamamlandı olarak sonlandırın.',
+  },
+}
+
 /**
  * Saf görev motoru — DB'den bağımsız, test edilebilir. Önceden hesaplanmış rapor
  * parçalarını alır, öncelikli aksiyon listesi üretir. In-memory durum override'ları
@@ -218,6 +244,26 @@ export function buildActions(args: BuildActionsArgs): ActionCenterResponseDto {
         relatedEntityType: 'order',
         relatedEntityId: it.id,
         evidence: { orderId: it.id, status: it.displayStatus, plannedShipmentDate: it.plannedShipmentDate ?? null },
+        relatedCustomer: it.customerDisplayName,
+        relatedOrder: it.orderNumber,
+        salesPerson: it.salesPerson ?? null,
+      })
+    }
+
+    // Shipment lifecycle olayları için statü bazlı aksiyon üretimi.
+    const lifecycleAction = SHIPMENT_LIFECYCLE_ACTIONS[it.displayStatus]
+    if (lifecycleAction) {
+      drafts.push({
+        id: `${lifecycleAction.idPrefix}:${it.id}`,
+        priority: 'P2',
+        category: 'SHIPMENT',
+        title: lifecycleAction.title,
+        reason: `${it.customerDisplayName} siparişi ${it.displayStatus} durumunda.`,
+        recommendedAction: lifecycleAction.recommendedAction,
+        assignedRole: 'SHIPMENT',
+        relatedEntityType: 'order',
+        relatedEntityId: it.id,
+        evidence: { orderId: it.id, status: it.displayStatus },
         relatedCustomer: it.customerDisplayName,
         relatedOrder: it.orderNumber,
         salesPerson: it.salesPerson ?? null,

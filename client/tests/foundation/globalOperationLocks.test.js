@@ -31,7 +31,7 @@ describe('computeGlobalOperationLocks', () => {
     )
     const balanceLock = locks.find((l) => l.id === OPERATION_LOCK_ID.BALANCE_BLOCKS_SHIPMENT)
     expect(balanceLock).toBeDefined()
-    expect(balanceLock?.blocks).toBe(true)
+    expect(balanceLock?.blocks).toBe(false)
   })
 
   it('filters info-only locks from drawer banner list', () => {

@@ -52,9 +52,10 @@ function toneClass(tone) {
  * @param {{
  *   onNavigate?: (page: string, ctx?: { opsFilter?: import('../lib/opsDeepLink.js').OpsDeepLinkFilterId }) => void
  *   onOpenOrderModal?: () => void
+ *   onDashboardInteract?: () => void
  * }} props
  */
-export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
+export default function RoleHomePage({ onNavigate, onOpenOrderModal, onDashboardInteract }) {
   const { user } = useAuth()
   const { orders, salesOrderListItemDtos, collectionRowVMs, refreshOrders, isRefreshing } = useOrders()
   const { plans, refreshPlans } = useShipmentPlans()
@@ -212,6 +213,7 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
   }, [isPhone, effectiveListItemDtos, plans, notificationPrefs])
 
   function handleOpenMobileNotification(item) {
+    onDashboardInteract?.()
     markMobileNotificationRead(item.id)
     setNotificationReadIds(readMobileNotificationReadIds())
     setNotificationCenterOpen(false)
@@ -226,6 +228,7 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
   }
 
   function handleOpenOperationTask(task) {
+    onDashboardInteract?.()
     if (!onNavigate) return
     if (task.navFilter) navigateWithOpsFilter(task.navTarget, task.navFilter, onNavigate)
     else onNavigate(task.navTarget)
@@ -242,6 +245,7 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
 
   /** @param {import('../mappers/home/roleHomeModel.js').RoleHomeAction} action */
   function runAction(action) {
+    onDashboardInteract?.()
     if (action.actionKind === 'new-order') {
       onOpenOrderModal?.()
       return
@@ -256,6 +260,7 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
 
   /** @param {import('../mappers/home/roleHomeModel.js').RoleHomeKpi} kpi */
   function openKpi(kpi) {
+    onDashboardInteract?.()
     if (!onNavigate) return
     if (kpi.navFilter) navigateWithOpsFilter(kpi.navTarget, kpi.navFilter, onNavigate)
     else onNavigate(kpi.navTarget)
@@ -263,6 +268,7 @@ export default function RoleHomePage({ onNavigate, onOpenOrderModal }) {
 
   /** @param {import('../mappers/home/roleHomeModel.js').RoleHomeTask} task */
   function openTask(task) {
+    onDashboardInteract?.()
     if (!onNavigate || !task.navTarget) return
     if (task.navFilter) navigateWithOpsFilter(task.navTarget, task.navFilter, onNavigate)
     else onNavigate(task.navTarget)

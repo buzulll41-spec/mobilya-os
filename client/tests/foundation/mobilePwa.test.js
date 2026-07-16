@@ -23,7 +23,6 @@ import { formatApiErrorMessage } from '../../src/utils/apiErrorMessage.js'
 import { ApiClientError } from '../../src/lib/apiClient.js'
 import MobileTabBar from '../../src/components/mobile/MobileTabBar.jsx'
 import PwaInstallPrompt from '../../src/components/mobile/PwaInstallPrompt.jsx'
-import MobileTestFlowPanel from '../../src/components/mobile/MobileTestFlowPanel.jsx'
 import {
   isMobileViewport,
   isTabletViewport,
@@ -107,14 +106,13 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
   })
 
   describe('Mobile Navigation', () => {
-    it('5 ana mobil menü öğesi tanımlı (FAZ 112)', () => {
-      expect(MOBILE_TAB_ITEMS).toHaveLength(5)
+    it('4 ana mobil menü öğesi tanımlı (Field Pilot)', () => {
+      expect(MOBILE_TAB_ITEMS).toHaveLength(4)
       expect(MOBILE_TAB_ITEMS.map((i) => i.id)).toEqual([
         'dashboard',
         'orders',
-        'shipment-ops',
-        'collection',
-        '__menu__',
+        'notifications',
+        'profile',
       ])
     })
 
@@ -228,14 +226,11 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
       expect(matched).toHaveLength(0)
     })
 
-    it('MobileTestFlowPanel bileşeni export edilir', () => {
-      expect(typeof MobileTestFlowPanel).toBe('function')
-    })
   })
 
   describe('Mobile CEO', () => {
-    it('CEO dashboard sidebar/menüden erişilebilir', () => {
-      expect(MOBILE_TAB_ITEMS.some((i) => i.id === '__menu__')).toBe(true)
+    it('CEO dashboard alt tab bar yerine uygulama menüsünden erişilir', () => {
+      expect(MOBILE_TAB_ITEMS.some((i) => i.id === '__menu__')).toBe(false)
     })
 
     it('test akışında CEO adımı', () => {
@@ -246,8 +241,8 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
   })
 
   describe('Mobile AI Workforce', () => {
-    it('AI Workforce sidebar menüsünden erişilebilir', () => {
-      expect(MOBILE_TAB_ITEMS.some((i) => i.action === 'menu')).toBe(true)
+    it('AI Workforce alt tab bar yerine uygulama menüsünden erişilir', () => {
+      expect(MOBILE_TAB_ITEMS.some((i) => i.action === 'menu')).toBe(false)
     })
 
     it('test akışında AI Workforce adımı', () => {
