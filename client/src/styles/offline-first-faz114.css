@@ -149,6 +149,105 @@
   color: #64748b;
 }
 
+.mos-dev-mobile-diag {
+  position: fixed;
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  z-index: 120;
+}
+
+.mos-dev-mobile-diag__toggle {
+  min-height: 44px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #f59e0b;
+  background: #111827;
+  color: #f8fafc;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgb(15 23 42 / 18%);
+}
+
+.mos-dev-mobile-diag__panel {
+  margin-top: 0.45rem;
+  width: min(22rem, calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 2rem));
+  max-height: min(70vh, 34rem);
+  overflow: auto;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #f59e0b;
+  background: rgb(17 24 39 / 96%);
+  color: #f8fafc;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 30%);
+}
+
+.mos-dev-mobile-diag__panel dl {
+  margin: 0.45rem 0 0;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+}
+
+.mos-dev-mobile-diag__panel dt {
+  color: #fbbf24;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mos-dev-mobile-diag__panel dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.mos-dev-mobile-diag__section {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.mos-dev-mobile-diag__actions {
+  margin-top: 0.55rem;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mos-dev-mobile-diag__actions button {
+  min-height: 44px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #fbbf24;
+  background: #1f2937;
+  color: #f8fafc;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mos-dev-mobile-diag__section pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.65rem;
+  color: #cbd5e1;
+}
+
+.mos-dev-mobile-diag__list {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.mos-dev-mobile-diag__list li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.mos-dev-mobile-diag__list code {
+  color: #fde68a;
+}
+
 @media (min-width: 1440px) {
   .mos-mobile-pwa.mos-viewport-desktop .mos-dev-offline {
     bottom: 1rem;

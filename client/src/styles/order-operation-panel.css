@@ -726,6 +726,8 @@
     width: 100%;
     background: #f8fafc;
     overflow: hidden;
+    animation: oop-mobile-sheet-in 180ms ease-out;
+    will-change: transform, opacity;
   }
 
   .oop-mobile-head {
@@ -733,7 +735,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.9rem 1rem 0.75rem;
+    padding: 0.72rem 0.9rem 0.62rem;
     background: #fff;
     border-bottom: 1px solid #e2e8f0;
   }
@@ -750,9 +752,19 @@
     border: none;
     background: transparent;
     text-align: left;
-    font-size: 1.08rem;
+    font-size: 1rem;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.18;
+    color: #0f172a;
+  }
+
+  .oop-mobile-head__order-no {
+    display: inline-block;
+    max-width: min(58vw, 260px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
     color: #0f172a;
   }
 
@@ -762,9 +774,9 @@
   .oop-mobile-hero__milestone,
   .oop-mobile-risk__summary {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: 0.78rem;
     color: #475569;
-    line-height: 1.4;
+    line-height: 1.34;
   }
 
   .oop-mobile-head__contact,
@@ -775,21 +787,21 @@
   .oop-mobile-body {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: 0.6rem;
+    padding: 0.62rem;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(6.4rem + env(safe-area-inset-bottom, 0px));
   }
 
   .oop-mobile-hero {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.75rem;
+    gap: 0.44rem;
+    padding: 0.66rem;
     border: 1px solid #dbe3ec;
-    border-radius: 16px;
+    border-radius: 14px;
     background: #fff;
   }
 
@@ -801,17 +813,76 @@
     justify-content: space-between;
   }
 
+  .oop-mobile-hero__status .mos-status {
+    border-width: 2px;
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
+    transform: translateZ(0);
+  }
+
+  .oop-mobile-hero__status .mos-status-label {
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
+  .oop-mobile-critical {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.38rem;
+  }
+
+  .oop-mobile-critical__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    padding: 0.42rem 0.44rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    min-width: 0;
+  }
+
+  .oop-mobile-critical__item--accent {
+    border-color: #c7d2fe;
+    background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  }
+
+  .oop-mobile-critical__label {
+    font-size: 0.66rem;
+    line-height: 1.2;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .oop-mobile-critical__value {
+    font-size: 0.78rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .oop-mobile-critical__value--numeric {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #1d4ed8;
+  }
+
   .oop-mobile-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.5rem;
   }
 
   .oop-mobile-card {
     border: 1px solid #dbe3ec;
-    border-radius: 16px;
+    border-radius: 14px;
     background: #fff;
     overflow: hidden;
+    content-visibility: auto;
+    contain-intrinsic-size: 280px;
   }
 
   .oop-mobile-card__head {
@@ -820,10 +891,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.9rem 0.95rem;
+    min-height: 48px;
+    padding: 0.68rem 0.78rem;
     border: 0;
     background: #f8fafc;
     text-align: left;
+    transition: background-color 160ms ease, transform 120ms ease;
+    touch-action: manipulation;
+  }
+
+  .oop-mobile-card__head:active {
+    transform: scale(0.995);
   }
 
   .oop-mobile-card.is-open .oop-mobile-card__head {
@@ -838,13 +916,14 @@
   }
 
   .oop-mobile-card__title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: #0f172a;
   }
 
   .oop-mobile-card__sub {
-    font-size: 0.75rem;
+    font-size: 0.71rem;
+    font-weight: 500;
     color: #64748b;
   }
 
@@ -859,10 +938,27 @@
     justify-content: center;
     font-weight: 800;
     color: #334155;
+    transition: transform 180ms ease;
+  }
+
+  .oop-mobile-card.is-open .oop-mobile-card__chev {
+    transform: rotate(180deg);
+  }
+
+  .oop-mobile-card__body-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms ease;
+  }
+
+  .oop-mobile-card__body-wrap.is-open {
+    grid-template-rows: 1fr;
   }
 
   .oop-mobile-card__body {
-    padding: 0.85rem 0.9rem 0.95rem;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0.7rem 0.74rem 0.8rem;
   }
 
   .oop-mobile-risk__list {
@@ -881,22 +977,49 @@
     z-index: 5;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
-    padding: 0.75rem;
+    gap: 0.38rem;
+    padding: 0.58rem 0.62rem calc(0.58rem + env(safe-area-inset-bottom, 0px));
     background: rgba(248, 250, 252, 0.96);
     border-top: 1px solid #dbe3ec;
     backdrop-filter: blur(8px);
   }
 
   .oop-mobile-actions__btn {
-    min-height: 3.4rem;
-    padding: 0.5rem 0.35rem;
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0.42rem 0.3rem;
     border: 1px solid #cfd6df;
-    border-radius: 14px;
+    border-radius: 12px;
     background: #fff;
     color: #0f172a;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: 800;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    touch-action: manipulation;
+    transition: transform 120ms ease, background-color 140ms ease, border-color 140ms ease;
+  }
+
+  .oop-mobile-actions__btn:active {
+    transform: translateY(1px);
+  }
+
+  .oop-mobile-actions__btn.is-active {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .oop-mobile-actions__icon {
+    line-height: 0;
+  }
+
+  .oop-mobile-actions__icon .mos-nav-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .oop-panel--mobile .oop-products .mos-erp-tbl-wrap,
@@ -954,6 +1077,17 @@
   .oop-panel--mobile .oop-ssh .mos-erp-tbl-wrap,
   .oop-panel--mobile .oop-history .mos-erp-tbl-wrap {
     border: 0;
+  }
+}
+
+@keyframes oop-mobile-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

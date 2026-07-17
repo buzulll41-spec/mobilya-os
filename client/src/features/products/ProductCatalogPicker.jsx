@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CATALOG_PICKER_PAGE_SIZE } from '../../constants/productCatalog.js'
 import { formatTry } from '../../data/dashboardHelpers.js'
 import { useModalDismiss } from '../../hooks/useModalDismiss.js'
+import { useViewportTier } from '../../hooks/useViewportTier.js'
 import CatalogPickerCategoryNav from './catalogPicker/CatalogPickerCategoryNav.jsx'
 import CatalogPickerFooter from './catalogPicker/CatalogPickerFooter.jsx'
 import CatalogPickerPagination from './catalogPicker/CatalogPickerPagination.jsx'
@@ -44,6 +45,11 @@ export default function ProductCatalogPicker({
   const [query, setQuery] = useState(emptyCatalogPickerQuery)
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState(/** @type {ProductListItemDto[]} */ ([]))
+  const [mobileItems, setMobileItems] = useState(/** @type {ProductListItemDto[]} */ ([]))
+  const [mobileInitialLoadedCount, setMobileInitialLoadedCount] = useState(0)
+  const mobileLoadLockRef = useRef(false)
+  const viewportTier = useViewportTier()
+  const isPhone = viewportTier === 'phone'
 
   useModalDismiss(open, onClose)
 
@@ -60,18 +66,74 @@ export default function ProductCatalogPicker({
     setQuery(emptyCatalogPickerQuery())
     setPage(1)
     setSelected([])
+    setMobileItems([])
+    setMobileInitialLoadedCount(0)
+    mobileLoadLockRef.current = false
   }, [open])
 
   useEffect(() => {
     setPage(1)
-  }, [query.category])
+    setMobileItems([])
+    setMobileInitialLoadedCount(0)
+    mobileLoadLockRef.current = false
+  }, [query.category, query.q])
 
   useEffect(() => {
-    setPage(1)
-  }, [query.q])
+    if (!open || !isPhone || !data) return
+    if (page === 1) {
+      const firstPageItems = data.items ?? []
+      setMobileItems(firstPageItems)
+      setMobileInitialLoadedCount(firstPageItems.length)
+      return
+    }
+    setMobileItems((prev) => {
+      const merged = [...prev]
+      const seen = new Set(prev.map((item) => item.id))
+      for (const item of data.items ?? []) {
+        if (seen.has(item.id)) continue
+        seen.add(item.id)
+        merged.push(item)
+      }
+      return merged
+    })
+  }, [open, isPhone, data, page])
+
+  useEffect(() => {
+    if (!loading) mobileLoadLockRef.current = false
+  }, [loading])
 
   const selectedIdSet = useMemo(() => new Set(selected.map((p) => p.id)), [selected])
   const selectionTotal = useMemo(() => computeCatalogSelectionTotal(selected), [selected])
+  const renderedItems = isPhone ? mobileItems : (data?.items ?? [])
+
+  const hasMoreMobilePages = Boolean(
+    isPhone &&
+      data &&
+      renderedItems.length < data.total &&
+      page < (data.totalPages ?? totalPages),
+  )
+
+  const handleMobileListScroll = useCallback(
+    (e) => {
+      if (!isPhone || !open || !data) return
+      if (loading || mobileLoadLockRef.current) return
+      if (renderedItems.length >= data.total) return
+      if (page >= (data.totalPages ?? totalPages)) return
+
+      const node = e.currentTarget
+      const thresholdPx = 140
+      const remaining = node.scrollHeight - node.scrollTop - node.clientHeight
+      if (remaining > thresholdPx) return
+
+      mobileLoadLockRef.current = true
+      setPage((prev) => {
+        const next = prev + 1
+        const maxPage = data.totalPages ?? totalPages
+        return next > maxPage ? prev : next
+      })
+    },
+    [isPhone, open, data, loading, renderedItems.length, page, totalPages],
+  )
 
   const handleCategorySelect = useCallback((categoryValue) => {
     setQuery((prev) => ({ ...prev, category: categoryValue }))
@@ -174,14 +236,16 @@ export default function ProductCatalogPicker({
                 />
 
                 <CatalogPickerMobileCardList
-                  items={data?.items ?? []}
-                  loading={loading}
+                  items={renderedItems}
+                  loading={loading && renderedItems.length === 0}
+                  loadingMore={loading && renderedItems.length > 0 && hasMoreMobilePages}
+                  onScroll={handleMobileListScroll}
                   emptyMessage="Bu filtrede ürün bulunamadı"
                   onToggle={handleToggle}
                   selectedIds={selectedIdSet}
                 />
 
-                {data && data.total > 0 ? (
+                {data && data.total > 0 && !isPhone ? (
                   <CatalogPickerPagination
                     page={page}
                     pageSize={data.pageSize ?? CATALOG_PICKER_PAGE_SIZE}
@@ -231,6 +295,8 @@ export default function ProductCatalogPicker({
 function CatalogPickerMobileCardList({
   items,
   loading,
+  loadingMore = false,
+  onScroll,
   emptyMessage = 'Bu kategoride ürün yok.',
   onToggle,
   selectedIds,
@@ -244,7 +310,7 @@ function CatalogPickerMobileCardList({
   }
 
   return (
-    <div className="catalog-picker-mobile-cards" aria-label="Ürün kartları">
+    <div className="catalog-picker-mobile-cards" aria-label="Ürün kartları" onScroll={onScroll}>
       {items.map((product) => {
         const isSelected = selectedIds.has(product.id)
 
@@ -283,6 +349,11 @@ function CatalogPickerMobileCardList({
           </button>
         )
       })}
+      {loadingMore ? (
+        <p className="catalog-picker-mobile-cards__loading-more mos-muted" role="status">
+          Daha fazla ürün yükleniyor…
+        </p>
+      ) : null}
     </div>
   )
 }

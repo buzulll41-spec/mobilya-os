@@ -77,6 +77,7 @@ import { readCachedOrders } from '../services/offline/offlineCacheStore.js'
 export function OrdersProvider({ children }) {
   const { user } = useAuth()
   const { cacheOrders, refreshSnapshot } = useOfflineFirst()
+  const apiMode = Boolean(getApiBaseUrl())
   const [salesOrderListItemDtos, setSalesOrderListItemDtos] = useState(/** @type {SalesOrderListItemDto[]} */ ([]))
   const [shipmentQueueRows, setShipmentQueueRows] = useState(/** @type {ShipmentRowVM[]} */ ([]))
   const [domainEvents, setDomainEvents] = useState(/** @type {DomainEventDto[]} */ ([]))
@@ -155,14 +156,16 @@ export function OrdersProvider({ children }) {
   )
 
   useEffect(() => {
+    if (apiMode) return
     // eslint-disable-next-line react-hooks/set-state-in-effect -- bootstrap: mock getOrders
     void refreshOrders({ includeDomainEvents: false })
-  }, [refreshOrders])
+  }, [apiMode, refreshOrders])
 
   useEffect(() => {
+    if (!apiMode) return
     if (!user?.id) return
     void refreshOrders({ includeDomainEvents: false })
-  }, [user?.id, refreshOrders])
+  }, [apiMode, user?.id, refreshOrders])
 
   const createOrder = useCallback(
     async (

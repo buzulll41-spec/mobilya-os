@@ -143,8 +143,8 @@
 
 .mos-mobile-quick-actions--dock {
   position: fixed;
-  left: 0.75rem;
-  right: 0.75rem;
+  left: max(0.75rem, env(safe-area-inset-left, 0px));
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
   bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   margin: 0;
@@ -294,10 +294,15 @@
 /* Chip bar */
 .mos-mobile-store-chips {
   display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   gap: 0.5rem;
   overflow-x: auto;
   padding-bottom: 0.25rem;
   margin-bottom: 0.75rem;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -421,12 +426,49 @@
 }
 
 .mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head {
-  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__title,
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__sub {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
   width: 100%;
-  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head-actions > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.mos-viewport-phone .mos-erp-ops--shipment .mos-erp-ops__head-actions .mos-erp-ops__btn {
+  width: auto;
+  max-width: 100%;
+  min-height: 44px;
 }
 
 .mos-viewport-phone .mos-erp-ops--shipment .mos-erp-summary {

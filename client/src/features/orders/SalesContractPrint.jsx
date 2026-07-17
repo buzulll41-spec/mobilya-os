@@ -17,6 +17,7 @@ import {
 import { computeOrderTotals } from './newOrderWizardModel.js'
 
 import { exportSalesContractPdf } from '../../lib/exportSalesContractPdf.js'
+import { exportSalesContractWord } from '../../lib/exportSalesContractWord.js'
 import { useOrders } from '../../state/useOrders.js'
 
 import '../../styles/sales-contract-print.css'
@@ -255,6 +256,32 @@ export default function SalesContractPrint({
     window.print()
   }, [order?.id, recordContractPrinted])
 
+  const handleShare = useCallback(async () => {
+    if (!model) return
+    const shareText = [
+      `Sipariş No: ${model.order.orderNo}`,
+      `Müşteri: ${model.customer.name}`,
+      `Genel Toplam: ${formatTry(model.finance.grandTotal)}`,
+      `Kalan: ${formatTry(model.finance.remaining)}`,
+    ].join('\n')
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Satış Sözleşmesi ${model.order.orderNo}`,
+          text: shareText,
+          url: window.location.href,
+        })
+        return
+      }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareText)
+      }
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank', 'noopener,noreferrer')
+    } catch {
+      // Kullanıcı paylaşımı iptal edebilir; sessizce devam edilir.
+    }
+  }, [model])
+
   const handleSavePdf = useCallback(async () => {
     const el = printAreaRef.current
     if (!el || !model) return
@@ -266,6 +293,17 @@ export default function SalesContractPrint({
       setPdfError(e instanceof Error ? e.message : 'PDF oluşturulamadı')
     } finally {
       setPdfBusy(false)
+    }
+  }, [model])
+
+  const handleSaveWord = useCallback(async () => {
+    const el = printAreaRef.current
+    if (!el || !model) return
+    setPdfError(null)
+    try {
+      await exportSalesContractWord(el, model.order.orderNo)
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : 'Word dosyası oluşturulamadı')
     }
   }, [model])
 
@@ -304,13 +342,15 @@ export default function SalesContractPrint({
           <p className="scp-toolbar-title">{toolbarTitle}</p>
 
           {isPostCreate ? (
+            <>
+              <p className="scp-toolbar-hint">
+                Sipariş kaydedildi. Kontrol edin, yazdırın veya sipariş detayına geçin.
+              </p>
 
-            <p className="scp-toolbar-hint">
-
-              Sipariş kaydedildi. Kontrol edin, yazdırın veya sipariş detayına geçin.
-
-            </p>
-
+              <p className="scp-toolbar-hint scp-toolbar-hint--success">
+                Sipariş başarıyla oluşturuldu
+              </p>
+            </>
           ) : null}
 
         </div>
@@ -347,6 +387,24 @@ export default function SalesContractPrint({
 
             {pdfBusy ? 'PDF hazırlanıyor…' : 'PDF Olarak Kaydet'}
 
+          </button>
+
+          <button
+            type="button"
+            className="scp-btn scp-btn--secondary"
+            disabled={!model}
+            onClick={() => void handleShare()}
+          >
+            WhatsApp ile Paylaş
+          </button>
+
+          <button
+            type="button"
+            className="scp-btn scp-btn--secondary"
+            disabled={!model}
+            onClick={() => void handleSaveWord()}
+          >
+            Word Olarak Kaydet
           </button>
 
           {isPostCreate && onGoToOrderDetail ? (
@@ -401,7 +459,7 @@ export default function SalesContractPrint({
 
 const SalesContractDocument = forwardRef(function SalesContractDocument({ model }, ref) {
 
-  const { store, customer, order, lines, finance, delivery, terms } = model
+  const { store, customer, order, lines, finance, delivery, paymentSchedule, compliance, terms } = model
 
   const showDiscount = finance.totalDiscount > 0
 
@@ -417,21 +475,35 @@ const SalesContractDocument = forwardRef(function SalesContractDocument({ model 
 
       <header className="scp-head">
 
-        <div>
+        <div className="scp-brand-block">
 
-          <p className="scp-store-brand">{store.brand}</p>
+          <div className="scp-brand-row">
 
-          <p className="scp-store-name">{store.name}</p>
+            <div className="scp-logo" aria-hidden>
+              {store.logoText || store.brand.slice(0, 2)}
+            </div>
+
+            <div>
+
+              <p className="scp-store-brand">{store.brand}</p>
+
+              <p className="scp-store-name">{store.name}</p>
+
+            </div>
+
+          </div>
 
           <p className="scp-store-meta">{store.address}</p>
 
           <p className="scp-store-meta">Tel: {store.phone}</p>
 
+          <p className="scp-store-meta">E-posta: {store.email}</p>
+
         </div>
 
         <div className="scp-title-block">
 
-          <h1 className="scp-doc-title">SATIŞ SÖZLEŞMESİ</h1>
+          <h1 className="scp-doc-title">{order.contractLabel || 'SATIŞ SÖZLEŞMESİ'}</h1>
 
           <p className="scp-doc-meta">
 
@@ -443,9 +515,40 @@ const SalesContractDocument = forwardRef(function SalesContractDocument({ model 
 
           {order.dueDate ? <p className="scp-doc-meta">Teslim tarihi: {order.dueDate}</p> : null}
 
+          <p className="scp-doc-meta">Satış kanalı: <strong>{order.channel || '—'}</strong></p>
+
         </div>
 
       </header>
+
+      <section className="scp-section scp-section--highlight">
+        <h2 className="scp-section-title">Sözleşme özeti</h2>
+
+        <table className="scp-table scp-table--kv">
+          <tbody>
+            <tr>
+              <td>Müşteri</td>
+              <td>{customer.name}</td>
+            </tr>
+            <tr>
+              <td>İletişim</td>
+              <td>{customer.phone || '—'}</td>
+            </tr>
+            <tr>
+              <td>Teslim adresi</td>
+              <td>{delivery.address || customer.address || '—'}</td>
+            </tr>
+            <tr>
+              <td>Genel toplam</td>
+              <td>{formatTry(finance.grandTotal)}</td>
+            </tr>
+            <tr>
+              <td>Kalan bakiye</td>
+              <td>{formatTry(finance.remaining)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
 
 
@@ -540,6 +643,34 @@ const SalesContractDocument = forwardRef(function SalesContractDocument({ model 
           </tbody>
 
         </table>
+
+        <div className="scp-payment-schedule">
+          <p className="scp-section-copy">{paymentSchedule.summary}</p>
+
+          <table className="scp-table scp-table--kv scp-table--finance">
+            <tbody>
+              {paymentSchedule.rows.map((row) => (
+                <tr key={row.label}>
+                  <td>{row.label}</td>
+                  <td>{row.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {paymentSchedule.installments.length ? (
+            <table className="scp-table scp-table--kv scp-table--finance" style={{ marginTop: '0.5rem' }}>
+              <tbody>
+                {paymentSchedule.installments.map((row) => (
+                  <tr key={row.label}>
+                    <td>{row.label}</td>
+                    <td>{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+        </div>
 
       </section>
 
@@ -749,6 +880,45 @@ const SalesContractDocument = forwardRef(function SalesContractDocument({ model 
 
       </section>
 
+      <section className="scp-section">
+
+        <h2 className="scp-section-title">Garanti ve KVKK</h2>
+
+        <div className="scp-clauses-grid">
+          <div>
+            <h3 className="scp-subsection-title">Garanti</h3>
+            <ol className="scp-clauses">
+              {compliance.warranty.map((clause) => (
+                <li key={clause}>{clause}</li>
+              ))}
+            </ol>
+          </div>
+
+          <div>
+            <h3 className="scp-subsection-title">KVKK Onayı</h3>
+            <ol className="scp-clauses">
+              {compliance.kvkk.map((clause) => (
+                <li key={clause}>{clause}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {compliance.distanceSalesEnabled ? (
+          <div className="scp-distance-sales">
+            <h3 className="scp-subsection-title">Mesafeli satış hükümleri</h3>
+            <ol className="scp-clauses">
+              {compliance.distanceSales.map((clause) => (
+                <li key={clause}>{clause}</li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+
+        <p className="scp-approval">{compliance.approvalText}</p>
+
+      </section>
+
 
 
       <section className="scp-section">
@@ -789,11 +959,28 @@ const SalesContractDocument = forwardRef(function SalesContractDocument({ model 
 
         </div>
 
+        <div className="scp-sig-box">
+
+          <p className="scp-sig-label">Mağaza onayı / imza</p>
+
+          <p className="scp-muted" style={{ margin: '0.5rem 0 0', fontSize: '0.82rem' }}>
+
+            {store.name}
+
+          </p>
+
+        </div>
+
       </footer>
 
 
 
-      <p className="scp-muted" style={{ marginTop: '1rem', fontSize: '0.72rem' }}>
+      <p className="scp-footer-note">
+        Bu belge satış kaydı, teslimat ve sözleşme okuması için hazırlanmıştır; resmî muhasebe ve
+        yasal süreçlerde ayrıca fatura ve teslim evrakları esas alınır.
+      </p>
+
+      <p className="scp-muted" style={{ marginTop: '0.5rem', fontSize: '0.72rem' }}>
 
         Bu belge mağaza içi satış kaydıdır; e-imza ve e-fatura kapsamı dışındadır.
 

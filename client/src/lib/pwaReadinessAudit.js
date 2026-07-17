@@ -34,6 +34,11 @@ export function auditPwaReadiness(sources = {}) {
         pass: manifestText.includes('"display": "standalone"'),
       },
       {
+        id: 'manifest-display-override',
+        label: 'PWA display override',
+        pass: manifestText.includes('"display_override"'),
+      },
+      {
         id: 'service-worker',
         label: 'Service worker fetch handler',
         pass: swText.includes('addEventListener') && swText.includes("'fetch'"),
@@ -41,7 +46,9 @@ export function auditPwaReadiness(sources = {}) {
       {
         id: 'install-meta',
         label: 'Apple mobile web app meta',
-        pass: /apple-mobile-web-app-capable/.test(indexHtml),
+        pass:
+          /apple-mobile-web-app-capable/.test(indexHtml) &&
+          /apple-mobile-web-app-status-bar-style/.test(indexHtml),
       },
     ],
   }

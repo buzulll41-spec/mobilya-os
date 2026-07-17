@@ -34,7 +34,7 @@
   font-family: var(--mos-font);
   font-size: 14px;
   line-height: 1.5;
-  overflow-x: clip;
+  overflow-x: hidden;
   max-width: 100vw;
 }
 
@@ -227,19 +227,18 @@
 
 @media (max-width: 900px) {
   .mos-sidebar {
+    display: none;
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
-    transform: translateX(-100%);
-    transition: transform 0.22s ease;
     box-shadow: var(--mos-shadow);
     padding-top: max(1.25rem, env(safe-area-inset-top));
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
   .mos-sidebar[data-open='true'] {
-    transform: translateX(0);
+    display: flex;
   }
 
   .mos-sidebar-close {
@@ -859,6 +858,17 @@
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .mos-full-bleed {
+    width: 100%;
+    max-width: 100%;
+    left: auto;
+    transform: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .mos-dash-active-inner {

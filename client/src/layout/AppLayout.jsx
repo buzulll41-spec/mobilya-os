@@ -73,6 +73,8 @@ export default function AppLayout({
   const isPhone = viewportTier === 'phone'
   const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet'
   const showStoreQuickDock = isPhone && isMobileStoreOpsPage(page) && page !== 'dashboard'
+  const showMobileFab = isPhone && !showStoreQuickDock && page !== 'dashboard'
+  const mobileDockMode = suspendMobileDock ? 'none' : showStoreQuickDock ? 'quick-actions' : 'fab'
   const tabletSidebarCollapsed = viewportTier === 'tablet' ? true : sidebarCollapsed
   const viewportClass =
     viewportTier === 'tablet'
@@ -105,6 +107,7 @@ export default function AppLayout({
       className={`mos mos-mobile-pwa ${viewportClass}`}
       data-sidebar-collapsed={tabletSidebarCollapsed ? 'true' : 'false'}
       data-viewport={viewportTier}
+      data-mobile-dock={isPhone ? mobileDockMode : 'none'}
     >
       <div
         className="mos-overlay"
@@ -152,7 +155,9 @@ export default function AppLayout({
               <>
                 <MobileSwipeEnhancer />
                 <MobileLongPressEnhancer />
-                {!suspendMobileDock ? <MobileFab page={page} onFabIntent={handleFabIntent} /> : null}
+                {!suspendMobileDock && showMobileFab ? (
+                  <MobileFab page={page} onFabIntent={handleFabIntent} />
+                ) : null}
                 {!suspendMobileDock ? (
                   <MobileTabBar
                     page={page}

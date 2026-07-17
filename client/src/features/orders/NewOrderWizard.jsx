@@ -195,13 +195,9 @@ export default function NewOrderWizard({
       const result = await Promise.resolve(onSave(draft))
       if (result && typeof result === 'object' && 'id' in result) {
         const created = /** @type {Order} */ (result)
-        if (isPhone) {
-          onCreated?.(created)
-        } else {
-          onCreated?.(created, {
-            form: { ...form, products: form.products.map((p) => ({ ...p })) },
-          })
-        }
+        onCreated?.(created, {
+          form: { ...form, products: form.products.map((p) => ({ ...p })) },
+        })
       } else {
         onClose()
       }
@@ -313,6 +309,12 @@ export default function NewOrderWizard({
             ) : null}
             {((!isPhone && step === 3) || (isPhone && step === 3)) ? (
               <SummaryStep form={form} totals={totals} locked={locked} setField={setField} />
+            ) : null}
+
+            {step === submitStepIndex ? (
+              <p className="now-products-summary-count" role="status" aria-live="polite">
+                Sipariş kaydından sonra satış sözleşmesi önizlemesi otomatik açılır.
+              </p>
             ) : null}
           </div>
 

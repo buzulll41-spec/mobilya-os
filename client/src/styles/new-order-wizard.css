@@ -48,12 +48,111 @@
   .now-root {
     padding: 0;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   .now-dialog {
     width: 100%;
-    max-height: 100vh;
+    max-width: 100%;
+    min-width: 0;
+    max-height: 100dvh;
     border-radius: 0;
+    overflow-x: hidden;
+  }
+
+  .now-form,
+  .now-body,
+  .now-products-step,
+  .now-products-scroll,
+  .now-summary,
+  .now-grid,
+  .now-phone-row,
+  .now-phone-composite,
+  .now-foot,
+  .now-head,
+  .now-stepper {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .now-head {
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 1rem 1rem 0.8rem;
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  }
+
+  .now-head > :first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .now-title,
+  .now-sub {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .now-close {
+    margin-left: auto;
+  }
+
+  .now-stepper {
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0 1rem;
+    overflow-x: hidden;
+  }
+
+  .now-step {
+    min-width: 0;
+    flex: 1 1 100%;
+    padding-inline: 0.4rem;
+  }
+
+  .now-phone-composite {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .now-phone-country,
+  .now-phone-local {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .now-foot {
+    flex-wrap: wrap;
+    padding: 0.85rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .now-foot-left,
+  .now-foot-right {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+  }
+
+  .now-foot-right {
+    flex-wrap: wrap;
+  }
+
+  .now-btn {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .now-btn--submit {
+    width: 100%;
+    min-width: 0;
   }
 }
 

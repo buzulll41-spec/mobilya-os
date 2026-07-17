@@ -87,6 +87,7 @@ import OfflineBanner from './components/OfflineBanner.jsx'
 import PwaInstallPrompt from './components/mobile/PwaInstallPrompt.jsx'
 import DeveloperPerformancePanel from './components/dev/DeveloperPerformancePanel.jsx'
 import DeveloperOfflinePanel from './components/dev/DeveloperOfflinePanel.jsx'
+import DeveloperMobileDiagnosticsPanel from './components/dev/DeveloperMobileDiagnosticsPanel.jsx'
 import PendingActionsPanel from './components/offline/PendingActionsPanel.jsx'
 import ConflictCenterPanel from './components/offline/ConflictCenterPanel.jsx'
 import { useOfflineFirst } from './state/OfflineFirstProvider.jsx'
@@ -737,6 +738,8 @@ export default function App() {
 
         {isTouchViewport ? <PwaInstallPrompt /> : null}
 
+        {isTouchViewport ? <DeveloperMobileDiagnosticsPanel /> : null}
+
         {!isTouchViewport ? <DeveloperPerformancePanel /> : null}
 
         {!isTouchViewport ? <DeveloperOfflinePanel /> : null}
@@ -1004,6 +1007,9 @@ export default function App() {
             order={drawerOrder}
             open={Boolean(drawerOrder)}
             onClose={closeOrderDrawer}
+            onOpenContract={(order) => {
+              setListContractOrderId(order.id)
+            }}
             initialTab={drawerTab}
             drawerSource={drawerSource}
             canGoPrev={canGoPrev}

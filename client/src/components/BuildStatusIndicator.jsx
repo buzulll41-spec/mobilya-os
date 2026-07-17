@@ -18,11 +18,15 @@ function connectionClass(state) {
 
 export default function BuildStatusIndicator() {
   const { build, api, database } = useBuildStatus()
+  const showTestBuild = build.mode === 'real-device-test'
 
   return (
     <div className="mos-build-status" aria-label="Build durumu">
       <span className="mos-build-status__edition">{build.edition}</span>
       <span className="mos-build-status__build">Build {build.build}</span>
+      {showTestBuild ? <span className="mos-build-status__line is-checking">{build.label}</span> : null}
+      {showTestBuild ? <span className="mos-build-status__line">Version {build.version}</span> : null}
+      {showTestBuild && build.timestamp ? <span className="mos-build-status__line">{build.timestamp}</span> : null}
       <span className={`mos-build-status__line ${connectionClass(api)}`}>
         {connectionLabel(api, 'API')}
       </span>

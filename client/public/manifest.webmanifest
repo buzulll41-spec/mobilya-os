@@ -1,13 +1,14 @@
 {
-  "name": "MOBILYA OS Enterprise 1.0",
+  "name": "MOBILYA OS",
   "short_name": "MOBILYA OS",
-  "description": "MOBILYA OS — mağaza operasyon kontrol merkezi (Mobile & Tablet Test Edition)",
-  "start_url": "/",
+  "description": "MOBILYA OS — real-device PWA test build",
+  "start_url": "/#/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "any",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "orientation": "portrait",
   "background_color": "#f5f6f8",
-  "theme_color": "#863bff",
+  "theme_color": "#0f172a",
   "lang": "tr",
   "categories": ["business", "productivity"],
   "icons": [
@@ -15,7 +16,7 @@
       "src": "/pwa-icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/pwa-icon-512.svg",

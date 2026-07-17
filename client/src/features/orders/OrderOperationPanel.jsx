@@ -15,7 +15,7 @@ import {
 import { buildOrderDrawerHeaderModel } from '../../mappers/order/orderLifecycleProjection.js'
 import OrderDrawerSummaryStrip from './drawer/OrderDrawerSummaryStrip.jsx'
 import OrderDrawerLockBanner from './drawer/OrderDrawerLockBanner.jsx'
-import { ORDER_STATUSES } from '../../data/index.js'
+import { ORDER_STATUSES, formatTry } from '../../data/index.js'
 import { DEMO_TODAY } from '../../data/constants.js'
 import { SHIPMENT_DELIVERY_TYPE } from '../../constants/shipmentDeliveryTypes.js'
 import { remainingBalance } from '../../utils/orderFinance.js'
@@ -86,6 +86,7 @@ export default function OrderOperationPanel({
   open,
   onClose,
   onOpenShipmentOperation,
+  onOpenContract,
   initialTab,
   initialSection,
   drawerSource = null,
@@ -131,6 +132,7 @@ export default function OrderOperationPanel({
       order={order}
       onClose={onClose}
       onOpenShipmentOperation={onOpenShipmentOperation}
+      onOpenContract={onOpenContract}
       initialActiveTab={initialActiveTab}
       drawerSource={drawerSource}
       canGoPrev={canGoPrev}
@@ -147,6 +149,7 @@ export default function OrderOperationPanel({
  *   order: Order
  *   onClose: () => void
  *   onOpenShipmentOperation?: (order: Order) => void
+ *   onOpenContract?: (order: Order) => void
  *   initialActiveTab?: string
  *   drawerSource?: OrderDrawerSource | null
  *   canGoPrev?: boolean
@@ -160,6 +163,7 @@ function OrderOperationPanelSurface({
   order,
   onClose,
   onOpenShipmentOperation,
+  onOpenContract,
   initialActiveTab = 'overview',
   drawerSource = null,
   canGoPrev = false,
@@ -260,6 +264,11 @@ function OrderOperationPanelSurface({
   const addressLine = order.notes?.match(/Adres:\s*([^\n]+)/i)?.[1]?.trim() ?? null
 
   const orderDateLabel = order.orderDate ? formatShortDate(order.orderDate) : null
+  const mobileDueDateLabel = order.dueDate
+    ? formatShortDate(order.dueDate)
+    : order.shipmentDate
+      ? formatShortDate(order.shipmentDate)
+      : 'Planlanmadi'
 
   const recentMoves = useMemo(() => {
     const formatMoveDate = (step) => {
@@ -317,8 +326,8 @@ function OrderOperationPanelSurface({
   const paymentsReadOnly = !canPostOrderPayment(user?.role)
 
   useEffect(() => {
-    setActiveTab(initialActiveTab)
-  }, [initialActiveTab, order.id])
+    setActiveTab(isCompactPhone ? 'overview' : initialActiveTab)
+  }, [initialActiveTab, order.id, isCompactPhone])
 
   /** @param {string} tabId */
   function goToTab(tabId) {
@@ -390,12 +399,13 @@ function OrderOperationPanelSurface({
 
   useEffect(() => {
     if (!isPhone || !isCompactPhone) return
+    if (phoneScenarioCursor <= 0) return
     if (!phoneScenarioCurrent?.tab) return
     const target = resolveOrderPanelTab(phoneScenarioCurrent.tab, undefined)
     if (target !== activeTab && canViewDrawerTab(user?.role, /** @type {any} */ (target))) {
       setActiveTab(target)
     }
-  }, [isPhone, isCompactPhone, phoneScenarioCurrent, activeTab, user?.role])
+  }, [isPhone, isCompactPhone, phoneScenarioCurrent, activeTab, user?.role, phoneScenarioCursor])
 
   function handlePanelClose() {
     if (isPhone) {
@@ -548,6 +558,7 @@ function OrderOperationPanelSurface({
 
   function MobileAccordionCard({ id, title, subtitle, children }) {
     const open = activeTab === id
+    const panelId = `oop-mobile-card-panel-${id}`
     return (
       <section className={`oop-mobile-card${open ? ' is-open' : ''}`} aria-label={title}>
         <button
@@ -555,16 +566,19 @@ function OrderOperationPanelSurface({
           className="oop-mobile-card__head"
           onClick={() => setActiveTab(open ? 'overview' : id)}
           aria-expanded={open}
+          aria-controls={panelId}
         >
           <div className="oop-mobile-card__head-copy">
             <span className="oop-mobile-card__title">{title}</span>
             {subtitle ? <span className="oop-mobile-card__sub">{subtitle}</span> : null}
           </div>
           <span className="oop-mobile-card__chev" aria-hidden>
-            {open ? '−' : '+'}
+            ▾
           </span>
         </button>
-        {open ? <div className="oop-mobile-card__body">{children}</div> : null}
+        <div id={panelId} className={`oop-mobile-card__body-wrap${open ? ' is-open' : ''}`}>
+          <div className="oop-mobile-card__body">{children}</div>
+        </div>
       </section>
     )
   }
@@ -590,7 +604,7 @@ function OrderOperationPanelSurface({
                 {drawerHeader.customerName}
               </button>
               <p className="oop-mobile-head__meta">
-                <span>{drawerHeader.orderNumber}</span>
+                <span className="oop-mobile-head__order-no">{drawerHeader.orderNumber}</span>
                 {queuePositionLabel ? <span>· {queuePositionLabel}</span> : null}
               </p>
               <p className="oop-mobile-head__contact">
@@ -609,9 +623,29 @@ function OrderOperationPanelSurface({
                 <span className={`oop-risk-pill oop-risk-pill--${drawerHeader.riskSeverity.toLowerCase()}`}>
                   {drawerHeader.riskLabel}
                 </span>
-                <StatusBadge status={drawerHeader.displayStatus} />
+                <span className="oop-mobile-hero__status">
+                  <StatusBadge status={drawerHeader.displayStatus} />
+                </span>
               </div>
               <p className="oop-mobile-hero__milestone">{drawerHeader.milestoneLabel}</p>
+              <div className="oop-mobile-critical" aria-label="Kritik sipariş özeti">
+                <div className="oop-mobile-critical__item">
+                  <span className="oop-mobile-critical__label">Müşteri</span>
+                  <strong className="oop-mobile-critical__value" title={drawerHeader.customerName}>
+                    {drawerHeader.customerName}
+                  </strong>
+                </div>
+                <div className="oop-mobile-critical__item">
+                  <span className="oop-mobile-critical__label">Termin</span>
+                  <strong className="oop-mobile-critical__value">{mobileDueDateLabel}</strong>
+                </div>
+                <div className="oop-mobile-critical__item oop-mobile-critical__item--accent">
+                  <span className="oop-mobile-critical__label">Kalan bakiye</span>
+                  <strong className="oop-mobile-critical__value oop-mobile-critical__value--numeric">
+                    {formatTry(rem)}
+                  </strong>
+                </div>
+              </div>
               <OrderDrawerSummaryStrip cells={drawerHeader.summaryCells} />
             </section>
 
@@ -720,17 +754,55 @@ function OrderOperationPanelSurface({
           </div>
 
           <footer className="oop-mobile-actions" aria-label="Hızlı işlemler">
-            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('overview')}>
-              Düzenle
+            <button
+              type="button"
+              className={`oop-mobile-actions__btn${activeTab === 'overview' ? ' is-active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              <span className="oop-mobile-actions__icon" aria-hidden>
+                <OrderPanelTabIcon tabId="overview" />
+              </span>
+              <span>Özet</span>
             </button>
-            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('payments')}>
-              Tahsilat
+            <button
+              type="button"
+              className={`oop-mobile-actions__btn${activeTab === 'payments' ? ' is-active' : ''}`}
+              onClick={() => setActiveTab('payments')}
+            >
+              <span className="oop-mobile-actions__icon" aria-hidden>
+                <OrderPanelTabIcon tabId="payments" />
+              </span>
+              <span>Tahsilat</span>
             </button>
-            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('shipment')}>
-              Sevk
+            <button
+              type="button"
+              className={`oop-mobile-actions__btn${activeTab === 'shipment' ? ' is-active' : ''}`}
+              onClick={() => setActiveTab('shipment')}
+            >
+              <span className="oop-mobile-actions__icon" aria-hidden>
+                <OrderPanelTabIcon tabId="shipment" />
+              </span>
+              <span>Sevk</span>
             </button>
-            <button type="button" className="oop-mobile-actions__btn" onClick={() => setActiveTab('ssh')}>
-              Servis
+            <button
+              type="button"
+              className={`oop-mobile-actions__btn${activeTab === 'ssh' ? ' is-active' : ''}`}
+              onClick={() => setActiveTab('ssh')}
+            >
+              <span className="oop-mobile-actions__icon" aria-hidden>
+                <OrderPanelTabIcon tabId="ssh" />
+              </span>
+              <span>Servis</span>
+            </button>
+            <button
+              type="button"
+              className="oop-mobile-actions__btn"
+              onClick={() => onOpenContract?.(order)}
+            >
+              <span className="oop-mobile-actions__icon" aria-hidden>
+                📄
+              </span>
+              <span>Sözleşme</span>
             </button>
           </footer>
         </aside>
@@ -820,6 +892,27 @@ function OrderOperationPanelSurface({
               onClick={() => setCustomerDrawerOpen(true)}
             >
               Müşteri kartı
+            </button>
+            <button
+              type="button"
+              className="oop-btn oop-btn--ghost"
+              onClick={() => onOpenContract?.(order)}
+            >
+              Sözleşme
+            </button>
+            <button
+              type="button"
+              className="oop-btn oop-btn--ghost"
+              onClick={() => onOpenContract?.(order)}
+            >
+              Yazdır
+            </button>
+            <button
+              type="button"
+              className="oop-btn oop-btn--ghost"
+              onClick={() => onOpenContract?.(order)}
+            >
+              PDF / Paylaş
             </button>
             {canChangeOrderStatus(user?.role) ? (
               <div className="oop-actions-menu">

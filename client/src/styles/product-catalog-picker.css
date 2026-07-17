@@ -575,6 +575,9 @@
 
 @media (max-width: 599px) {
   .catalog-picker-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     padding-inline: 0.75rem;
   }
 
@@ -584,7 +587,19 @@
 
   .catalog-picker-mobile-cards {
     display: grid;
+    flex: 1;
+    min-height: 0;
     gap: 0.65rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0.25rem;
+  }
+
+  .catalog-picker-mobile-cards__loading-more {
+    margin: 0.15rem 0 0.2rem;
+    padding: 0.45rem 0.35rem;
+    font-size: 0.78rem;
+    text-align: center;
   }
 
   .catalog-picker-mobile-card {

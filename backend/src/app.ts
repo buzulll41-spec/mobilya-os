@@ -280,7 +280,8 @@ function resolveCorsOrigin():
     }
   }
 
-  const raw = process.env.CORS_ORIGIN ?? 'http://localhost:5173'
+  const raw =
+    process.env.CORS_ALLOWED_ORIGINS ?? process.env.CORS_ORIGIN ?? 'http://localhost:5173'
   const list = raw
     .split(',')
     .map((s) => s.trim())

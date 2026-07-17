@@ -1,4 +1,10 @@
-import { SALES_CONTRACT_STORE, SALES_CONTRACT_TERMS } from '../../constants/salesContract.js'
+import {
+  SALES_CONTRACT_DISTANCE_SALES_CLAUSES,
+  SALES_CONTRACT_KVKK_CLAUSES,
+  SALES_CONTRACT_STORE,
+  SALES_CONTRACT_TERMS,
+  SALES_CONTRACT_WARRANTY_CLAUSES,
+} from '../../constants/salesContract.js'
 import { parseCustomerExtraFromNotes } from '../../features/orders/newOrderWizardModel.js'
 import {
   buildCommercialSummary,
@@ -7,6 +13,7 @@ import {
 } from '../../domain/commerce/commerceSummaries.js'
 import { remainingFromTotals } from '../../domain/commerce/commerceFinance.js'
 import { formatShortDate } from '../../utils/dates.js'
+import { formatTry } from '../../data/index.js'
 
 /** @typedef {import('../../data/seedOrders.js').Order} Order */
 /** @typedef {import('../../contracts/v1/salesOrderListItem.js').SalesOrderListItemDto} SalesOrderListItemDto */
@@ -20,6 +27,8 @@ import { formatShortDate } from '../../utils/dates.js'
  * @property {SalesContractLineRow[]} lines
  * @property {Object} finance
  * @property {Object} delivery
+ * @property {Object} paymentSchedule
+ * @property {Object} compliance
  * @property {string[]} terms
  */
 
@@ -39,17 +48,32 @@ import { formatShortDate } from '../../utils/dates.js'
 export function buildSalesContractModel(order, dto, lines, options) {
   const extra = parseCustomerExtraFromNotes(order.notes)
   const noteText = order.notes ?? ''
-
+  const financeExtras = options?.financeExtras ?? null
   const totalAmount =
-    typeof order.totalAmount === 'number' ? order.totalAmount : (order.amount ?? 0)
+    typeof financeExtras?.grandTotal === 'number'
+      ? financeExtras.grandTotal
+      : typeof order.totalAmount === 'number'
+        ? order.totalAmount
+        : (order.amount ?? 0)
   const subtotalAmount =
-    typeof order.subtotalAmount === 'number' ? order.subtotalAmount : totalAmount
-  const discountAmount = typeof order.discountAmount === 'number' ? order.discountAmount : 0
+    typeof financeExtras?.subtotal === 'number'
+      ? financeExtras.subtotal
+      : typeof order.subtotalAmount === 'number'
+        ? order.subtotalAmount
+        : totalAmount
+  const discountAmount =
+    typeof financeExtras?.totalDiscount === 'number'
+      ? financeExtras.totalDiscount
+      : typeof order.discountAmount === 'number'
+        ? order.discountAmount
+        : 0
   const paidAmount = order.paid ? totalAmount : (order.paidAmount ?? 0)
   const remainingAmount =
     typeof order.remainingAmount === 'number'
       ? order.remainingAmount
       : remainingFromTotals(totalAmount, paidAmount, order.paid)
+  const channel = dto?.channel ?? null
+  const isDistanceSale = channel === 'WEB' || channel === 'PHONE'
 
   const commercial = buildCommercialSummary({
     subtotalAmount,
@@ -71,6 +95,38 @@ export function buildSalesContractModel(order, dto, lines, options) {
   })
 
   const payment = buildPaymentSummary(commercial)
+  const paymentRows = []
+  if (commercial.paidAmount > 0) {
+    paymentRows.push({ label: 'Tahsil edilen', value: formatTry(commercial.paidAmount) })
+  }
+  if (commercial.remainingAmount > 0) {
+    paymentRows.push({ label: 'Kalan bakiye', value: formatTry(commercial.remainingAmount) })
+  } else if (commercial.paidAmount > 0) {
+    paymentRows.push({ label: 'Toplam tahsilat', value: formatTry(commercial.paidAmount) })
+  }
+  if (order.dueDate) {
+    paymentRows.push({ label: 'Vade', value: formatShortDate(order.dueDate) })
+  }
+  paymentRows.push({ label: 'Ödeme yöntemi', value: payment.method || '—' })
+  if (payment.note) {
+    paymentRows.push({ label: 'Ödeme notu', value: payment.note })
+  }
+
+  const installmentRows =
+    commercial.remainingAmount > 0
+      ? [
+          {
+            label: 'Peşinat / tahsil edilen',
+            value: formatTry(commercial.paidAmount),
+          },
+          {
+            label: 'Kalan taksit / bakiye',
+            value: formatTry(commercial.remainingAmount),
+          },
+        ]
+      : commercial.paidAmount > 0
+        ? [{ label: 'Tek tahsilat', value: formatTry(commercial.paidAmount) }]
+        : []
 
   return {
     store: { ...SALES_CONTRACT_STORE },
@@ -88,6 +144,8 @@ export function buildSalesContractModel(order, dto, lines, options) {
       orderDate: formatShortDate(order.orderDate),
       dueDate: order.dueDate ? formatShortDate(order.dueDate) : undefined,
       salesPerson: order.salesPerson?.trim() || undefined,
+      channel,
+      contractLabel: isDistanceSale ? 'Mesafeli Satış Sözleşmesi' : 'Satış Sözleşmesi',
     },
     lines,
     finance: {
@@ -101,6 +159,25 @@ export function buildSalesContractModel(order, dto, lines, options) {
       paymentNote: payment.note ?? undefined,
     },
     delivery,
+    paymentSchedule: {
+      title: commercial.remainingAmount > 0 ? 'Taksit / ödeme planı' : 'Ödeme planı',
+      summary:
+        commercial.remainingAmount > 0
+          ? `${formatTry(commercial.paidAmount)} tahsil edildi, ${formatTry(commercial.remainingAmount)} bakiye kaldı.`
+          : commercial.paidAmount > 0
+            ? `${formatTry(commercial.paidAmount)} tek seferde tahsil edildi.`
+            : 'Tahsilat bilgisi girilmedi.',
+      rows: paymentRows,
+      installments: installmentRows,
+    },
+    compliance: {
+      warranty: [...SALES_CONTRACT_WARRANTY_CLAUSES],
+      kvkk: [...SALES_CONTRACT_KVKK_CLAUSES],
+      distanceSales: isDistanceSale ? [...SALES_CONTRACT_DISTANCE_SALES_CLAUSES] : [],
+      distanceSalesEnabled: isDistanceSale,
+      approvalText:
+        'Müşteri, işbu sözleşmede yer alan bilgiler, kişisel veri işlemleri ve teslimat koşullarını okuyup kabul ettiğini beyan eder.',
+    },
     terms: [...SALES_CONTRACT_TERMS],
   }
 }

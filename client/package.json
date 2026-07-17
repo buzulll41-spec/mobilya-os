@@ -6,10 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:real-device-test": "vite --host 0.0.0.0 --port 5173 --strictPort --mode real-device-test",
     "build": "vite build",
+    "build:real-device-test": "vite build --mode real-device-test",
     "lint": "eslint .",
     "test": "vitest run",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:real-device-test": "vite preview --host 0.0.0.0 --port 5173 --strictPort"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",

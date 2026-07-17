@@ -849,17 +849,43 @@
 @media (max-width: 599px) {
   .mos-erp-ops--shipment .mos-erp-ops__head {
     align-items: stretch;
+    flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .mos-erp-ops--shipment .mos-erp-ops__head-copy {
+    width: 100%;
     min-width: 0;
   }
 
+  .mos-erp-ops--shipment .mos-erp-ops__head-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-ops__title,
+  .mos-erp-ops--shipment .mos-erp-ops__sub {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
   .mos-erp-ops--shipment .mos-erp-ops__head-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
     width: 100%;
     justify-content: flex-start;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .mos-erp-ops--shipment .mos-erp-ops__head-actions > * {
+    max-width: 100%;
+    min-width: 0;
   }
 
   .mos-erp-ops--shipment .mos-erp-summary {

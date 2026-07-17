@@ -269,3 +269,17 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone[data-mobile-dock='none'] .mos-content {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone[data-mobile-dock='fab'] .mos-content {
+    padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone[data-mobile-dock='quick-actions'] .mos-content {
+    padding-bottom: calc(10rem + env(safe-area-inset-bottom, 0px));
+  }
+}

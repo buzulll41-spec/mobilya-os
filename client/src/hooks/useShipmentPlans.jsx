@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { DEMO_TODAY } from '../data/constants.js'
 import { getApiBaseUrl } from '../config/dataSource.js'
+import { useAuth } from '../state/AuthProvider.jsx'
 import {
   listShipmentPlans,
   upsertShipmentPlan as persistShipmentPlan,
@@ -14,6 +15,8 @@ import {
 const ShipmentPlansContext = createContext(null)
 
 function useShipmentPlansState() {
+  const { user } = useAuth()
+  const apiMode = Boolean(getApiBaseUrl())
   const [plans, setPlans] = useState(/** @type {ShipmentPlan[]} */ ([]))
   const [loading, setLoading] = useState(true)
 
@@ -33,8 +36,12 @@ function useShipmentPlansState() {
   }, [])
 
   useEffect(() => {
+    if (apiMode && !user?.id) {
+      setLoading(false)
+      return
+    }
     refreshPlans()
-  }, [refreshPlans])
+  }, [apiMode, user?.id, refreshPlans])
 
   const plansByOrderId = useMemo(() => {
     const map = new Map()

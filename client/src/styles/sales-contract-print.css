@@ -35,6 +35,11 @@
   color: #94a3b8;
 }
 
+.scp-toolbar-hint--success {
+  color: #86efac;
+  font-weight: 700;
+}
+
 .scp-toolbar-actions {
   display: flex;
   gap: 0.5rem;
@@ -96,6 +101,33 @@
   margin-bottom: 1rem;
 }
 
+.scp-brand-block {
+  min-width: 0;
+}
+
+.scp-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.scp-logo {
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, #0f172a, #1d4ed8);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+  flex-shrink: 0;
+}
+
 .scp-store-brand {
   margin: 0 0 0.15rem;
   font-size: 1.35rem;
@@ -136,6 +168,13 @@
   margin-bottom: 0.85rem;
 }
 
+.scp-section--highlight {
+  padding: 0.75rem 0.8rem;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
 .scp-section-title {
   margin: 0 0 0.35rem;
   font-size: 0.72rem;
@@ -143,6 +182,19 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #64748b;
+}
+
+.scp-subsection-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.scp-section-copy {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  color: #334155;
 }
 
 .scp-table {
@@ -186,6 +238,32 @@
   font-weight: 700;
 }
 
+.scp-clauses-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.scp-clauses {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.scp-distance-sales {
+  margin-top: 0.7rem;
+}
+
+.scp-approval {
+  margin: 0.7rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid #2563eb;
+  background: #eff6ff;
+  font-size: 0.82rem;
+  color: #1e3a8a;
+}
+
 .scp-terms {
   margin: 0;
   padding-left: 1.1rem;
@@ -199,7 +277,7 @@
 
 .scp-signatures {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 2rem;
   margin-top: 1.25rem;
   padding-top: 0.5rem;
@@ -216,6 +294,20 @@
   font-size: 0.78rem;
   font-weight: 700;
   color: #475569;
+}
+
+.scp-footer-note {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #dbe4f0;
+  color: #334155;
+  font-size: 0.76rem;
+}
+
+.scp-payment-schedule {
+  margin-top: 0.55rem;
 }
 
 .scp-muted {
@@ -313,4 +405,56 @@
   color: #475569;
   line-height: 1.35;
   white-space: pre-line;
+}
+
+@media (max-width: 900px) {
+  .scp-toolbar {
+    padding: 0.65rem 0.85rem;
+    padding-top: max(0.65rem, env(safe-area-inset-top, 0px));
+    padding-left: max(0.85rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.85rem, env(safe-area-inset-right, 0px));
+    align-items: flex-start;
+  }
+
+  .scp-toolbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .scp-btn {
+    min-height: 38px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.84rem;
+  }
+
+  .scp-preview-scroll {
+    padding: 0.65rem 0.5rem 1rem;
+    padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .scp-document {
+    width: 100%;
+    min-height: auto;
+    padding: 0.9rem 0.8rem 1.1rem;
+  }
+
+  .scp-head {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .scp-clauses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scp-title-block {
+    text-align: left;
+  }
+
+  .scp-signatures {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }

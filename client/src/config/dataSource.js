@@ -1,11 +1,33 @@
 import { getAppModeLabel, isDemoMode, isProductionMode, isRuntimeModeAllowed } from './appMode.js'
 
+function isLoopbackHostname(host) {
+  const h = String(host ?? '').toLowerCase()
+  return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '::1' || h.endsWith('.localhost')
+}
+
+function resolveBrowserReachableApiBase(base) {
+  if (typeof window === 'undefined') return base
+
+  try {
+    const url = new URL(base, window.location.origin)
+    if (!/^https?:$/.test(url.protocol)) return url.toString()
+    if (!isLoopbackHostname(url.hostname)) return url.toString()
+    if (isLoopbackHostname(window.location.hostname)) return url.toString()
+
+    url.hostname = window.location.hostname
+    return url.toString()
+  } catch {
+    return base
+  }
+}
+
 /** @returns {string | undefined} */
 export function getApiBaseUrl() {
   const raw = typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_API_BASE_URL : undefined
   if (typeof raw !== 'string') return undefined
   const trimmed = raw.trim()
-  return trimmed.length > 0 ? trimmed : undefined
+  if (trimmed.length === 0) return undefined
+  return resolveBrowserReachableApiBase(trimmed)
 }
 
 /** @returns {boolean} */
@@ -21,12 +43,8 @@ export function isUsingMockData() {
 export function isLocalhostApiBase() {
   const base = getApiBaseUrl()
   if (!base) return false
-  const loopback = (host) => {
-    const h = host.toLowerCase()
-    return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '::1' || h.endsWith('.localhost')
-  }
   try {
-    return loopback(new URL(base).hostname)
+    return isLoopbackHostname(new URL(base).hostname)
   } catch {
     return /^(https?:\/\/)?(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])/i.test(base)
   }
