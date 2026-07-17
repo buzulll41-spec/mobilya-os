@@ -52,5 +52,7 @@
 - Vite bundle size warning exists for large chunks; this is non-blocking for Mobile V1 delivery but should be optimized in follow-up.
 
 ## Rollback
+- Release commit: `7222fae` (`release: MOBILYA OS Mobile V1`)
+- Release tag: `mobile-v1.0.0`
 - Safety checkpoint commit: `3c19819` (`checkpoint: mobile-v1-pre-delivery`)
 - Rollback command (local): `git checkout 3c19819`
