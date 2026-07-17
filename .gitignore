@@ -24,3 +24,4 @@ client/screenshots/
 .env.*
 !.env.example
 !.env.production.example
+!client/.env.test
