@@ -136,6 +136,12 @@
   color: #64748b;
 }
 
+.mos-user-card__about {
+  font-size: 0.58rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
 .mos-user-card__logout {
   min-height: 44px;
   min-width: 44px;

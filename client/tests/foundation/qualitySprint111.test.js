@@ -41,9 +41,9 @@ describe('FAZ 111 Sprint 1 quality', () => {
   })
 
   describe('Build Status', () => {
-    it('Enterprise 1.0 Build 111 sabitleri', () => {
-      expect(BUILD_STATUS.edition).toBe('Enterprise 1.0')
-      expect(BUILD_STATUS.build).toBe('111')
+    it('Mobile V1 build sabitleri', () => {
+      expect(BUILD_STATUS.edition).toBe('MOBILYA OS Mobile V1')
+      expect(BUILD_STATUS.build).toBe('mobile-v1.0.0')
     })
 
     it('BuildStatusIndicator chrome entegrasyonu', () => {

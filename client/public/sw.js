@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'mobilya-os-shell-'
-const CACHE_NAME = 'mobilya-os-shell-v2-real-device-test'
+const CACHE_NAME = 'mobilya-os-shell-v3-mobile-v1'
 const OFFLINE_URL = '/offline.html'
 const BG_SYNC_TAG = 'mobilya-os-offline-sync'
 const SHELL = ['/', '/#/', '/index.html', OFFLINE_URL, '/favicon.svg', '/pwa-icon-192.svg', '/pwa-icon-512.svg', '/manifest.webmanifest']

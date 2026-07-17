@@ -27,12 +27,14 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port: 5173,
       strictPort: true,
+      allowedHosts: true,
     },
     define: {
-      'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(env.VITE_BUILD_VERSION || pkg.version),
+      'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(env.VITE_BUILD_VERSION || 'mobile-v1.0.0'),
       'import.meta.env.VITE_BUILD_TIMESTAMP': JSON.stringify(env.VITE_BUILD_TIMESTAMP || buildTimestamp),
-      'import.meta.env.VITE_BUILD_ID': JSON.stringify(env.VITE_BUILD_ID || '111'),
-      'import.meta.env.VITE_SW_CACHE_VERSION': JSON.stringify(env.VITE_SW_CACHE_VERSION || 'v2'),
+      'import.meta.env.VITE_BUILD_ID': JSON.stringify(env.VITE_BUILD_ID || 'mobile-v1.0.0'),
+      'import.meta.env.VITE_SW_CACHE_VERSION': JSON.stringify(env.VITE_SW_CACHE_VERSION || 'v3'),
+      'import.meta.env.VITE_DELIVERY_DATE': JSON.stringify(env.VITE_DELIVERY_DATE || '2026-07-17'),
     },
     test: {
       environment: 'node',
