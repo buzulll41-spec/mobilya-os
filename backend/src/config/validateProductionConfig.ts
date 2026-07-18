@@ -19,6 +19,26 @@ export interface ProductionConfigIssue {
   type: ProductionConfigIssueType
 }
 
+function resolveSecret(env: NodeJS.ProcessEnv): { value: string | undefined; variable: string } {
+  const jwtSecret = env.JWT_SECRET?.trim()
+  if (jwtSecret) return { value: jwtSecret, variable: 'JWT_SECRET' }
+
+  const authJwtSecret = env.AUTH_JWT_SECRET?.trim()
+  if (authJwtSecret) return { value: authJwtSecret, variable: 'AUTH_JWT_SECRET' }
+
+  return { value: undefined, variable: 'JWT_SECRET' }
+}
+
+function resolveCorsOrigins(env: NodeJS.ProcessEnv): { value: string | undefined; variable: string } {
+  const allowedOrigins = env.CORS_ALLOWED_ORIGINS?.trim()
+  if (allowedOrigins) return { value: allowedOrigins, variable: 'CORS_ALLOWED_ORIGINS' }
+
+  const legacyOrigins = env.CORS_ORIGIN?.trim()
+  if (legacyOrigins) return { value: legacyOrigins, variable: 'CORS_ORIGIN' }
+
+  return { value: undefined, variable: 'CORS_ALLOWED_ORIGINS' }
+}
+
 function isLoopbackOrigin(origin: string): boolean {
   const value = origin.trim().toLowerCase()
   if (!value) return false
@@ -59,13 +79,13 @@ export function collectProductionConfigIssues(
   const issues: ProductionConfigIssue[] = []
   if (env.NODE_ENV !== 'production') return issues
 
-  const secret = env.AUTH_JWT_SECRET?.trim()
+  const { value: secret, variable: secretVariable } = resolveSecret(env)
   if (!secret) {
-    issues.push({ variable: 'AUTH_JWT_SECRET', type: 'missing' })
+    issues.push({ variable: secretVariable, type: 'missing' })
   } else if (PLACEHOLDER_SECRETS.has(secret.toLowerCase())) {
-    issues.push({ variable: 'AUTH_JWT_SECRET', type: 'placeholder' })
+    issues.push({ variable: secretVariable, type: 'placeholder' })
   } else if (secret.length < MIN_SECRET_LENGTH) {
-    issues.push({ variable: 'AUTH_JWT_SECRET', type: 'too_short' })
+    issues.push({ variable: secretVariable, type: 'too_short' })
   }
 
   if (env.AUTH_DISABLED === 'true') {
@@ -79,16 +99,16 @@ export function collectProductionConfigIssues(
     issues.push({ variable: 'DATABASE_URL', type: 'invalid' })
   }
 
-  const cors = env.CORS_ORIGIN?.trim()
+  const { value: cors, variable: corsVariable } = resolveCorsOrigins(env)
   if (!cors) {
-    issues.push({ variable: 'CORS_ORIGIN', type: 'missing' })
+    issues.push({ variable: corsVariable, type: 'missing' })
   } else {
     const origins = cors
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean)
     if (origins.some((origin) => isLoopbackOrigin(origin))) {
-      issues.push({ variable: 'CORS_ORIGIN', type: 'invalid' })
+      issues.push({ variable: corsVariable, type: 'invalid' })
     }
   }
 

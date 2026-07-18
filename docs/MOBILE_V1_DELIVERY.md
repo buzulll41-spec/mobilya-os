@@ -1,7 +1,7 @@
 # MOBILYA OS Mobile V1
 
 ## Version
-- mobile-v1.0.0-final
+- mobile-v1.0.0
 
 ## Build
 - MOBILYA OS Mobile V1
@@ -10,10 +10,26 @@
 - 2026-07-17
 
 ## Frontend HTTPS URL
-- https://aqbxf8-ip-151-250-172-24.tunnelmole.net
+- TBD (Vercel deployment pending)
 
 ## Backend HTTPS URL
-- https://us2nng-ip-151-250-172-24.tunnelmole.net
+- TBD (Render deployment pending)
+
+## Vercel Project
+- TBD
+
+## Render Service
+- mobilya-os-backend
+
+## Environment Variables
+- `DATABASE_URL` set in Render, secret value not committed.
+- `NODE_ENV=production` set in Render.
+- `JWT_SECRET` set in Render, secret value not committed.
+- `CORS_ALLOWED_ORIGINS` set to the exact Vercel frontend origin plus approved production origins.
+- `PORT` provided by Render runtime.
+- `VITE_API_BASE_URL` set in Vercel to the Render backend HTTPS URL.
+- `VITE_APP_MODE=production` set in Vercel.
+- `VITE_APP_VERSION=mobile-v1.0.0` set in Vercel.
 
 ## Installation
 
@@ -41,7 +57,7 @@
 - finance@mobilya.local / finance123
 
 ## Known Limitations
-- Tunnel endpointleri gecicidir; kalici production domainine gecis gerekir.
+- Frontend ve backend kalici HTTPS domainleri bu çalışma sırasında platform erişim eksikliği nedeniyle tamamlanamadı.
 - Vite bundle size warning (buyuk chunk) mevcut, calismayi engellemez.
 
 ## Rollback Commit

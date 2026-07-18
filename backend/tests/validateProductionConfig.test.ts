@@ -10,9 +10,9 @@ import {
 
 const baseProd = {
   NODE_ENV: 'production',
-  AUTH_JWT_SECRET: 'a-very-strong-random-secret-value-1234',
+  JWT_SECRET: 'a-very-strong-random-secret-value-1234',
   DATABASE_URL: 'postgresql://user:pass@db-host:5432/app',
-  CORS_ORIGIN: 'https://app.example.com',
+  CORS_ALLOWED_ORIGINS: 'https://app.example.com',
 } as NodeJS.ProcessEnv
 
 describe('collectProductionConfigIssues', () => {
@@ -26,18 +26,18 @@ describe('collectProductionConfigIssues', () => {
   })
 
   it('senaryo 5: production + placeholder JWT secret → placeholder', () => {
-    const r = collectProductionConfigIssues({ ...baseProd, AUTH_JWT_SECRET: 'change-me-in-production' })
-    expect(r).toContainEqual({ variable: 'AUTH_JWT_SECRET', type: 'placeholder' })
+    const r = collectProductionConfigIssues({ ...baseProd, JWT_SECRET: 'change-me-in-production' })
+    expect(r).toContainEqual({ variable: 'JWT_SECRET', type: 'placeholder' })
   })
 
   it('production + eksik JWT secret → missing', () => {
-    const r = collectProductionConfigIssues({ ...baseProd, AUTH_JWT_SECRET: '' })
-    expect(r).toContainEqual({ variable: 'AUTH_JWT_SECRET', type: 'missing' })
+    const r = collectProductionConfigIssues({ ...baseProd, JWT_SECRET: '' })
+    expect(r).toContainEqual({ variable: 'JWT_SECRET', type: 'missing' })
   })
 
   it('production + çok kısa JWT secret → too_short', () => {
-    const r = collectProductionConfigIssues({ ...baseProd, AUTH_JWT_SECRET: 'short' })
-    expect(r).toContainEqual({ variable: 'AUTH_JWT_SECRET', type: 'too_short' })
+    const r = collectProductionConfigIssues({ ...baseProd, JWT_SECRET: 'short' })
+    expect(r).toContainEqual({ variable: 'JWT_SECRET', type: 'too_short' })
   })
 
   it('production + eksik DATABASE_URL → missing', () => {
@@ -50,16 +50,16 @@ describe('collectProductionConfigIssues', () => {
     expect(r).toContainEqual({ variable: 'DATABASE_URL', type: 'invalid' })
   })
 
-  it('production + eksik CORS_ORIGIN → missing', () => {
-    const r = collectProductionConfigIssues({ ...baseProd, CORS_ORIGIN: '' })
-    expect(r).toContainEqual({ variable: 'CORS_ORIGIN', type: 'missing' })
+  it('production + eksik CORS_ALLOWED_ORIGINS → missing', () => {
+    const r = collectProductionConfigIssues({ ...baseProd, CORS_ALLOWED_ORIGINS: '' })
+    expect(r).toContainEqual({ variable: 'CORS_ALLOWED_ORIGINS', type: 'missing' })
   })
 
   it('senaryo 7: development → guard pasif (sorun yok)', () => {
     const r = collectProductionConfigIssues({
       ...baseProd,
       NODE_ENV: 'development',
-      AUTH_JWT_SECRET: '',
+      JWT_SECRET: '',
       AUTH_DISABLED: 'true',
     })
     expect(r).toEqual([])
@@ -69,7 +69,7 @@ describe('collectProductionConfigIssues', () => {
     const r = collectProductionConfigIssues({
       ...baseProd,
       NODE_ENV: 'test',
-      AUTH_JWT_SECRET: '',
+      JWT_SECRET: '',
     })
     expect(r).toEqual([])
   })
@@ -83,13 +83,13 @@ describe('validateProductionConfig', () => {
   it('güvensiz config → ProductionConfigError fırlatır (secret değeri sızmaz)', () => {
     let caught: unknown
     try {
-      validateProductionConfig({ ...baseProd, AUTH_JWT_SECRET: 'change-me-in-production' })
+      validateProductionConfig({ ...baseProd, JWT_SECRET: 'change-me-in-production' })
     } catch (err) {
       caught = err
     }
     expect(caught).toBeInstanceOf(ProductionConfigError)
     const message = (caught as Error).message
-    expect(message).toContain('AUTH_JWT_SECRET')
+    expect(message).toContain('JWT_SECRET')
     expect(message).not.toContain('change-me-in-production')
   })
 })

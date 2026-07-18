@@ -8,4 +8,5 @@ import { config as loadEnv } from 'dotenv'
 loadEnv({ path: '.env.test', override: true })
 
 process.env.AUTH_DISABLED = 'true'
+process.env.JWT_SECRET = 'test-jwt-secret-mobilya-os'
 process.env.AUTH_JWT_SECRET = 'test-jwt-secret-mobilya-os'

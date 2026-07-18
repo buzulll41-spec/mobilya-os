@@ -18,10 +18,10 @@ function decodeBase64url(input: string): string {
 }
 
 export function jwtSecret(): string {
-  const s = process.env.AUTH_JWT_SECRET
+  const s = process.env.JWT_SECRET ?? process.env.AUTH_JWT_SECRET
   if (s && s.trim()) return s.trim()
   if (process.env.NODE_ENV === 'test') return 'test-jwt-secret-mobilya-os'
-  throw new Error('AUTH_JWT_SECRET is required')
+  throw new Error('JWT_SECRET is required')
 }
 
 export function signJwt(payload: Omit<JwtPayload, 'exp'>, expiresInSec = 86_400): string {

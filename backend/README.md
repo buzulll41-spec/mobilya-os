@@ -48,7 +48,7 @@ cd backend
 npm run dev
 ```
 
-Varsayılan: `http://0.0.0.0:4000`, CORS: `CORS_ORIGIN` (varsayılan `http://localhost:5173` + `5174`). Referans günü: `DEMO_TODAY` (varsayılan `2026-05-14`, client `DEMO_TODAY` ile uyumlu).
+Varsayılan: `http://0.0.0.0:4000`, CORS: `CORS_ALLOWED_ORIGINS` (varsayılan `http://localhost:5173` + `5174`). Referans günü: `DEMO_TODAY` (varsayılan `2026-05-14`, client `DEMO_TODAY` ile uyumlu).
 
 ## Smoke test
 
