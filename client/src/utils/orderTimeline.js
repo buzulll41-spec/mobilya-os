@@ -8,6 +8,9 @@ import { formatShortDate } from './dates.js'
  * @property {string} label
  * @property {TimelineStepState} state
  * @property {string} [dateLabel]
+ * @property {boolean} [showDayHead] Yeni gün grubu başlığı göster
+ * @property {string} [groupLabel] Başlık metni (showDayHead ile birlikte)
+ * @property {'default' | 'risk' | 'task'} [variant]
  */
 
 /** @param {import('../data/seedOrders.js').Order} order */

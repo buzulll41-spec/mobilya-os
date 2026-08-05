@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { ORDER_STATUSES } from '../data/index.js'
+import { ORDER_LIST_FULFILLMENT_STATUSES } from '../data/index.js'
 import { applyOrderFilters, uniqueSalesPeople } from '../utils/orderFilters.js'
 import ActiveOrdersTable from './ActiveOrdersTable.jsx'
 import OrderFiltersToolbar from './orders/OrderFiltersToolbar.jsx'
 
 /** @typedef {import('../data/seedOrders.js').Order} Order */
 
-const ACTIVE_STATUS_OPTIONS = ORDER_STATUSES.filter((s) => s !== 'Teslim Edildi')
+const ACTIVE_STATUS_OPTIONS = ORDER_LIST_FULFILLMENT_STATUSES.filter((s) => s !== 'Teslim Edildi')
 
 /** @param {{ orders: Order[]; todayIso: string; onOrderSelect: (order: Order) => void }} props */
 export default function ActiveOrdersSection({ orders, todayIso, onOrderSelect }) {

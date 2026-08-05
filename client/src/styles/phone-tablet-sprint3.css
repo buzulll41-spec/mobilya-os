@@ -1,0 +1,276 @@
+/**
+ * FAZ 111 Sprint 3 — Phone & Tablet Edition responsive katmanı.
+ * Desktop görünümü korunur; phone/tablet override'ları scoped.
+ */
+
+/* ——— Mobile header: taşma önleme ——— */
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-app-chrome {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-app-chrome-left {
+    flex: 0 0 auto;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-global-search-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-global-search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-global-search-input {
+    font-size: 1rem;
+    padding-left: 2rem;
+    padding-right: 1.75rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-app-chrome-right {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 0.2rem;
+    max-width: 42%;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-build-status,
+  .mos-mobile-pwa.mos-viewport-phone .mos-pilot-indicator,
+  .mos-mobile-pwa.mos-viewport-phone .mos-api-status,
+  .mos-mobile-pwa.mos-viewport-phone .mos-data-source-pill,
+  .mos-mobile-pwa.mos-viewport-phone .mos-store-pill,
+  .mos-mobile-pwa.mos-viewport-phone .mos-quick-action-wrap {
+    display: none !important;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-user-card__logout {
+    min-width: 44px;
+    padding: 0.35rem 0.45rem;
+    font-size: 0;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-user-card__logout::after {
+    content: '⎋';
+    font-size: 0.85rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-user-card__meta {
+    display: none;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ——— Mobile bottom action bar ——— */
+.mos-mobile-action-bar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(3.35rem + env(safe-area-inset-bottom));
+  z-index: 39;
+  padding: 0.32rem 0.42rem calc(0.35rem + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.97);
+  border-top: 1px solid var(--mos-line, #e2e6ed);
+  box-shadow: 0 -4px 16px rgb(15 23 42 / 6%);
+  backdrop-filter: blur(8px);
+}
+
+.mos-mobile-action-bar__btn {
+  flex: 1 1 0;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 100%);
+  color: #1d4ed8;
+  font-size: 0.66rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 180ms ease, border-color 140ms ease;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  touch-action: manipulation;
+}
+
+.mos-mobile-action-bar__btn:active {
+  transform: translateY(1px);
+}
+
+.mos-mobile-action-bar__icon {
+  line-height: 0;
+}
+
+.mos-mobile-action-bar__icon .mos-nav-icon,
+.mos-mobile-action-bar__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mos-mobile-action-bar__label {
+  line-height: 1.1;
+}
+
+.mos-mobile-action-bar__btn.is-active {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.16);
+}
+
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .mos-mobile-action-bar {
+    display: flex;
+    gap: 0.35rem;
+  }
+}
+
+/* ——— Tablet: daraltılmış sidebar ——— */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-sidebar,
+  .mos-mobile-pwa.mos-viewport-tablet[data-sidebar-collapsed='true'] .mos-sidebar {
+    width: 76px;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-sidebar .mos-nav-item-label,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-brand-text,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-sidebar-foot,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-sidebar-section-label {
+    display: none;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-sidebar .mos-nav-item {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* ——— Tablet: 2 kolon kart grid ——— */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa.mos-viewport-tablet .ecd__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .ecd__grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-role-home__kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-pmc-list__cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+}
+
+/* ——— Phone: kart görünümleri ——— */
+@media (max-width: 767px) {
+  .mos-mobile-pwa.mos-viewport-phone .ecd__grid,
+  .mos-mobile-pwa.mos-viewport-phone .ecd__grid--2 {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .ecd__panel {
+    padding: 0.85rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .ecd__actions {
+    flex-direction: column;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .ecd__actions .mos-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-role-home__kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-role-home__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-page-refresh {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-page-refresh__btn {
+    width: 100%;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--product-master-center .mos-pmc-list__table {
+    display: none !important;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--product-master-center .mos-pmc-list__cards {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--product-master-center .mos-pmc-view-toggle {
+    display: none;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-tbl-wrap,
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-center__table-panel {
+    overflow-x: visible;
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-content {
+    overflow-x: hidden;
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--orders,
+  .mos-mobile-pwa.mos-viewport-phone .mos-page.mos-erp-ops--shipment,
+  .mos-mobile-pwa.mos-viewport-phone .coll-ops-center,
+  .mos-mobile-pwa.mos-viewport-phone .mos-operation-center,
+  .mos-mobile-pwa.mos-viewport-phone .mos-erp-ops--product-master-center {
+    padding-bottom: calc(9.25rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 1440px) {
+  .mos-mobile-pwa.mos-viewport-desktop .mos-mobile-tabbar,
+  .mos-mobile-pwa.mos-viewport-desktop .mos-mobile-action-bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-mobile-action-bar__btn,
+  .mos-mobile-pwa .mos-page-refresh__btn,
+  .mos-mobile-pwa .mos-notification-btn,
+  .mos-mobile-pwa .mos-user-card__logout {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

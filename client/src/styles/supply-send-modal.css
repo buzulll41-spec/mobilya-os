@@ -1,0 +1,125 @@
+.supply-send-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 0.45);
+}
+
+.supply-send-modal {
+  width: min(100%, 28rem);
+  max-height: min(90vh, 36rem);
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid #cfd6df;
+  background: #fff;
+  box-shadow: 0 12px 40px rgb(15 23 42 / 0.18);
+  padding: 1rem;
+}
+
+.supply-send-modal__head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.supply-send-modal__sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.supply-send-modal__channels {
+  margin: 0.85rem 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+}
+
+.supply-send-modal__channels legend {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  padding: 0 0.2rem;
+}
+
+.supply-send-modal__channels label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+}
+
+.supply-send-modal__preview {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  padding: 0.55rem 0.65rem;
+}
+
+.supply-send-modal__preview-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.supply-send-modal__preview pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.supply-send-modal__lines {
+  margin: 0.65rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.supply-send-modal__confirm-q {
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.supply-send-modal__error {
+  margin: 0 0 0.65rem;
+  color: #b42318;
+  font-size: 0.78rem;
+}
+
+.supply-send-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.supply-send-modal__btn {
+  min-height: 2rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.supply-send-modal__btn--primary {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.supply-send-modal__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>Evtrend - Cevrimdisi</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        min-height: 100svh;
+        max-width: 100%;
+        overflow-x: hidden;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #f5f6f8;
+        color: #0f172a;
+      }
+      .offline-root {
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+          max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+        box-sizing: border-box;
+      }
+      .offline-card {
+        width: min(100%, 420px);
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 20px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+      }
+      p {
+        margin: 0;
+        line-height: 1.45;
+        color: #475569;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="offline-root">
+      <section class="offline-card" role="status" aria-live="polite">
+        <h1>Evtrend cevrimdisi</h1>
+        <p>Baglanti geri geldiginde uygulama otomatik olarak guncel verileri yukleyecektir.</p>
+      </section>
+    </main>
+  </body>
+</html>

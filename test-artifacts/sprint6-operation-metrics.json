@@ -1,0 +1,74 @@
+{
+  "baseUrl": "http://127.0.0.1:5180",
+  "timestamps": {
+    "startedAt": "2026-08-02T16:41:34.170Z",
+    "finishedAt": "2026-08-02T16:41:53.686Z"
+  },
+  "flows": {
+    "homeOrders": {
+      "listOpenMs": 46,
+      "expectedRouteMatched": true,
+      "landedHash": "#/mobile/orders",
+      "detailOpened": false,
+      "detailSelector": null,
+      "actionTriggered": false
+    },
+    "homeCollection": {
+      "listOpenMs": 34,
+      "expectedRouteMatched": true,
+      "landedHash": "#/mobile/collections",
+      "detailOpened": false,
+      "actionTriggered": false
+    },
+    "homeService": {
+      "listOpenMs": 12029,
+      "expectedRouteMatched": false,
+      "landedHash": "#/mobile/home",
+      "detailOpened": false,
+      "actionTriggered": false
+    },
+    "quickActions": {
+      "newOrderOpened": true,
+      "whatsappTarget": {
+        "href": "http://127.0.0.1:5180/mobile#/mobile/customers",
+        "hash": "#/mobile/customers"
+      }
+    }
+  },
+  "touchMetrics": {
+    "newOrderTouches": 2,
+    "whatsappTouches": 2,
+    "shipmentPlanTouches": 2
+  },
+  "timeMetricsSec": {
+    "orderFindSec": 0.05,
+    "collectionOpenSec": 0.03,
+    "serviceOpenSec": 12.03,
+    "newOrderStartSec": 0.08,
+    "whatsappStartSec": 0.76,
+    "shipmentPlanStartSec": 0.05
+  },
+  "removedSteps": [
+    "Hizli islem merkezi ile Yeni Siparis/Tahsilat/Sevkiyat/Servis/Musteri islemleri menuye girmeden aciliyor.",
+    "Home brief satirlari ile kullanici filtre secmeden dogrudan ilgili operasyona yonleniyor.",
+    "Operasyon onerileri ilk ekranda verildigi icin ara dashboard ekran gecisi kaldirildi."
+  ],
+  "blockers": [
+    "Home->Siparis akisinda detay acilamadi: siparis listesi bos veya tiklanabilir satir yok.",
+    "Home->Tahsilat akisinda Tahsilat Al aksiyonu tetiklenemedi: kayit/veri yok.",
+    "Home->Servis akisinda Tamamla aksiyonu tetiklenemedi: kayit/veri yok."
+  ],
+  "screenshots": [
+    "test-artifacts/sprint6/flow-home.png",
+    "test-artifacts/sprint6/flow-home-orders-list.png",
+    "test-artifacts/sprint6/flow-home-collection-list.png",
+    "test-artifacts/sprint6/flow-home-service-list.png"
+  ],
+  "consoleErrorCount": 4,
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "HOME API ERROR {source: OrdersProvider.refreshOrders, durationMs: 376, message: Oturum süresi doldu veya oturum geçersiz}",
+    "HOME API ERROR {source: OrdersProvider.refreshOrders, durationMs: 373, message: Oturum süresi doldu veya oturum geçersiz}"
+  ]
+}

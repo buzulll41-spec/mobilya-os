@@ -1,101 +1,263 @@
-import { memo } from 'react'
-import ActiveOrdersSection from '../components/ActiveOrdersSection.jsx'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { IconPlus } from '../components/Icons.jsx'
-import RiskMerkezi from '../components/RiskMerkezi.jsx'
-import TodayOperations from '../components/TodayOperations.jsx'
-import { dashboardTodaySales, formatTry } from '../data/index.js'
+import ErpOpsSummaryStrip from '../components/erp-ops/ErpOpsSummaryStrip.jsx'
+import ErpOpsLeftFilters from '../components/erp-ops/ErpOpsLeftFilters.jsx'
+import ErpOpsDetailStrip from '../components/erp-ops/ErpOpsDetailStrip.jsx'
+import ErpOpsTable from '../components/erp-ops/ErpOpsTable.jsx'
+import {
+  buildDashboardOpsView,
+  countDashboardByFilter,
+  DASHBOARD_MANAGER_QUICK_FILTERS,
+  DASHBOARD_SCOPE_FILTERS,
+  filterDashboardRows,
+} from '../features/dashboard/dashboardOpsCenterUi.js'
+import { buildDrawerQueue } from '../application/orderDrawerOrchestration.js'
+import '../styles/mos-erp-ops.css'
 
 /** @typedef {import('../data/seedOrders.js').Order} Order */
+/** @typedef {import('../features/dashboard/dashboardOpsCenterUi.js').DashboardFilterId} DashboardFilterId */
+/** @typedef {import('../features/dashboard/dashboardOpsCenterUi.js').DashboardOpsTableRow} DashboardOpsTableRow */
 
 /**
  * @param {{
- *   activeOrders: Order[]
- *   overdueRisk: Order[]
- *   underpaidRisk: Order[]
- *   missingOrders: Order[]
- *   todayDeliveries: Order[]
- *   montajEkipleri: { id: string; ad: string; uyeler: string; saat: string; not: string }[]
+ *   controlTower: import('../mappers/dashboard/computeDashboardControlTower.js').ReturnType<import('../mappers/dashboard/computeDashboardControlTower.js').computeDashboardControlTower>
+ *   operationalAlarms: import('../utils/operationalAlarms.js').OperationalAlarm[]
+ *   orders: Order[]
+ *   ordersById: Map<string, Order>
  *   todayIso: string
- *   kpis: { pendingCollection: number; overdueOrders: number; tomorrowShipments: number }
  *   onOpenOrderModal: () => void
- *   onOrderSelect: (order: Order) => void
+ *   onOrderSelect: (order: Order, options?: import('../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onNavigate: (page: string) => void
+ *   sshMissingParts: import('../mappers/ssh/sshMissingPartsModel.js').SshMissingPartCard[]
+ *   listItemDtos?: import('../contracts/v1/salesOrderListItem.js').SalesOrderListItemDto[]
+ *   kpis?: ReturnType<import('../data/dashboardHelpers.js').computeDashboardKpis>
+ *   highlightOrderId?: string | null
  * }} props
  */
 function DashboardPage({
-  activeOrders,
-  overdueRisk,
-  underpaidRisk,
-  missingOrders,
-  todayDeliveries,
-  montajEkipleri,
+  controlTower,
+  orders,
+  ordersById,
   todayIso,
-  kpis,
   onOpenOrderModal,
   onOrderSelect,
+  onNavigate,
+  sshMissingParts,
+  listItemDtos = [],
+  kpis,
+  highlightOrderId = null,
 }) {
+  /** @type {[DashboardFilterId, import('react').Dispatch<import('react').SetStateAction<DashboardFilterId>>]} */
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [selectedRowId, setSelectedRowId] = useState(/** @type {string | null} */ (null))
+
+  const view = useMemo(
+    () =>
+      buildDashboardOpsView({
+        controlTower,
+        sshMissingParts,
+        orders,
+        listItemDtos,
+        kpis,
+        todayIso,
+      }),
+    [controlTower, sshMissingParts, orders, listItemDtos, kpis, todayIso],
+  )
+
+  const filteredRows = useMemo(
+    () => filterDashboardRows(view.rows, activeFilter),
+    [view.rows, activeFilter],
+  )
+
+  const filterCounts = useMemo(() => {
+    /** @type {Record<string, number>} */
+    const counts = {}
+    for (const f of [...DASHBOARD_MANAGER_QUICK_FILTERS, ...DASHBOARD_SCOPE_FILTERS]) {
+      counts[f.id] = countDashboardByFilter(view.rows, f.id)
+    }
+    return counts
+  }, [view.rows])
+
+  useEffect(() => {
+    if (filteredRows.length === 0) {
+      setSelectedRowId(null)
+      return
+    }
+    const visible = filteredRows.some((r) => r.id === selectedRowId)
+    if (!visible) {
+      setSelectedRowId(filteredRows[0].id)
+    }
+  }, [filteredRows, selectedRowId])
+
+  useEffect(() => {
+    if (highlightOrderId && filteredRows.some((r) => r.orderId === highlightOrderId)) {
+      const row = filteredRows.find((r) => r.orderId === highlightOrderId)
+      if (row) setSelectedRowId(row.id)
+    }
+  }, [highlightOrderId, filteredRows])
+
+  const selectedRow = useMemo(
+    () => filteredRows.find((r) => r.id === selectedRowId) ?? filteredRows[0] ?? null,
+    [filteredRows, selectedRowId],
+  )
+
+  const filterGroups = useMemo(
+    () => [{ title: 'Kapsam', options: DASHBOARD_SCOPE_FILTERS }],
+    [],
+  )
+
+  const openRow = useCallback(
+    /** @param {DashboardOpsTableRow} row */
+    (row) => {
+      const order = ordersById.get(row.orderId)
+      if (!order) return
+      const tab =
+        row.openKind === 'shipment' || row.filterCategory === 'shipment'
+          ? 'shipment'
+          : row.filterCategory === 'ssh'
+            ? 'ssh'
+            : undefined
+      onOrderSelect(order, {
+        tab,
+        source: 'dashboard',
+        queue: buildDrawerQueue({
+          queueId: `dashboard:${activeFilter}`,
+          filterSnapshot: { filter: activeFilter },
+          rowIds: filteredRows.map((r) => r.orderId),
+          activeOrderId: row.orderId,
+          source: 'dashboard',
+        }),
+      })
+    },
+    [ordersById, onOrderSelect, activeFilter, filteredRows],
+  )
+
+  const handleSummaryClick = useCallback(
+    /** @param {string} metricId */
+    (metricId) => {
+      switch (metricId) {
+        case 'open-orders':
+          onNavigate('orders')
+          break
+        case 'pending-ship':
+          onNavigate('shipment-ops')
+          break
+        case 'open-collect':
+          onNavigate('collection')
+          break
+        case 'critical-risk':
+          setActiveFilter('critical')
+          break
+        default:
+          break
+      }
+    },
+    [onNavigate],
+  )
+
   return (
-    <>
-      <div className="mos-dash">
-        <header className="mos-dash-head">
-          <div className="mos-dash-intro">
-            <h1 className="mos-page-title">Günün özeti</h1>
-            <p className="mos-page-sub">
-              Operasyon, finans ve sevk tek çatıda — hızlı karar için tasarlandı.
-            </p>
-          </div>
-          <button type="button" className="mos-btn mos-btn-primary" onClick={onOpenOrderModal}>
+    <div className="mos-page mos-erp-ops mos-erp-ops--dashboard-manager">
+      <header className="mos-erp-ops__head">
+        <div className="mos-erp-ops__head-copy">
+          <h1 className="mos-erp-ops__title">Operasyon masası</h1>
+          <span className="mos-erp-ops__sub">
+            {view.totalCount} açık iş · {filteredRows.length} listede
+          </span>
+        </div>
+        <div className="mos-erp-ops__head-actions">
+          <button type="button" className="mos-erp-ops__btn mos-erp-ops__btn--primary" onClick={onOpenOrderModal}>
             <IconPlus />
             Sipariş ekle
           </button>
-        </header>
-
-        <div className="mos-grid-kpi">
-          <article className="mos-card mos-kpi mos-kpi--sales mos-kpi--elevated mos-card--saas">
-            <p className="mos-kpi-label">Bugünkü satış</p>
-            <p className="mos-kpi-value">{formatTry(dashboardTodaySales)}</p>
-            <p className="mos-kpi-hint">Kasa + POS</p>
-          </article>
-          <article className="mos-card mos-kpi mos-kpi--collect mos-kpi--elevated mos-card--saas">
-            <p className="mos-kpi-label">Bekleyen tahsilat</p>
-            <p className="mos-kpi-value">{formatTry(kpis.pendingCollection)}</p>
-            <p className="mos-kpi-hint">Kalan bakiye toplamı</p>
-          </article>
-          <article className="mos-card mos-kpi mos-kpi--late mos-kpi--elevated mos-card--saas">
-            <p className="mos-kpi-label">Geciken sipariş</p>
-            <p className="mos-kpi-value">{kpis.overdueOrders}</p>
-            <p className="mos-kpi-hint">Termin aşımı</p>
-          </article>
-          <article className="mos-card mos-kpi mos-kpi--ship mos-kpi--elevated mos-card--saas">
-            <p className="mos-kpi-label">Yarınki sevk</p>
-            <p className="mos-kpi-value">{kpis.tomorrowShipments}</p>
-            <p className="mos-kpi-hint">Yükleme planı</p>
-          </article>
         </div>
+      </header>
 
-        <RiskMerkezi
-          overdue={overdueRisk}
-          underpaid={underpaidRisk}
-          missing={missingOrders}
-          onOrderClick={onOrderSelect}
-        />
+      <ErpOpsSummaryStrip
+        metrics={view.summaryMetrics}
+        ariaLabel="Günün operasyon özeti"
+        onMetricClick={handleSummaryClick}
+      />
 
-        <div className="mos-dash-split mos-dash-split--today">
-          <TodayOperations
-            todayIso={todayIso}
-            deliveries={todayDeliveries}
-            missing={missingOrders}
-            crews={montajEkipleri}
-            onOrderClick={onOrderSelect}
-          />
-        </div>
+      <ErpOpsSummaryStrip
+        metrics={view.managerKpiMetrics}
+        ariaLabel="Müdür operasyon göstergeleri"
+        summaryClassName="mos-erp-summary--cols-6 mos-erp-ops__manager-kpis"
+      />
+
+      <section className="mos-erp-ops__today-focus" aria-label="Bugün odaklan">
+        <h2 className="mos-erp-ops__today-focus-title">BUGÜN ODAKLAN</h2>
+        <ul className="mos-erp-ops__today-focus-list">
+          {view.todayFocusItems.map((item) => (
+            <li key={item} className="mos-erp-ops__today-focus-item">
+              {item === 'Bugün kritik operasyon beklenmiyor' ? (
+                item
+              ) : (
+                <>
+                  <span className="mos-erp-ops__today-focus-icon" aria-hidden>
+                    ⚠
+                  </span>
+                  <span>{item}</span>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div
+        className="mos-erp-ops__quick-filters"
+        role="toolbar"
+        aria-label="Hızlı operasyon filtreleri"
+      >
+        {DASHBOARD_MANAGER_QUICK_FILTERS.map((filter) => (
+          <button
+            key={filter.id}
+            type="button"
+            className={`mos-erp-ops__quick-filter${activeFilter === filter.id ? ' is-active' : ''}`}
+            onClick={() => setActiveFilter(/** @type {DashboardFilterId} */ (filter.id))}
+          >
+            <span>{filter.label}</span>
+            <span className="mos-erp-ops__quick-filter-count">
+              {filterCounts[filter.id] ?? 0}
+            </span>
+          </button>
+        ))}
       </div>
 
-      <ActiveOrdersSection
-        orders={activeOrders}
-        todayIso={todayIso}
-        onOrderSelect={onOrderSelect}
-      />
-    </>
+      <div className="mos-erp-ops__workspace">
+        <ErpOpsLeftFilters
+          groups={filterGroups}
+          activeFilter={activeFilter}
+          filterCounts={filterCounts}
+          onFilterChange={(id) => setActiveFilter(/** @type {DashboardFilterId} */ (id))}
+          ariaLabel="Operasyon filtreleri"
+        />
+
+        <div className="mos-erp-ops__main">
+          <ErpOpsDetailStrip
+            row={selectedRow}
+            onOpen={() => {
+              if (selectedRow) openRow(selectedRow)
+            }}
+          />
+
+          <section className="mos-erp-ops__table-panel" aria-label="Operasyon listesi">
+            {activeFilter === 'all' && view.managerCriticalCount > 0 ? (
+              <p className="mos-erp-ops__manager-hint" role="status">
+                Yönetici görünümü: ilk {view.managerCriticalCount} kritik kayıt üstte vurgulanıyor.
+              </p>
+            ) : null}
+            <ErpOpsTable
+              rows={filteredRows}
+              selectedRowId={selectedRow?.id ?? null}
+              onSelectRow={(row) => setSelectedRowId(row.id)}
+              onOpenRow={openRow}
+              variant="dashboard-manager"
+            />
+          </section>
+        </div>
+      </div>
+    </div>
   )
 }
 

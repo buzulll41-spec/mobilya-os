@@ -1,0 +1,58 @@
+@media (max-width: 480px) {
+  .mos-mobile-card-shell {
+    width: 100%;
+    display: grid;
+    gap: 8px;
+    text-align: left;
+    border: 1px solid var(--mos-border, #e2e8f0);
+    border-radius: 16px;
+    background: #fff;
+    padding: 12px 13px;
+    color: #0f172a;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .mos-mobile-card-shell--button {
+    cursor: pointer;
+  }
+
+  .mos-mobile-card-shell__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mos-mobile-card-shell__icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .mos-mobile-card-shell__title {
+    font-size: 0.93rem;
+    font-weight: 800;
+  }
+
+  .mos-mobile-card-shell__summary {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #334155;
+  }
+
+  .mos-mobile-card-shell__meta {
+    display: grid;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: #475569;
+  }
+
+  .mos-mobile-card-shell__meta span {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .mos-mobile-card-shell__meta strong {
+    color: #0f172a;
+    font-weight: 700;
+  }
+}

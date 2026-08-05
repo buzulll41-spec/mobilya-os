@@ -1,0 +1,6 @@
+{
+  "landedHash": "#/mobile/orders?filter=today",
+  "before": "test-artifacts/home-live/home-before-click.png",
+  "after": "test-artifacts/home-live/home-after-click.png",
+  "timestamp": "2026-08-04T15:53:40.335Z"
+}

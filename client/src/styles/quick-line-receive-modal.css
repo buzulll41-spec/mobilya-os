@@ -1,0 +1,242 @@
+/* Hızlı ürün geldi — operasyon paneli üstü (portal, z-index 120) */
+
+.qlr-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.qlr-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.qlr-modal {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 780px);
+  max-height: min(92vh, 880px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow:
+    0 24px 64px rgba(15, 23, 42, 0.28),
+    0 0 0 1px rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+}
+
+.qlr-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem 1.1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.qlr-modal__title {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.qlr-modal__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.qlr-modal__meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+}
+
+.qlr-modal__meta strong {
+  color: #334155;
+  font-weight: 700;
+}
+
+.qlr-modal__close {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.qlr-modal__close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.qlr-modal__form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.qlr-modal__body {
+  padding: 1.35rem 1.5rem 1rem;
+}
+
+.qlr-modal__alert {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.qlr-modal__info {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.qlr-modal__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+@media (max-width: 720px) {
+  .qlr-modal__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qlr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.qlr-field__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.qlr-field__input,
+.qlr-field__select,
+.qlr-field__textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  font: inherit;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  color: #0f172a;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.qlr-field__textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.qlr-field__input:focus,
+.qlr-field__select:focus,
+.qlr-field__textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.qlr-field__select {
+  cursor: pointer;
+}
+
+.qlr-field__hint {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.qlr-modal__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 1rem 1.5rem 1.35rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.qlr-btn {
+  min-height: 2.75rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.qlr-btn--ghost {
+  background: #fff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.qlr-btn--ghost:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.qlr-btn--primary {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+.qlr-btn--primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.qlr-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

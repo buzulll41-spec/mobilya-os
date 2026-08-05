@@ -1,0 +1,445 @@
+/* Tahsilat V4 — Kurumsal finans çalışma masası */
+
+.coll-page--desk {
+  gap: 0.65rem;
+  max-width: none;
+}
+
+.coll-page--desk .coll-page__head {
+  margin-bottom: 0.15rem;
+}
+
+.coll-page--desk .mos-page-sub {
+  font-size: 0.8rem;
+}
+
+/* —— 4 KPI —— */
+
+.coll-desk-kpi {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--mos-line);
+  border-radius: var(--mos-radius-sm);
+  background: #fff;
+  overflow: hidden;
+}
+
+.coll-desk-kpi__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  border-right: 1px solid var(--mos-line);
+  background: #fff;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  min-height: 0;
+}
+
+.coll-desk-kpi__item:last-child {
+  border-right: 0;
+}
+
+button.coll-desk-kpi__item {
+  cursor: pointer;
+}
+
+button.coll-desk-kpi__item:hover {
+  background: rgba(17, 24, 39, 0.02);
+}
+
+.coll-desk-kpi__item.is-active {
+  background: rgba(17, 24, 39, 0.04);
+  box-shadow: inset 0 -2px 0 var(--mos-ink);
+}
+
+.coll-desk-kpi__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mos-muted);
+}
+
+.coll-desk-kpi__value {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--mos-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-desk-kpi__item--overdue .coll-desk-kpi__value,
+.coll-desk-kpi__item--critical-balance .coll-desk-kpi__value {
+  color: #9f1239;
+}
+
+/* —— Operasyon barı —— */
+
+.coll-ops-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--mos-line);
+  border-radius: var(--mos-radius-sm);
+  background: #fafafa;
+  font-size: 0.78rem;
+  color: var(--mos-ink);
+}
+
+.coll-ops-bar__label {
+  font-weight: 700;
+  color: var(--mos-muted);
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+}
+
+.coll-ops-bar__item strong {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-ops-bar__sep {
+  color: var(--mos-muted);
+  opacity: 0.5;
+  user-select: none;
+}
+
+.coll-ops-bar__item--alert strong {
+  color: #9f1239;
+}
+
+.coll-page--desk .coll-filter-bar {
+  margin-top: 0.1rem;
+}
+
+/* —— Masa düzeni —— */
+
+.coll-desk-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.coll-desk-main {
+  min-width: 0;
+  border: 1px solid var(--mos-line);
+  border-radius: var(--mos-radius-sm);
+  background: #fff;
+  overflow: hidden;
+}
+
+/* —— Tablo —— */
+
+.coll-desk-tables {
+  display: flex;
+  flex-direction: column;
+}
+
+.coll-desk-section__title {
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mos-ink);
+  background: #f4f4f5;
+  border-bottom: 1px solid var(--mos-line);
+}
+
+.coll-desk-section__title--sub {
+  color: var(--mos-muted);
+  background: #fafafa;
+}
+
+.coll-desk-table-scroll {
+  overflow-x: auto;
+}
+
+.coll-desk-table-scroll--top {
+  max-height: min(420px, 52vh);
+  overflow-y: auto;
+}
+
+.coll-desk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.coll-desk-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.38rem 0.65rem;
+  border-bottom: 1px solid var(--mos-line);
+  background: #f4f4f5;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mos-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.coll-desk-th--num {
+  text-align: right;
+}
+
+.coll-desk-row {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+  background: #fff;
+  transition: background 0.12s ease;
+}
+
+.coll-desk-row:hover {
+  background: rgba(17, 24, 39, 0.02);
+}
+
+.coll-desk-row:focus-visible {
+  outline: 2px solid var(--mos-indigo-muted);
+  outline-offset: -2px;
+}
+
+.coll-desk-row--critical {
+  background: rgba(225, 29, 72, 0.03);
+}
+
+.coll-desk-row--critical:hover {
+  background: rgba(225, 29, 72, 0.05);
+}
+
+.coll-desk-row--risky {
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.coll-desk-row--risky:hover {
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.coll-desk-row--top .coll-desk-customer {
+  font-weight: 700;
+}
+
+.coll-desk-cell {
+  padding: 0.42rem 0.65rem;
+  vertical-align: middle;
+}
+
+.coll-desk-cell--prio {
+  width: 3.25rem;
+  white-space: nowrap;
+}
+
+.coll-desk-prio {
+  margin-right: 0.25rem;
+}
+
+.coll-desk-rank {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--mos-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-desk-rank--empty {
+  opacity: 0.35;
+}
+
+.coll-desk-cell--customer {
+  min-width: 10rem;
+}
+
+.coll-desk-customer {
+  display: block;
+  font-weight: 600;
+  color: var(--mos-ink);
+}
+
+.coll-desk-order-no {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--mos-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-desk-cell--status {
+  color: var(--mos-muted);
+  font-size: 0.76rem;
+  max-width: 11rem;
+}
+
+.coll-desk-cell--amount {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--mos-ink);
+}
+
+.coll-desk-cell--pct {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--mos-muted);
+}
+
+.coll-desk-cell--action {
+  font-weight: 600;
+  color: var(--mos-ink);
+  white-space: nowrap;
+}
+
+.coll-desk-cell--ops {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.coll-desk-link {
+  margin-right: 0.5rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--mos-indigo-muted);
+  text-decoration: none;
+}
+
+.coll-desk-link:hover {
+  text-decoration: underline;
+}
+
+.coll-desk-btn {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--mos-line);
+  border-radius: 2px;
+  background: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mos-ink);
+  cursor: pointer;
+}
+
+.coll-desk-btn:hover {
+  border-color: var(--mos-ink);
+  background: #f4f4f5;
+}
+
+.coll-desk-muted {
+  margin-right: 0.5rem;
+  color: var(--mos-muted);
+  font-size: 0.76rem;
+}
+
+/* —— Sağ görev paneli —— */
+
+.coll-desk-aside {
+  position: sticky;
+  top: 0.75rem;
+  border: 1px solid var(--mos-line);
+  border-radius: var(--mos-radius-sm);
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+}
+
+.coll-desk-aside__title {
+  margin: 0 0 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mos-ink);
+}
+
+.coll-desk-aside__empty {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--mos-muted);
+}
+
+.coll-desk-task-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.coll-desk-task {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--mos-ink);
+}
+
+.coll-desk-task__box {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  color: var(--mos-muted);
+  font-family: ui-monospace, monospace;
+}
+
+.coll-desk-task__label {
+  flex: 1;
+}
+
+@media (max-width: 1100px) {
+  .coll-desk-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .coll-desk-aside {
+    position: static;
+    order: -1;
+  }
+
+  .coll-desk-kpi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coll-desk-kpi__item:nth-child(2) {
+    border-right: 0;
+  }
+
+  .coll-desk-kpi__item:nth-child(1),
+  .coll-desk-kpi__item:nth-child(2) {
+    border-bottom: 1px solid var(--mos-line);
+  }
+}
+
+@media (max-width: 720px) {
+  .coll-ops-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .coll-ops-bar__sep {
+    display: none;
+  }
+
+  .coll-desk-kpi {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .coll-desk-table-scroll--top {
+    max-height: none;
+  }
+
+  .coll-desk-cell--status,
+  .coll-desk-cell--action {
+    display: none;
+  }
+}

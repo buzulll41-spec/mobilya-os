@@ -6,5 +6,12 @@ export function useOrders() {
   if (!ctx) {
     throw new Error('useOrders: OrdersProvider eksik (main.jsx içinde sarmalayın).')
   }
-  return ctx
+  return {
+    ...ctx,
+    domainEvents: ctx.domainEvents ?? [],
+    operationalTasks: ctx.operationalTasks ?? [],
+    dataPipeline:
+      ctx.dataPipeline ??
+      ({ layer: 'mock', hasApiBase: false, usedFallback: true, fetchedAt: null }),
+  }
 }

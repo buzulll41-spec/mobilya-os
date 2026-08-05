@@ -1,0 +1,218 @@
+/**
+ * Otomasyon Merkezi — sağ drawer (ERP V1)
+ */
+
+.auto-erp-drawer__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.1);
+  cursor: pointer;
+}
+
+.auto-erp-drawer {
+  --auto-border: #cfd6df;
+  --auto-radius: 6px;
+  --auto-ink: #1a1a1a;
+  --auto-muted: #5c6678;
+  --auto-surface: #fff;
+  --auto-panel: #f4f6f9;
+  --auto-critical: #b91c1c;
+  --auto-success: #15803d;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  width: min(440px, 100%);
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--auto-surface);
+  border-left: 1px solid var(--auto-border);
+  overflow: hidden;
+}
+
+.auto-erp-drawer__hero {
+  flex: 0 0 auto;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 2px solid var(--auto-border);
+  background: var(--auto-panel);
+}
+
+.auto-erp-drawer__head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.auto-erp-drawer__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--auto-ink);
+  line-height: 1.25;
+}
+
+.auto-erp-drawer__sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--auto-muted);
+}
+
+.auto-erp-drawer__close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  background: var(--auto-surface);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.auto-erp-drawer__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+
+.auto-erp-drawer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.auto-erp-drawer__action {
+  min-height: 1.6rem;
+  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  background: var(--auto-surface);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--auto-ink);
+  cursor: pointer;
+}
+
+.auto-erp-drawer__action:hover {
+  background: var(--auto-panel);
+}
+
+.auto-erp-drawer__action--primary {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.auto-erp-drawer__action--primary:hover {
+  background: #1e293b;
+}
+
+.auto-erp-drawer__action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.auto-erp-drawer__alert {
+  margin: 0.4rem 0 0;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid #fecaca;
+  border-radius: var(--auto-radius);
+  background: #fef2f2;
+  color: var(--auto-critical);
+  font-size: 0.72rem;
+}
+
+.auto-erp-drawer__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.55rem 0.8rem 0.8rem;
+}
+
+.auto-erp-drawer__section + .auto-erp-drawer__section {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--auto-border);
+}
+
+.auto-erp-drawer__section-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--auto-muted);
+}
+
+.auto-erp-drawer__kv {
+  margin: 0;
+}
+
+.auto-erp-drawer__kv-row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.35rem 0.5rem;
+  padding: 0.22rem 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.auto-erp-drawer__kv-row dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--auto-muted);
+}
+
+.auto-erp-drawer__kv-row dd {
+  margin: 0;
+  color: var(--auto-ink);
+}
+
+.auto-erp-drawer__timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.auto-erp-drawer__timeline-item {
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  background: var(--auto-panel);
+}
+
+.auto-erp-drawer__timeline-msg {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--auto-ink);
+}
+
+.auto-erp-drawer__timeline-meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  color: var(--auto-muted);
+}
+
+.auto-erp-drawer__empty,
+.auto-erp-drawer__loading {
+  padding: 1rem 0.8rem;
+  font-size: 0.78rem;
+  color: var(--auto-muted);
+}

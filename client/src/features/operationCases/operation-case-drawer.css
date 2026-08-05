@@ -1,0 +1,231 @@
+/**
+ * Operasyon Vakaları Merkezi — sağ drawer (ERP V1)
+ */
+
+.case-erp-drawer__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.1);
+  cursor: pointer;
+}
+
+.case-erp-drawer {
+  --case-border: #cfd6df;
+  --case-radius: 6px;
+  --case-ink: #1a1a1a;
+  --case-muted: #5c6678;
+  --case-surface: #fff;
+  --case-panel: #f4f6f9;
+  --case-critical: #b91c1c;
+  --case-success: #15803d;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9;
+  width: min(440px, 100%);
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--case-surface);
+  border-left: 1px solid var(--case-border);
+  overflow: hidden;
+}
+
+.case-erp-drawer__hero {
+  flex: 0 0 auto;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 2px solid var(--case-border);
+  background: var(--case-panel);
+}
+
+.case-erp-drawer__head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.case-erp-drawer__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--case-ink);
+  line-height: 1.25;
+}
+
+.case-erp-drawer__sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--case-muted);
+}
+
+.case-erp-drawer__close {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--case-border);
+  border-radius: var(--case-radius);
+  background: var(--case-surface);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.case-erp-drawer__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+
+.case-erp-drawer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.case-erp-drawer__action {
+  min-height: 1.6rem;
+  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--case-border);
+  border-radius: var(--case-radius);
+  background: var(--case-surface);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.case-erp-drawer__action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.case-erp-drawer__action--primary {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.case-erp-drawer__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.55rem 0.75rem 0.75rem;
+}
+
+.case-erp-drawer__section {
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--case-border);
+}
+
+.case-erp-drawer__section:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.case-erp-drawer__section-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #334155;
+}
+
+.case-erp-drawer__section-title--critical {
+  color: var(--case-critical);
+}
+
+.case-erp-drawer__section-title--collection {
+  color: #c2410c;
+}
+
+.case-erp-drawer__section-title--ssh {
+  color: #7c3aed;
+}
+
+.case-erp-drawer__section-title--success {
+  color: var(--case-success);
+}
+
+.case-erp-drawer__kv {
+  margin: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.case-erp-drawer__kv-row {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.4rem;
+  font-size: 0.76rem;
+}
+
+.case-erp-drawer__kv-row dt {
+  margin: 0;
+  font-weight: 700;
+  color: var(--case-muted);
+}
+
+.case-erp-drawer__kv-row dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--case-ink);
+  word-break: break-word;
+}
+
+.case-erp-drawer__timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.case-erp-drawer__timeline-item {
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--case-border);
+}
+
+.case-erp-drawer__timeline-msg {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--case-ink);
+}
+
+.case-erp-drawer__timeline-meta {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.68rem;
+  color: var(--case-muted);
+}
+
+.case-erp-drawer__empty {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--case-muted);
+}
+
+.case-erp-drawer__alert {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: var(--case-critical);
+}
+
+.case-erp-drawer__loading {
+  padding: 1.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--case-muted);
+}

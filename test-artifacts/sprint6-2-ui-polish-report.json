@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-08-02T16:52:25.425Z",
+  "metrics": {
+    "uiScore": 94.69,
+    "premiumFeelScore": 100,
+    "appleGuidelineScore": 100,
+    "touchQuality": 83,
+    "spacingQuality": 100,
+    "typographyQuality": 100
+  },
+  "checks": {
+    "firstActionStartSec": 1.43,
+    "actionCardRadiusPx": 20,
+    "actionCardPaddingPx": 18,
+    "actionCardGapPx": 14,
+    "actionTitleRem": 1.28,
+    "actionSubtitleRem": 0.875,
+    "badgeRem": 0.78,
+    "navActiveStrong": true,
+    "navPassiveSoft": true,
+    "navIconSoft": true,
+    "motionMs": {
+      "fast": 150,
+      "base": 180,
+      "slow": 200
+    },
+    "motionInRange150to200": true,
+    "minTouch44Count": 11,
+    "emptyStateHasIcon": true,
+    "emptyStateHasPrimaryAction44": true
+  }
+}

@@ -1,0 +1,326 @@
+/* Sipariş paneli — Ödemeler sekmesi (ERP V1 tablo) */
+
+.oop-payments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.oop-payments__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.oop-payments__head .oop-payments__summary {
+  flex: 1 1 28rem;
+  min-width: 0;
+}
+
+.oop-payments__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.oop-payments__btn {
+  min-height: 1.85rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.oop-payments__btn:hover:not(:disabled) {
+  background: #f4f6f9;
+}
+
+.oop-payments__btn--primary {
+  background: #334155;
+  border-color: #334155;
+  color: #fff;
+}
+
+.oop-payments__btn--primary:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.oop-payments__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.oop-payments .mos-erp-summary {
+  border-radius: 6px;
+}
+
+/* Özet şeridi — metrik renkleri */
+.oop-payments [data-metric-id='total'] .mos-erp-summary__value {
+  color: #334155;
+}
+
+.oop-payments [data-metric-id='collected'] .mos-erp-summary__label,
+.oop-payments [data-metric-id='collected'] .mos-erp-summary__value {
+  color: #15803d;
+}
+
+.oop-payments [data-metric-id='remaining'] .mos-erp-summary__label,
+.oop-payments [data-metric-id='remaining'] .mos-erp-summary__value {
+  color: #b42318;
+}
+
+.oop-payments [data-metric-id='rate'] .mos-erp-summary__label,
+.oop-payments [data-metric-id='rate'] .mos-erp-summary__value {
+  color: #c2410c;
+}
+
+.oop-payments [data-metric-id='last'] .mos-erp-summary__value {
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.oop-payments__summary--green [data-metric-id='status'] .mos-erp-summary__label,
+.oop-payments__summary--green [data-metric-id='status'] .mos-erp-summary__value {
+  color: #15803d;
+}
+
+.oop-payments__summary--orange [data-metric-id='status'] .mos-erp-summary__label,
+.oop-payments__summary--orange [data-metric-id='status'] .mos-erp-summary__value {
+  color: #c2410c;
+}
+
+.oop-payments__summary--red [data-metric-id='status'] .mos-erp-summary__label,
+.oop-payments__summary--red [data-metric-id='status'] .mos-erp-summary__value {
+  color: #b42318;
+}
+
+.oop-payments__summary--purple [data-metric-id='status'] .mos-erp-summary__label,
+.oop-payments__summary--purple [data-metric-id='status'] .mos-erp-summary__value {
+  color: #7c3aed;
+}
+
+.oop-payments__alert {
+  margin: 0;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  background: #fffbeb;
+  font-size: 0.78rem;
+  color: #92400e;
+}
+
+.oop-payments__readonly {
+  margin: 0;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.oop-payments__table-panel {
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.oop-payments .mos-erp-tbl-wrap {
+  max-height: min(52vh, 28rem);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.oop-payments-row--alt td {
+  background: #fafbfc;
+}
+
+.oop-payments-row:hover td {
+  background: #f4f7fa !important;
+}
+
+.oop-payments__amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.oop-payments__amount--credit {
+  color: #15803d;
+}
+
+.oop-payments__amount--debit {
+  color: #7c3aed;
+}
+
+.oop-payments__desc {
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #334155;
+}
+
+.oop-payments__actor {
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.oop-payments__status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  border: 1px solid #cfd6df;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.oop-payments__status--posted {
+  color: #166534;
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.oop-payments__status--pending {
+  color: #c2410c;
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.oop-payments__status--failed {
+  color: #b42318;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.oop-payments__status--cancelled {
+  color: #64748b;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.oop-payments__footer td {
+  font-weight: 700;
+  background: #f8fafc !important;
+  border-top: 2px solid #cfd6df;
+}
+
+.oop-payments__no-op {
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.oop-payments__meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Ödeme kayıt modalı */
+.oop-pay-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.oop-pay-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+}
+
+.oop-pay-modal {
+  position: relative;
+  z-index: 1;
+  width: min(28rem, 100%);
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+}
+
+.oop-pay-field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.mos-label.is-invalid .mos-input,
+.mos-label.is-invalid .mos-select {
+  border-color: #f87171;
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.35);
+}
+
+@media (max-width: 1024px) {
+  .oop-payments .mos-erp-summary--cols-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .oop-payments .mos-erp-tbl-wrap {
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .oop-payments__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .oop-payments .mos-erp-summary--cols-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oop-payments__actions {
+    justify-content: stretch;
+  }
+
+  .oop-payments__btn {
+    flex: 1;
+  }
+}
+
+.oop-payments__row-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.oop-payments__alert--error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.oop-payments-row--age-warning td {
+  background: #fffbeb !important;
+}
+
+.oop-payments-row--age-critical td {
+  background: #fef2f2 !important;
+}
+
+.mos-payment-approval-banner {
+  border-color: #fbbf24;
+  background: #fffbeb;
+}

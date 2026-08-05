@@ -1,0 +1,158 @@
+.mos-pilot-ready {
+  max-width: 880px;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.mos-pilot-ready__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.mos-pilot-ready__sub {
+  margin: 0 0 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.mos-pilot-ready__verdict {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.mos-pilot-ready__verdict.is-ready {
+  color: #15803d;
+}
+
+.mos-pilot-ready__verdict.is-not-ready {
+  color: #b45309;
+}
+
+.mos-pilot-ready__list {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mos-pilot-ready__item {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  border-left-width: 4px;
+  background: #fff;
+}
+
+.mos-pilot-ready__item.is-pass {
+  border-left-color: #16a34a;
+}
+
+.mos-pilot-ready__item.is-warning {
+  border-left-color: #d97706;
+}
+
+.mos-pilot-ready__item.is-fail {
+  border-left-color: #dc2626;
+}
+
+.mos-pilot-ready__item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mos-pilot-ready__status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mos-pilot-ready__detail {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+.mos-exec-health {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 900px) {
+  .mos-exec-health {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mos-exec-health__item {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.mos-exec-health__item.is-success {
+  border-color: #86efac;
+}
+
+.mos-exec-health__item.is-warning {
+  border-color: #fcd34d;
+}
+
+.mos-exec-health__item.is-critical {
+  border-color: #fca5a5;
+}
+
+.mos-exec-health__label {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mos-exec-health__detail {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.mos-exec-daily {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.mos-exec-daily__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.mos-exec-daily__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .mos-exec-daily__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.mos-exec-daily__item {
+  font-size: 0.85rem;
+}
+
+.mos-exec-daily__item strong {
+  display: block;
+  font-size: 1.15rem;
+}

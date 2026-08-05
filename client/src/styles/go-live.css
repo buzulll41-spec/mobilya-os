@@ -1,0 +1,192 @@
+.mos-go-live {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.mos-go-live__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mos-go-live__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.mos-go-live__sub {
+  margin: 0.35rem 0 0;
+  color: var(--mos-text-muted, #64748b);
+  font-size: 0.9rem;
+}
+
+.mos-go-live__score-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--mos-surface-2, #f8fafc);
+  border: 1px solid var(--mos-border, #e2e8f0);
+}
+
+.mos-go-live__score-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mos-go-live__score-label {
+  font-size: 0.75rem;
+  color: var(--mos-text-muted, #64748b);
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.mos-go-live__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .mos-go-live__grid {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+}
+
+.mos-go-live__panel {
+  border: 1px solid var(--mos-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  background: var(--mos-surface, #fff);
+}
+
+.mos-go-live__panel-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mos-go-live__checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mos-go-live__check {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--mos-border, #f1f5f9);
+}
+
+.mos-go-live__check:last-child {
+  border-bottom: none;
+}
+
+.mos-go-live__check-box {
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.mos-go-live__check-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mos-go-live__check-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.mos-go-live__check-detail {
+  font-size: 0.78rem;
+  color: var(--mos-text-muted, #64748b);
+  margin-top: 0.15rem;
+}
+
+.mos-go-live__check.is-pass .mos-go-live__check-box {
+  color: #16a34a;
+}
+
+.mos-go-live__check.is-warn .mos-go-live__check-box {
+  color: #ca8a04;
+}
+
+.mos-go-live__check.is-fail .mos-go-live__check-box {
+  color: #dc2626;
+}
+
+.mos-go-live__verdict {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.mos-go-live__verdict.is-ready {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.mos-go-live__verdict.is-blocked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.mos-go-live__mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mos-go-live__mode-btn {
+  font-size: 0.78rem;
+}
+
+.mos-go-live__mode-btn.is-active {
+  font-weight: 700;
+}
+
+.mos-go-live__perf-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+}
+
+.mos-go-live__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mos-go-live__dim-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mos-go-live__dim {
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: var(--mos-surface-2, #f8fafc);
+  font-size: 0.78rem;
+}
+
+.mos-go-live__dim strong {
+  display: block;
+  font-size: 1rem;
+}

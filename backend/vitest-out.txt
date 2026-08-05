@@ -1,0 +1,20 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...version of npm.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v3.2.4 C:/Users/Monster/Desktop/mobilya-os/backend
+
+ Ô£ô tests/productsSeed.integration.test.ts (3 tests) 1821ms
+   Ô£ô demo product catalog seed > seedDemoCatalog idempotent ÔÇö ikinci ├ğal─▒┼şt─▒rmada duplicate olu┼şmaz  799ms
+   Ô£ô demo product catalog seed > GET /v1/products demo katalog d├Âner  403ms
+   Ô£ô demo product catalog seed > GET /v1/product-master demo master alanlar─▒ d├Âner  356ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  10:42:23
+   Duration  6.80s (transform 1.56s, setup 59ms, collect 4.52s, tests 1.82s, environment 0ms, prepare 175ms)
+

@@ -1,0 +1,30 @@
+-- Product Master Center alanları — products tablosuna geriye uyumlu ekleme
+ALTER TABLE "products" ADD COLUMN "barcode" TEXT;
+ALTER TABLE "products" ADD COLUMN "brand" TEXT;
+ALTER TABLE "products" ADD COLUMN "vatRate" DECIMAL(5,2);
+ALTER TABLE "products" ADD COLUMN "currency" TEXT NOT NULL DEFAULT 'TRY';
+ALTER TABLE "products" ADD COLUMN "publishStatus" TEXT NOT NULL DEFAULT 'PUBLISHED';
+ALTER TABLE "products" ADD COLUMN "webEnabled" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "products" ADD COLUMN "mobileEnabled" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "products" ADD COLUMN "marketplaceEnabled" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "products" ADD COLUMN "slug" TEXT;
+ALTER TABLE "products" ADD COLUMN "seoTitle" TEXT;
+ALTER TABLE "products" ADD COLUMN "seoDescription" TEXT;
+ALTER TABLE "products" ADD COLUMN "shortDescription" TEXT;
+ALTER TABLE "products" ADD COLUMN "longDescription" TEXT;
+ALTER TABLE "products" ADD COLUMN "widthCm" DECIMAL(10,2);
+ALTER TABLE "products" ADD COLUMN "depthCm" DECIMAL(10,2);
+ALTER TABLE "products" ADD COLUMN "heightCm" DECIMAL(10,2);
+ALTER TABLE "products" ADD COLUMN "bedSize" TEXT;
+ALTER TABLE "products" ADD COLUMN "tableSize" TEXT;
+ALTER TABLE "products" ADD COLUMN "material" TEXT;
+ALTER TABLE "products" ADD COLUMN "warrantyMonths" INTEGER;
+ALTER TABLE "products" ADD COLUMN "mainImageUrl" TEXT;
+ALTER TABLE "products" ADD COLUMN "galleryImageUrls" JSONB;
+ALTER TABLE "products" ADD COLUMN "videoUrl" TEXT;
+ALTER TABLE "products" ADD COLUMN "catalogPdfUrl" TEXT;
+ALTER TABLE "products" ADD COLUMN "productHealthScore" INTEGER;
+ALTER TABLE "products" ADD COLUMN "missingFields" JSONB;
+
+CREATE INDEX "products_publishStatus_idx" ON "products"("publishStatus");
+CREATE INDEX "products_slug_idx" ON "products"("slug");

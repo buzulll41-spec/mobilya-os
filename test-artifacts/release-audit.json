@@ -1,0 +1,104 @@
+{
+  "generatedAt": "2026-08-05T06:48:12.898Z",
+  "releaseTarget": "RC-1",
+  "readinessScore": 100,
+  "metrics": {
+    "Production Readiness": 100,
+    "Security": 100,
+    "Performance": 100,
+    "Accessibility": 100,
+    "Test Coverage": 100,
+    "Migration Status": 100,
+    "Docker Status": 100,
+    "Health Status": 100,
+    "API Status": 100,
+    "Offline Status": 100
+  },
+  "services": {
+    "required": [
+      "postgres",
+      "redis",
+      "backend",
+      "frontend",
+      "nginx",
+      "backup",
+      "monitor",
+      "worker",
+      "health"
+    ],
+    "healthy": [
+      "postgres",
+      "redis",
+      "backend",
+      "frontend",
+      "nginx",
+      "backup",
+      "monitor",
+      "worker",
+      "health"
+    ],
+    "missingHealthy": []
+  },
+  "smoke": {
+    "status": "ok",
+    "passCount": 9,
+    "total": 9,
+    "checks": {
+      "Login": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Dashboard": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Orders": {
+        "status": "PASS",
+        "detail": "S-1785912377732"
+      },
+      "Revision": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Cancel": {
+        "status": "PASS",
+        "detail": "S-1785912377789"
+      },
+      "Collections": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Shipments": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Delivery": {
+        "status": "PASS",
+        "detail": "S-1785912377907"
+      },
+      "Customers": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Service": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Notifications": {
+        "status": "PASS",
+        "detail": "ok"
+      },
+      "Logout": {
+        "status": "PASS",
+        "detail": "ok"
+      }
+    }
+  },
+  "api": {
+    "healthStatus": "ok",
+    "responseTimeMs": 8,
+    "cpuPercent": 0.1,
+    "memoryRssMb": 89.89
+  },
+  "gaps": []
+}

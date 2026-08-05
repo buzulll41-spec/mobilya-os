@@ -1,0 +1,12 @@
+{
+  "baseUrl": "http://127.0.0.1:5180",
+  "firstAction": {
+    "startFromHomeMs": 4371,
+    "clickToNavigationMs": 105,
+    "startFromHomeSec": 4.37,
+    "clickToNavigationSec": 0.1,
+    "landedHash": "#/mobile/orders?filter=today"
+  },
+  "screenshot": "test-artifacts/sprint6-1/home-action-first.png",
+  "timestamp": "2026-08-04T15:52:42.672Z"
+}

@@ -1,0 +1,543 @@
+/**
+ * FAZ 111 — Mobile & Tablet Test Edition / PWA responsive katmanı.
+ * Yeni ERP özelliği değil; mevcut ekranların mobil/tablet test uyumu.
+ */
+
+/* ——— Splash ——— */
+.mos-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #f5f6f8;
+  color: #1a1a2e;
+  transition: opacity 0.28s ease;
+}
+
+.mos-splash img {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.mos-splash p {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mos-splash--hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ——— Mobil alt tab bar ——— */
+.mos-mobile-tabbar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.98);
+  border-top: 1px solid var(--mos-line, #e2e6ed);
+  /* P2-11: fallback 0px — env() desteklemeyen tarayicida deklarasyon dusmez. */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -14px 32px rgba(15, 23, 42, 0.1);
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] {
+  --mos-mobile-tabbar-height: 72px;
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-mobile-tabbar {
+  display: block;
+  z-index: 70;
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(var(--mos-mobile-tabbar-height) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-shell-page-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+.mos-mobile-tabbar__list {
+  /* P2-9: 5 sabit sekme tam genislige esit yayilir; yatay scroll gerekmez.
+     (Onceki overflow-x:auto + flex:1 0 auto zaten --faz112 tarafindan eziliyordu;
+     taban artik efektif davranisla tutarli, latent yatay-scroll borcu kaldirildi.) */
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mos-mobile-tabbar__item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mos-mobile-tabbar__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  width: 100%;
+  min-height: 3.4rem;
+  min-width: 44px;
+  padding: 0.35rem 0.25rem;
+  border: none;
+  background: transparent;
+  color: #8a97a8;
+  font-size: 0.62rem;
+  font-weight: 640;
+  cursor: pointer;
+  transition: color 180ms cubic-bezier(0.22, 1, 0.36, 1), transform 180ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.9;
+}
+
+.mos-mobile-tabbar__btn[data-active='true'] {
+  color: #0f172a;
+  opacity: 1;
+}
+
+.mos-mobile-tabbar__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: #f2f5f9;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms cubic-bezier(0.22, 1, 0.36, 1), color 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mos-mobile-tabbar__btn[data-active='true'] .mos-mobile-tabbar__icon {
+  background: #0f172a;
+  color: #fff;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+}
+
+/* ——— PWA install prompt ——— */
+.mos-pwa-install {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #c4b5fd;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+}
+
+.mos-pwa-install__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.82rem;
+}
+
+.mos-pwa-install__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mos-pwa-install__btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mos-pwa-install__btn--primary {
+  border-color: #863bff;
+  background: #863bff;
+  color: #fff;
+}
+
+/* ——— Touch UX ——— */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-btn,
+  .mos-mobile-pwa .mos-erp-detail__action,
+  .mos-mobile-pwa .mos-erp-tbl-op,
+  .mos-mobile-pwa .coll-ops-tbl-op,
+  .mos-mobile-pwa .coll-ops-customer__btn,
+  .mos-mobile-pwa .mos-erp-ops__btn,
+  .mos-mobile-pwa .mos-menu-btn,
+  .mos-mobile-pwa a.mos-link-action {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .mos-mobile-pwa .mos-erp-detail__action--ghost,
+  .mos-mobile-pwa .mos-link-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid var(--mos-line, #e2e6ed);
+    background: var(--mos-surface, #fff);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+}
+
+/* ——— Phone: sidebar gizli, tab bar, kart tablolar ——— */
+@media (max-width: 767px) {
+  .mos-mobile-pwa,
+  .mos-mobile-pwa .mos-main,
+  .mos-mobile-pwa .mos-content,
+  .mos-mobile-pwa .mos-page {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .mos-mobile-pwa .mos-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .mos-mobile-pwa .mos-sidebar[data-open='true'] {
+    transform: translateX(0);
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar {
+    display: block;
+  }
+
+  .mos-mobile-pwa .mos-content {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl-wrap {
+    overflow-x: visible;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl thead,
+  .mos-mobile-pwa .coll-ops-tbl thead {
+    display: none;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody tr,
+  .mos-mobile-pwa .coll-ops-tbl tbody tr {
+    display: block;
+    margin-bottom: 0.55rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--mos-erp-border, #d5dce4);
+    border-radius: 10px;
+    background: var(--mos-erp-bg-surface, #fff);
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody td,
+  .mos-mobile-pwa .coll-ops-tbl tbody td {
+    display: block;
+    padding: 0.2rem 0;
+    border: none;
+    font-size: 0.78rem;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody td[data-label]::before,
+  .mos-mobile-pwa .coll-ops-tbl tbody td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    color: var(--mos-erp-muted, #64748b);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.1rem;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl .mos-erp-tbl-op,
+  .mos-mobile-pwa .coll-ops-tbl .coll-ops-tbl-op {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.35rem;
+  }
+
+  .mos-mobile-pwa .mos-erp-ops__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-mobile-pwa .mos-erp-filters {
+    max-height: 8rem;
+  }
+
+  .mos-mobile-pwa .coll-ops-center__workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-mobile-pwa .coll-ops-left {
+    max-height: 8rem;
+  }
+
+  /* Klavye açılınca native focus-scroll odaklanan alanı sticky topbar/offline banner
+     (üst) ve sticky save-bar + alt tab bar (alt) arkasında bırakmasın. scroll-margin
+     yalnızca scrollIntoView davranışını etkiler; layout/logic değişmez. */
+  .mos-mobile-pwa input,
+  .mos-mobile-pwa select,
+  .mos-mobile-pwa textarea,
+  .mos-mobile-pwa .mos-input,
+  .mos-mobile-pwa .cc-v2-input {
+    scroll-margin-top: 4.75rem;
+    scroll-margin-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa[data-mobile-shell='true'] .mos-mobile-tabbar {
+    display: block;
+  }
+
+  .mos-mobile-pwa[data-mobile-shell='true'] .mos-content {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-bottom: calc(var(--mos-mobile-tabbar-height) + env(safe-area-inset-bottom, 0px) + 20px);
+  }
+}
+
+/* ——— P2-10 Tablet gorunumu: store-home / hizli islem konfor yuksekligi ———
+   Tablet (768-1024) dashboard kart ve hizli islem butonlari daha dengeli yukseklik
+   alir; dokunma konforu artar. Telefon/desktop degismez; grid/logic degismez. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-mobile-store-home__card {
+    min-height: 8.5rem;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-mobile-quick-actions__btn {
+    min-height: 5.25rem;
+  }
+}
+
+/* ——— Tablet: iki kolon liste + detay ——— */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops--orders .mos-erp-detail,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops .mos-erp-detail,
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center--store-tablet .coll-ops-customer {
+    display: flex !important;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__workspace {
+    grid-template-columns: 10rem minmax(0, 1fr);
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__main {
+    display: grid;
+    grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0.4rem;
+    align-items: stretch;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__table-panel {
+    order: 1;
+    min-height: 0;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-detail,
+  .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops__main > .mos-erp-detail {
+    order: 2;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__workspace {
+    grid-template-columns: 9.5rem minmax(0, 1fr) !important;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__main {
+    display: grid;
+    grid-template-columns: minmax(0, 45%) minmax(0, 55%);
+    gap: 0.4rem;
+    min-height: 0;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center__table-panel {
+    order: 1;
+    min-height: 0;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .coll-ops-customer {
+    order: 2;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .mos-mobile-pwa.mos-viewport-tablet .mos-supply-incoming .mos-erp-ops__main {
+    display: grid;
+    grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+    gap: 0.4rem;
+  }
+}
+
+/* ——— 13" laptop ——— */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .mos-mobile-pwa .mos-content {
+    max-width: 1240px;
+  }
+}
+
+/* ——— P0-4 Touch target ≥44px: mevcut kurallarda kapsanmayan tiklanabilir alanlar ———
+   Touch cihaz genisligi (max-width:1024) esas alinir — bu dosyadaki mevcut touch
+   kurali (satir 250) ile ayni konvansiyon. Desktop (>1024) etkilenmez;
+   layout/logic/API degismez, yalnizca min boyut buyutulur. */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-icon-btn,
+  .mos-mobile-pwa .mos-quick-action-btn,
+  .mos-mobile-pwa .mos-sidebar-close,
+  .mos-mobile-pwa .mos-nav-item,
+  .mos-mobile-pwa .coll-ops-left__btn,
+  .mos-mobile-pwa .mos-erp-filters__btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ——— P2-12 Scroll davranislari (touch): ic panel momentum + zincirleme engeli ———
+   Ic scroll panellerinde iOS momentum scroll ve overscroll zincirleme engeli;
+   panel scroll'u sayfayi/pull-to-refresh'i kazara tetiklemez. Yalnizca scroll
+   hissi; layout/logic/API degismez. */
+@media (max-width: 1024px) {
+  .mos-mobile-pwa .mos-erp-filters,
+  .mos-mobile-pwa .coll-ops-left,
+  .mos-mobile-pwa .mos-erp-detail,
+  .mos-mobile-pwa .coll-ops-customer,
+  .mos-mobile-pwa .mos-erp-tbl-wrap,
+  .mos-mobile-pwa .coll-ops-tbl-wrap {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* ——— Offline banner PWA ——— */
+.mos-offline-banner--pwa {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+}
+
+.mos-offline-banner--pwa strong {
+  font-weight: 700;
+}
+
+/* ——— P1-5 Bottom navigation: aktif durum netligi + esit yerlesim (telefon) ———
+   Alt tab bar yalnizca telefonda (≤767) gorunur. Yeni sekme/route eklenmez;
+   yalnizca gorsel netlik ve dokunma konforu artirilir. Logic/API degismez. */
+@media (max-width: 767px) {
+  /* 5 sekme tam genislige esit yayilir; kazara yatay scroll olmaz. */
+  .mos-mobile-pwa .mos-mobile-tabbar__list {
+    overflow-x: visible;
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn {
+    position: relative;
+  }
+
+  /* Aktif sekme: ust aksan cizgisi + kalin etiket + ikon tint. */
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true'] {
+    font-weight: 700;
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true']::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 3px;
+    border-radius: 999px;
+    background: #0f172a;
+    transition: width 180ms ease;
+  }
+
+  .mos-mobile-pwa .mos-mobile-tabbar__btn[data-active='true'] .mos-mobile-tabbar__icon {
+    background: #0f172a;
+    color: #fff;
+  }
+}
+
+/* ——— P1-6 FAB yerlesimi: tab bar ustunde net konum + safe-area + erisilebilir odak ———
+   FAB yalnizca telefonda gorunur. Sayfa eslemesi/aksiyon degismez; yalnizca konum
+   ve odak gorunurlugu iyilestirilir. */
+@media (max-width: 767px) {
+  .mos-mobile-pwa .mos-mobile-fab {
+    /* Tab bar (~3.5rem) uzerinde net bosluk; cihaz safe-area'si dahil. */
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mos-mobile-pwa .mos-mobile-fab:focus-visible {
+    outline: 3px solid #c4b5fd;
+    outline-offset: 2px;
+  }
+
+  /* '+' glyph optik ortalama. */
+  .mos-mobile-pwa .mos-mobile-fab__icon {
+    margin-top: -1px;
+  }
+}
+
+/* ——— P1-7 Font okunabilirligi (telefon): kartlasmis tablo icerigi ———
+   Telefonda (<=767) yigilmis kart satirlarindaki degerler ve alan etiketleri
+   okunabilir tabana yukseltilir. Kartlar bloklu oldugundan tasma olmaz.
+   Desktop tablo gorunumu (>767) degismez. */
+@media (max-width: 767px) {
+  .mos-mobile-pwa .mos-erp-tbl tbody td,
+  .mos-mobile-pwa .coll-ops-tbl tbody td {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody td[data-label]::before,
+  .mos-mobile-pwa .coll-ops-tbl tbody td[data-label]::before {
+    font-size: 0.7rem;
+  }
+}
+
+/* ——— P1-8 Kart spacing (telefon): kartlasmis satir nefes alani + ayrim ———
+   Telefonda (<=767) yigilmis kart satirlarinin ic bosluğu ve satirlar arasi
+   ayrimi artirilir. Desktop tablo (>767) degismez; grid/logic degismez. */
+@media (max-width: 767px) {
+  .mos-mobile-pwa .mos-erp-tbl tbody tr,
+  .mos-mobile-pwa .coll-ops-tbl tbody tr {
+    padding: 0.75rem 0.85rem;
+    margin-bottom: 0.65rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .mos-mobile-pwa .mos-erp-tbl tbody td,
+  .mos-mobile-pwa .coll-ops-tbl tbody td {
+    padding: 0.25rem 0;
+  }
+}

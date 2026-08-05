@@ -1,0 +1,34 @@
+{
+  // MOBILYA OS — Cursor terminal allowlist (repo)
+  // Docs: https://cursor.com/docs/reference/permissions
+  //
+  // Gereksinim: Cursor Settings → Agents → Run Mode = "Allowlist" veya "Allowlist (with Sandbox)"
+  // "Auto-Run in Sandbox" / "Run Everything" seçilirse allowlist devre dışı kalabilir.
+  //
+  // Eşleşme: tam komut string'inin PREFIX'i (case-sensitive).
+  // PowerShell zinciri (Set-Location ...; npm test) genelde onay ister — gerekirse UI'dan ekle.
+
+  "terminalAllowlist": [
+    "npm test",
+    "npm run test",
+    "npm run build",
+    "npm run dev",
+    "npx vitest run",
+    "npx prisma generate",
+    "npx prisma migrate deploy",
+    "npm run db:migrate",
+    "npm run db:generate"
+  ],
+
+  "autoRun": {
+    "allow_instructions": [
+      "Read-only test and build commands in client/ or backend/: npm test, npm run build, npm run dev, npx vitest run, npx prisma generate, npx prisma migrate deploy."
+    ],
+    "block_instructions": [
+      "Always require approval before destructive or production-impacting commands: npm run db:reset-demo, prisma migrate reset, database seed/reset, rm, del, rmdir, Remove-Item, git push, git push --force, DROP TABLE, or any command that deletes data or pushes to remote.",
+      "Require approval for npx prisma migrate reset, prisma db push --force-reset, and any prisma command that resets or wipes the database.",
+      "Require approval before git push, force push, or rewriting remote history.",
+      "Require approval before recursive delete: rm -rf, del /s, rmdir /s, Remove-Item -Recurse."
+    ]
+  }
+}

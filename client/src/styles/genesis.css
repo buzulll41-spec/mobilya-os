@@ -1,0 +1,161 @@
+.mos-erp-cockpit-section.genesis-living,
+.mos-erp-cockpit-section.genesis-score,
+.mos-erp-cockpit-section.genesis-predictions,
+.mos-erp-cockpit-section.genesis-board,
+.mos-erp-cockpit-section.genesis-chat {
+  margin-bottom: 1rem;
+}
+
+.genesis-living__pulse {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(90deg, #eff6ff, #f0fdf4);
+}
+
+.genesis-living__pulse.is-breathing {
+  animation: genesis-breathe 2s ease-in-out infinite;
+}
+
+@keyframes genesis-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.01);
+  }
+}
+
+.genesis-living__phase {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+.genesis-living__meta {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.genesis-score__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.genesis-score__item {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.genesis-score__item dt {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.genesis-score__item dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.genesis-predictions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.genesis-predictions__item {
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+
+.genesis-predictions__item--yüksek,
+.genesis-predictions__item--high {
+  border-color: #fca5a5;
+}
+
+.genesis-board__summary {
+  margin: 0 0 0.65rem;
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+.genesis-board__transcript {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  color: #334155;
+}
+
+.genesis-chat__thread {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.genesis-chat__msg {
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.genesis-chat__msg--ceo {
+  background: #eff6ff;
+  align-self: flex-end;
+  max-width: 85%;
+}
+
+.genesis-chat__msg--genesis {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  max-width: 90%;
+}
+
+.genesis-chat__role {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.genesis-chat__composer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.genesis-chat__input {
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+
+@media (max-width: 960px) {
+  .genesis-score__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

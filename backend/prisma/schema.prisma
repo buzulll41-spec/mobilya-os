@@ -1,0 +1,816 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Wire id — demo’da S-… formatı (frontend ile uyum)
+model SalesOrder {
+  id               String   @id
+  customerName     String
+  customerPhone    String?
+  productSummary   String
+  displayStatus    String
+  currency         String   @default("TRY")
+  subtotalAmount   Decimal  @default(0) @db.Decimal(14, 2)
+  discountAmount   Decimal  @default(0) @db.Decimal(14, 2)
+  discountType     String?
+  discountPercent  Decimal? @db.Decimal(5, 2)
+  discountFixedAmount Decimal? @db.Decimal(14, 2)
+  discountNote     String?
+  totalAmount      Decimal  @db.Decimal(14, 2)
+  paidAmount       Decimal  @db.Decimal(14, 2) @default(0)
+  remainingAmount  Decimal  @default(0) @db.Decimal(14, 2)
+  isFullyPaid      Boolean  @default(false)
+  orderDate        DateTime @db.Date
+  dueDate          DateTime? @db.Date
+  shipmentDate     DateTime? @db.Date
+  salesPerson      String?
+  lineCostAmount   Decimal? @db.Decimal(14, 2)
+  notes            String?
+  version          Int      @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  lines            OrderLine[]
+  payments         PaymentTransaction[]
+  shipments        Shipment[]
+  shipmentPlans    ShipmentPlan[]
+  missingItems     OrderMissingItem[]
+
+  @@map("sales_orders")
+}
+
+model OrderLine {
+  id                    String   @id @default(uuid())
+  salesOrderId          String
+  salesOrder            SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  productId             String?
+  product               Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  title                 String
+  productTitleSnapshot  String?
+  productGroupSnapshot  String?
+  unitPrice             Decimal? @db.Decimal(14, 2)
+  lineTotal             Decimal? @db.Decimal(14, 2)
+  qtyOrdered            Decimal  @db.Decimal(14, 2)
+  qtyReceived           Decimal  @default(0) @db.Decimal(14, 2)
+  supplierId            String?
+  supplier              Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  supplierNameSnapshot  String?
+  configuration         Json?
+  configurationSummary  Json?
+  soldSalesSourceType    String?
+  soldDisplayFloor       String?
+  soldExternalSupplyType String?
+  soldUnitCost           Decimal? @db.Decimal(14, 2)
+  soldWholesalePrice     Decimal? @db.Decimal(14, 2)
+  soldWholesaleDiscountRate Decimal? @db.Decimal(5, 2)
+  /// Tedarik emri: NOT_SENT | SENT
+  supplyStatus           String   @default("NOT_SENT")
+  /// MAIL | WHATSAPP
+  supplyChannel          String?
+  supplySentAt           DateTime?
+  supplySentByUserId     String?
+  supplySentByName       String?
+  /// Depo girişi: NOT_SENT | WAITING | ARRIVED | PARTIAL_ARRIVED
+  warehouseEntryStatus   String   @default("NOT_SENT")
+  /// Kullanıcı onayı ile sevke hazır işareti (depo Geldi sonrası ayrı adım)
+  shipmentReady          Boolean  @default(false)
+
+  shipmentLines   ShipmentLine[]
+  missingItems    OrderMissingItem[]
+  incomingGoods   IncomingGoodsRecord[]
+
+  @@index([salesOrderId])
+  @@index([productId])
+  @@index([supplierId])
+  @@index([soldSalesSourceType])
+  @@map("order_lines")
+}
+
+/// Ürün kartı master (v1 — katalog + varyantlar)
+model Product {
+  id                String   @id @default(uuid())
+  productCode       String   @unique
+  productName       String
+  category          String
+  suiteType         String?
+  defaultSalePrice  Decimal  @db.Decimal(14, 2)
+  minSalePrice      Decimal  @db.Decimal(14, 2)
+  wholesalePrice    Decimal  @default(0) @db.Decimal(14, 2)
+  wholesaleDiscountRate Decimal @default(0) @db.Decimal(5, 2)
+  purchasePrice     Decimal  @db.Decimal(14, 2)
+  defaultSupplierId String?
+  defaultSupplier   Supplier? @relation(fields: [defaultSupplierId], references: [id], onDelete: SetNull)
+  deliveryDays      Int      @default(14)
+  isActive          Boolean  @default(true)
+  stockType         String
+  description       String?
+  salesSourceType    String?
+  displayFloor       String?
+  externalSupplyType String?
+  physicalLocation   String?
+  /// Product Master Center — ek alanlar (ürün kartı API ile geriye uyumlu)
+  barcode            String?
+  brand              String?
+  vatRate            Decimal? @db.Decimal(5, 2)
+  currency           String   @default("TRY")
+  publishStatus      String   @default("PUBLISHED")
+  webEnabled         Boolean  @default(true)
+  mobileEnabled      Boolean  @default(true)
+  marketplaceEnabled Boolean  @default(false)
+  slug               String?
+  seoTitle           String?
+  seoDescription     String?
+  shortDescription   String?
+  longDescription    String?
+  widthCm            Decimal? @db.Decimal(10, 2)
+  depthCm            Decimal? @db.Decimal(10, 2)
+  heightCm           Decimal? @db.Decimal(10, 2)
+  bedSize            String?
+  tableSize          String?
+  material           String?
+  warrantyMonths     Int?
+  mainImageUrl       String?
+  galleryImageUrls   Json?
+  videoUrl           String?
+  catalogPdfUrl      String?
+  productHealthScore Int?
+  missingFields      Json?
+  /// FAZ 3 — WooCommerce sync omurgası (gerçek API sonraki faz)
+  wooProductId       Int?
+  wooStatus          String   @default("NOT_READY")
+  wooLastSyncAt      DateTime?
+  wooLastError       String?
+  wooSyncRequired    Boolean  @default(false)
+  wooCategoryId      Int?
+  /// Faz A — SSOT çekirdek (mobilya / e-ticaret omurgası)
+  productType        String   @default("SIMPLE")
+  collectionCode     String?
+  seasonCode         String?
+  weightKg           Decimal? @db.Decimal(10, 2)
+  packageWidthCm     Decimal? @db.Decimal(10, 2)
+  packageDepthCm     Decimal? @db.Decimal(10, 2)
+  packageHeightCm    Decimal? @db.Decimal(10, 2)
+  packageCount       Int?
+  assemblyType       String?
+  coating            String?
+  mechanism          String?
+  technicalAttributes Json?
+  colorOptions       Json?
+  fabricOptions      Json?
+  tags               Json?
+  relatedProductIds  Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  orderLines     OrderLine[]
+  incomingGoods  IncomingGoodsRecord[]
+  variants       ProductVariant[]
+  mediaLinks     ProductMediaLink[]
+
+  @@index([productName])
+  @@index([category])
+  @@index([isActive])
+  @@index([defaultSupplierId])
+  @@index([salesSourceType])
+  @@index([wooStatus])
+  @@map("products")
+}
+
+/// Ürün varyantı — renk, kumaş, ölçü, SKU, barkod
+model ProductVariant {
+  id            String   @id @default(uuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantCode   String   @unique
+  barcode       String?  @unique
+  name          String
+  attributes    Json?
+  priceDelta    Decimal? @db.Decimal(14, 2)
+  costDelta     Decimal? @db.Decimal(14, 2)
+  salePrice     Decimal? @db.Decimal(14, 2)
+  purchasePrice Decimal? @db.Decimal(14, 2)
+  stockQuantity Int?
+  stockStatus   String?
+  widthCm       Decimal? @db.Decimal(10, 2)
+  depthCm       Decimal? @db.Decimal(10, 2)
+  heightCm      Decimal? @db.Decimal(10, 2)
+  color         String?
+  fabric        String?
+  sizeLabel     String?
+  isDefault     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  wooVariationId Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+/// Eksik ürün / parça operasyon kaydı (Slice 2 — persisted workflow)
+model OrderMissingItem {
+  id           String    @id @default(uuid())
+  orderId      String
+  salesOrder   SalesOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  lineId       String?
+  orderLine    OrderLine? @relation(fields: [lineId], references: [id], onDelete: SetNull)
+  title        String
+  quantity     Decimal   @db.Decimal(14, 2)
+  reason       String
+  status       String
+  supplierNote String?
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+
+  @@index([orderId])
+  @@index([orderId, status])
+  @@map("order_missing_items")
+}
+
+model PaymentTransaction {
+  id           String   @id @default(uuid())
+  salesOrderId String
+  salesOrder   SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  kind         String
+  status       String
+  amount       Decimal  @db.Decimal(14, 2)
+  currency     String   @default("TRY")
+  occurredAt   DateTime
+  mailOrderSupplierId String?
+  mailOrderSupplierNameSnapshot String?
+  mailOrderSupplier Supplier? @relation(fields: [mailOrderSupplierId], references: [id], onDelete: SetNull)
+
+  /// Enterprise 2.2 — Saha operasyonu tahsilat köprüsü (referans; tahsilat SSOT burada kalır)
+  fieldOperationLinks FieldOperationPaymentLink[]
+
+  @@index([salesOrderId])
+  @@index([mailOrderSupplierId])
+  @@map("payment_transactions")
+}
+
+model Shipment {
+  id               String   @id @default(uuid())
+  salesOrderId     String
+  salesOrder       SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  status           String
+  plannedShipDate  DateTime? @db.Date
+  crewName         String?
+  vehicleNote      String?
+  note             String?
+
+  lines ShipmentLine[]
+
+  @@index([salesOrderId])
+  @@map("shipments")
+}
+
+model ShipmentLine {
+  id          String    @id @default(uuid())
+  shipmentId String
+  shipment    Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  orderLineId String
+  orderLine   OrderLine @relation(fields: [orderLineId], references: [id], onDelete: Cascade)
+  qty         Decimal   @db.Decimal(14, 2)
+
+  @@index([shipmentId])
+  @@map("shipment_lines")
+}
+
+/// Operasyonel sevk planı (Sevk Ops takvimi)
+model ShipmentPlan {
+  id             String   @id @default(uuid())
+  salesOrderId   String   @unique
+  salesOrder     SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  plannedDate    DateTime @db.Date
+  plannedTime    String?
+  region         String?
+  vehicleName    String?
+  crewPrimary    String?
+  crewSecondary  String?
+  note           String?
+  status         String   @default("PLANNED")
+  groupId        String?
+  group          ShipmentGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([plannedDate])
+  @@index([groupId])
+  @@map("shipment_plans")
+}
+
+/// Bölgesel sevk grubu (optimizasyon)
+model ShipmentGroup {
+  id              String   @id @default(uuid())
+  groupNo         String   @unique
+  region          String
+  plannedDate     DateTime @db.Date
+  vehicleName     String?
+  crewPrimary     String?
+  crewSecondary   String?
+  estimatedSaving Decimal  @db.Decimal(14, 2)
+  totalOrders     Int
+  totalAmount     Decimal  @db.Decimal(14, 2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  plans ShipmentPlan[]
+
+  @@index([plannedDate])
+  @@map("shipment_groups")
+}
+
+model DomainEvent {
+  id                   String   @id @default(uuid())
+  type                 String
+  aggregateType        String
+  aggregateId          String
+  occurredAt           DateTime
+  correlationId        String
+  payloadSchemaVersion String   @default("1")
+  payload              Json
+
+  @@index([aggregateId, occurredAt])
+  @@map("domain_events")
+}
+
+/// Mağaza kullanıcısı (auth foundation)
+model User {
+  id           String   @id @default(uuid())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  role         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  taskStates   TaskState[]
+
+  @@index([role, isActive])
+  @@map("users")
+}
+
+/// Görev projection overlay — kullanıcı bazlı
+model TaskState {
+  id           String    @id @default(uuid())
+  dedupeKey    String
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state        String
+  snoozedUntil DateTime?
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, state])
+  @@map("task_states")
+}
+
+/// Tedarikçi kartı (Dilim A — cari omurga)
+model Supplier {
+  id          String   @id @default(uuid())
+  code        String?
+  companyName String
+  contactName String?
+  phone       String?
+  iban        String?
+  taxNumber   String?
+  taxOffice   String?
+  address     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ledgerEntries    SupplierLedgerEntry[]
+  incomingGoods    IncomingGoodsRecord[]
+  catalogProducts  Product[]
+  orderLines       OrderLine[]
+  mailOrderPayments PaymentTransaction[]
+
+  @@index([companyName])
+  @@index([isActive])
+  @@map("suppliers")
+}
+
+/// Tedarikçi cari hareket — borç = SUM(credit) - SUM(debit)
+model SupplierLedgerEntry {
+  id          String   @id @default(uuid())
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  entryType   String
+  occurredAt  DateTime @db.Date
+  description String
+  debitAmount  Decimal @default(0) @db.Decimal(14, 2)
+  creditAmount Decimal @default(0) @db.Decimal(14, 2)
+  balanceAfter Decimal @db.Decimal(14, 2)
+  currency    String   @default("TRY")
+  paymentMethod String?
+  documentNo  String?
+  paymentTransactionId String? @unique
+  salesOrderId String?
+  customerNameSnapshot String?
+  productTitleSnapshot String?
+  dueAt       DateTime? @db.Date
+  source      String?
+  status      String   @default("APPROVED")
+  reversesEntryId String?
+  incomingGoodsRecordId String? @unique
+  incomingGoodsRecord   IncomingGoodsRecord? @relation(fields: [incomingGoodsRecordId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@index([supplierId, occurredAt])
+  @@index([supplierId, createdAt])
+  @@index([supplierId, status])
+  @@index([salesOrderId])
+  @@map("supplier_ledger_entries")
+}
+
+/// Gelen ürün kaydı (Dilim B)
+model IncomingGoodsRecord {
+  id               String    @id @default(uuid())
+  supplierId       String
+  supplier         Supplier  @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  receivedAt       DateTime  @db.Date
+  productId        String?
+  product          Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productTitle     String
+  productGroup     String?
+  qty              Decimal   @db.Decimal(14, 2)
+  unitPurchasePrice Decimal  @db.Decimal(14, 2)
+  lineTotal        Decimal   @db.Decimal(14, 2)
+  currency         String    @default("TRY")
+  purpose          String
+  orderLineId      String?
+  orderLine        OrderLine? @relation(fields: [orderLineId], references: [id], onDelete: SetNull)
+  salesOrderId     String?
+  invoiceNo        String?
+  documentNo       String?
+  note             String?
+  createdAt        DateTime  @default(now())
+
+  ledgerEntry SupplierLedgerEntry?
+
+  @@index([supplierId, receivedAt])
+  @@index([receivedAt])
+  @@index([purpose])
+  @@index([orderLineId])
+  @@index([salesOrderId])
+  @@index([productId])
+  @@map("incoming_goods_records")
+}
+
+/// Kurumsal medya varlığı (FAZ 2 — Media Merkezi omurgası)
+model MediaAsset {
+  id              String   @id @default(uuid())
+  fileName        String
+  mimeType        String
+  fileSize        Int
+  storageProvider String   @default("LOCAL")
+  storageKey      String
+  cdnUrl          String
+  thumbnailUrl    String?
+  uploadedBy      String?
+  uploadedAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  productLinks ProductMediaLink[]
+
+  @@index([mimeType])
+  @@index([uploadedAt])
+  @@map("media_assets")
+}
+
+/// Ürün ↔ medya bağlantısı (rol bazlı)
+model ProductMediaLink {
+  id        String     @id @default(uuid())
+  productId String
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  assetId   String
+  asset     MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  role      String
+  sortOrder Int        @default(0)
+  altText   String?
+  createdAt DateTime   @default(now())
+
+  @@unique([productId, assetId, role])
+  @@index([productId, role, sortOrder])
+  @@index([assetId])
+  @@map("product_media_links")
+}
+
+/// FAZ 4A — WooCommerce mağaza bağlantısı (tek mağaza; ileride çoklu genişler)
+model WooConnection {
+  id                   String    @id @default(uuid())
+  storeName            String
+  storeUrl             String
+  consumerKey          String
+  consumerSecret       String
+  isActive             Boolean   @default(true)
+  lastConnectionCheck  DateTime?
+  lastConnectionStatus String?
+  lastError            String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([isActive])
+  @@map("woo_connections")
+}
+
+/// FAZ 41 — AI Worker Memory (kalıcı ERP hafızası)
+model AIWorkerMemory {
+  id          String   @id @default(uuid())
+  workerCode  String
+  entityType  String
+  entityId    String
+  memoryType  String
+  title       String
+  content     String   @db.Text
+  importance  String
+  sourceEvent String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([workerCode, active, createdAt(sort: Desc)])
+  @@index([entityType, entityId, active])
+  @@index([importance, active])
+  @@map("ai_worker_memories")
+}
+
+/// FAZ 42 — AI Tool Execution log
+model AIToolExecution {
+  id               String    @id @default(uuid())
+  workerId         String
+  workerCode       String?
+  toolName         String
+  category         String
+  permission       String
+  approvalRequired Boolean   @default(false)
+  parameters       Json
+  status           String
+  result           Json?
+  orderId          String?
+  runId            String?
+  taskId           String?
+  managerName      String?
+  managerNote      String?
+  approvedAt       DateTime?
+  rejectedAt       DateTime?
+  durationMs       Int?
+  safeMode         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([workerId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([orderId])
+  @@map("ai_tool_executions")
+}
+
+// ============================================================================
+// Enterprise 2.2 — SAHA OPERASYON MERKEZİ (Field Operation Core Model)
+// Kural: SSOT değişmez. Sipariş/sevk/tahsilat/SSH verisi kendi modüllerinde kalır;
+// FieldOperation bu kayıtları referanslar (kopyalamaz). Durum/tip String + TS
+// constant (repo konvansiyonu; ayrı lookup tablosu yok). Soft delete + version +
+// append-only timeline + audit (createdBy/updatedBy) standarttır.
+// ============================================================================
+
+/// Saha operasyonunun ana kaydı (tüm saha iş türleri için tek SSOT — süreç)
+model FieldOperation {
+  id                String    @id @default(uuid())
+  operationNumber   String    @unique
+  type              String
+  status            String    @default("PLANNED")
+  priority          String    @default("NORMAL")
+  title             String
+  description       String?
+  /// Kaynak referansları (FK değil; ilgili modül SSOT'u değişmez)
+  orderId           String?
+  shipmentPlanId    String?
+  serviceRecordId   String?
+  customerId        String?
+  addressId         String?
+  plannedDate       DateTime? @db.Date
+  plannedStartTime  String?
+  plannedEndTime    String?
+  actualStartTime   DateTime?
+  actualEndTime     DateTime?
+  assignedTeamId    String?
+  assignedVehicleId String?
+  requiresPhoto     Boolean   @default(false)
+  requiresSignature Boolean   @default(false)
+  requiresPayment   Boolean   @default(false)
+  requiresLocation  Boolean   @default(false)
+  /// Duplicate guard: aktifken `${sourceType}:${sourceId}:${type}`; terminal/silinince NULL
+  dedupeKey         String?   @unique
+  createdByUserId   String?
+  updatedByUserId   String?
+  version           Int       @default(1)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  tasks             FieldTask[]
+  assignments       FieldOperationAssignment[]
+  vehicles          FieldOperationVehicle[]
+  timeline          FieldOperationTimeline[]
+  evidence          FieldOperationEvidence[]
+  issues            FieldOperationIssue[]
+  partRequests      FieldOperationPartRequest[]
+  paymentLinks      FieldOperationPaymentLink[]
+  customerApprovals FieldOperationCustomerApproval[]
+
+  @@index([status, plannedDate])
+  @@index([type, status])
+  @@index([orderId])
+  @@index([shipmentPlanId])
+  @@index([assignedTeamId])
+  @@index([deletedAt])
+  @@map("field_operations")
+}
+
+/// Saha operasyonu alt görevi (opsiyonel kırılım)
+model FieldTask {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  title            String
+  status           String         @default("PLANNED")
+  sequence         Int            @default(0)
+  assignedUserId   String?
+  note             String?
+  createdByUserId  String?
+  updatedByUserId  String?
+  version          Int            @default(1)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, sequence])
+  @@map("field_tasks")
+}
+
+/// Personel ataması (kim → hangi rolde; kim atadı audit'i)
+model FieldOperationAssignment {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  userId           String
+  role             String
+  assignedAt       DateTime       @default(now())
+  unassignedAt     DateTime?
+  assignedByUserId String?
+  isPrimary        Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([fieldOperationId, role])
+  @@index([userId])
+  @@map("field_operation_assignments")
+}
+
+/// Ekip tanımı (lider + üyeler ataması FieldOperationAssignment üzerinden)
+model FieldOperationTeam {
+  id           String    @id @default(uuid())
+  name         String
+  active       Boolean   @default(true)
+  leaderUserId String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  @@index([active])
+  @@map("field_operation_teams")
+}
+
+/// Araç ilişki tablosu (araç master YOK → vehicleId serbest referans)
+model FieldOperationVehicle {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  vehicleId        String
+  assignedAt       DateTime       @default(now())
+  releasedAt       DateTime?
+
+  @@index([fieldOperationId])
+  @@index([vehicleId])
+  @@map("field_operation_vehicles")
+}
+
+/// Append-only zaman çizelgesi (durum geçişi + saha olayları). Güncellenmez/silinmez.
+model FieldOperationTimeline {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  eventType        String
+  fromStatus       String?
+  toStatus         String?
+  note             String?
+  actorUserId      String?
+  latitude         Float?
+  longitude        Float?
+  occurredAt       DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+
+  @@index([fieldOperationId, occurredAt])
+  @@map("field_operation_timelines")
+}
+
+/// Kanıt (foto/imza/belge) — bu sprintte yalnızca model; upload akışı yok
+model FieldOperationEvidence {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  type             String
+  fileUrl          String
+  fileName         String?
+  mimeType         String?
+  sizeBytes        Int?
+  latitude         Float?
+  longitude        Float?
+  capturedAt       DateTime?
+  uploadedByUserId String?
+  createdAt        DateTime       @default(now())
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, type])
+  @@map("field_operation_evidences")
+}
+
+/// Saha sorunu (eksik/hasar/adres vb.)
+model FieldOperationIssue {
+  id               String         @id @default(uuid())
+  fieldOperationId String
+  fieldOperation   FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  type             String
+  severity         String         @default("MEDIUM")
+  description      String?
+  status           String         @default("OPEN")
+  reportedByUserId String?
+  assignedToUserId String?
+  resolvedAt       DateTime?
+  resolutionNote   String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  @@index([fieldOperationId, status])
+  @@map("field_operation_issues")
+}
+
+/// Eksik parça talebi (SSH/OrderMissingItem ile ileride köprülenir)
+model FieldOperationPartRequest {
+  id                String         @id @default(uuid())
+  fieldOperationId  String
+  fieldOperation    FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  productId         String?
+  quantity          Int            @default(1)
+  reason            String?
+  status            String         @default("REQUESTED")
+  requestedByUserId String?
+  approvedByUserId  String?
+  approvedAt        DateTime?
+  deliveredAt       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  @@index([fieldOperationId, status])
+  @@map("field_operation_part_requests")
+}
+
+/// Tahsilat köprüsü — PaymentTransaction (SSOT) referansı; yeni ödeme sistemi YOK
+model FieldOperationPaymentLink {
+  id                   String             @id @default(uuid())
+  fieldOperationId     String
+  fieldOperation       FieldOperation     @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  paymentTransactionId String
+  paymentTransaction   PaymentTransaction @relation(fields: [paymentTransactionId], references: [id], onDelete: Cascade)
+  createdAt            DateTime           @default(now())
+
+  @@unique([fieldOperationId, paymentTransactionId])
+  @@index([paymentTransactionId])
+  @@map("field_operation_payment_links")
+}
+
+/// Müşteri onayı / imza kaydı
+model FieldOperationCustomerApproval {
+  id                  String         @id @default(uuid())
+  fieldOperationId    String
+  fieldOperation      FieldOperation @relation(fields: [fieldOperationId], references: [id], onDelete: Cascade)
+  customerName        String?
+  approvalType        String?
+  approved            Boolean        @default(false)
+  signatureEvidenceId String?
+  note                String?
+  approvedAt          DateTime?
+  createdAt           DateTime       @default(now())
+
+  @@index([fieldOperationId])
+  @@map("field_operation_customer_approvals")
+}

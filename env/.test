@@ -1,0 +1,28 @@
+# Runtime profile
+NODE_ENV=test
+
+# Networking
+NGINX_PORT=18080
+POSTGRES_PORT=15432
+REDIS_PORT=16379
+
+# Database
+POSTGRES_USER=mobilya
+POSTGRES_PASSWORD=mobilya_test_change_me
+POSTGRES_DB=mobilya_test
+DATABASE_URL=postgresql://mobilya:mobilya_test_change_me@localhost:15432/mobilya_test?schema=public
+
+# Security
+JWT_SECRET=test_jwt_secret_change_me_123456
+AUTH_DISABLED=true
+CORS_ALLOWED_ORIGINS=http://localhost:18080,http://127.0.0.1:18080
+
+# App boot
+RUN_SEED_ON_BOOT=true
+LOG_LEVEL=info
+LOG_FORMAT=json
+
+# Ops
+BACKUP_CRON_SCHEDULE=0 2 * * *
+BACKUP_INTERVAL_SECONDS=86400
+MONITOR_INTERVAL_SECONDS=30

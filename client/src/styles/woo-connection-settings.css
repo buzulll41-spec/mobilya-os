@@ -1,0 +1,115 @@
+.mos-erp-ops--woo-settings .mos-erp-summary--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mos-woo-settings__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.mos-woo-settings__panel {
+  background: var(--mos-erp-surface, #fff);
+  border: 1px solid var(--mos-erp-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.mos-woo-settings__title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.mos-woo-settings__subtitle {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.mos-woo-settings__hint {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.mos-woo-settings__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.mos-woo-settings__field input {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--mos-erp-border, #e2e8f0);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.mos-woo-settings__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.5rem 0 0.85rem;
+  font-size: 0.82rem;
+}
+
+.mos-woo-settings__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mos-woo-settings__kv {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.mos-woo-settings__kv dt {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.mos-woo-settings__kv dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.mos-woo-settings__sample-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mos-woo-settings__sample-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-size: 0.78rem;
+}
+
+.mos-woo-settings__sample-list span {
+  color: #64748b;
+}
+
+@media (max-width: 960px) {
+  .mos-woo-settings__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mos-erp-ops--woo-settings .mos-erp-summary--cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

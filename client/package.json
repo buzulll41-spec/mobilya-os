@@ -1,15 +1,23 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "MOBILYA OS Enterprise 1.0 client — quality gate: npm run test && npm run lint && npm run build",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:real-device-test": "vite --host 0.0.0.0 --port 5173 --strictPort --mode real-device-test",
     "build": "vite build",
+    "build:real-device-test": "vite build --mode real-device-test",
+    "audit:stabilization": "node scripts/enterprise-stabilization-audit.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "vitest run",
+    "preview": "vite preview",
+    "preview:real-device-test": "vite preview --host 0.0.0.0 --port 5173 --strictPort"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
@@ -22,6 +30,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
-    "vite": "^8.0.12"
+    "pixelmatch": "^7.2.0",
+    "playwright": "^1.60.0",
+    "pngjs": "^7.0.0",
+    "vite": "^8.0.12",
+    "vitest": "^3.2.4"
   }
 }
