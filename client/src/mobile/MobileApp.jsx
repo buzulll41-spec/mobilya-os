@@ -67,6 +67,7 @@ export default function MobileApp() {
 
   useEffect(() => {
     function onHashChange() {
+      setQuickActionsOpen(false)
       setPage(parseMobilePage(window.location.hash))
     }
 
@@ -80,6 +81,7 @@ export default function MobileApp() {
   }, [])
 
   function navigateToPage(nextPage) {
+    setQuickActionsOpen(false)
     setPage(nextPage)
     const nextHash = toMobileHash(nextPage)
     if (window.location.hash !== nextHash) {
@@ -159,22 +161,22 @@ export default function MobileApp() {
     <>
       <MobileLayout page={page} onNavigate={navigateToPage} onOpenOrderModal={openQuickActions}>
         {content}
-      </MobileLayout>
 
-      <BottomSheet open={quickActionsOpen} title="Hizli Islem" onClose={closeQuickActions}>
-        <div className="evm-v2-sheet-action-list" aria-label="Hizli islem listesi">
-          <ListRow title="Yeni Siparis" subtitle="2 dokunusla siparis ac" onPress={() => { closeQuickActions(); openOrderModal() }} buttonProps={{ 'data-testid': 'qa-new-order' }} />
-          <ListRow title="Yeni Tahsilat" subtitle="Bugunku tahsilat listesine git" onPress={() => { closeQuickActions(); navigateToPage('collection') }} buttonProps={{ 'data-testid': 'qa-new-collection' }} />
-          <ListRow title="Yeni Sevkiyat" subtitle="Sevkiyat planlama ekranina git" onPress={() => { closeQuickActions(); navigateToPage('shipment') }} buttonProps={{ 'data-testid': 'qa-new-shipment' }} />
-          <ListRow title="Yeni Servis" subtitle="Servis kaydi baslat" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-new-service' }} />
-          <ListRow title="Yeni Musteri" subtitle="Musteri listesi ve kayit akisina git" onPress={() => { closeQuickActions(); navigateToPage('customers') }} buttonProps={{ 'data-testid': 'qa-new-customer' }} />
-          <ListRow title="Yeni Not" subtitle="Siparis detayinda hizli not gir" onPress={() => { closeQuickActions(); navigateToPage('orders') }} buttonProps={{ 'data-testid': 'qa-new-note' }} />
-          <ListRow title="Fotograf Yukle" subtitle="Servis kaydinda kanit ekle" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-upload-photo' }} />
-          <ListRow title="QR Tara" subtitle="Depo veya urun akisini ac" onPress={() => { closeQuickActions(); navigateToPage('warehouse') }} buttonProps={{ 'data-testid': 'qa-qr-scan' }} />
-          <ListRow title="Telefon Ara" subtitle="Ilk uygun musteri ile gorus" onPress={() => openExternalOrFallback(defaultContact.telHref, 'customers')} buttonProps={{ 'data-testid': 'qa-phone-call' }} />
-          <ListRow title="WhatsApp Gonder" subtitle="Ilk uygun musteriye mesaj gonder" onPress={() => openExternalOrFallback(defaultContact.waHref, 'customers')} buttonProps={{ 'data-testid': 'qa-whatsapp' }} />
-        </div>
-      </BottomSheet>
+        <BottomSheet open={quickActionsOpen} title="Hizli Islem" onClose={closeQuickActions}>
+          <div className="evm-v2-sheet-action-list" aria-label="Hizli islem listesi">
+            <ListRow title="Yeni Siparis" subtitle="2 dokunusla siparis ac" onPress={() => { closeQuickActions(); openOrderModal() }} buttonProps={{ 'data-testid': 'qa-new-order' }} />
+            <ListRow title="Yeni Tahsilat" subtitle="Bugunku tahsilat listesine git" onPress={() => { closeQuickActions(); navigateToPage('collection') }} buttonProps={{ 'data-testid': 'qa-new-collection' }} />
+            <ListRow title="Yeni Sevkiyat" subtitle="Sevkiyat planlama ekranina git" onPress={() => { closeQuickActions(); navigateToPage('shipment') }} buttonProps={{ 'data-testid': 'qa-new-shipment' }} />
+            <ListRow title="Yeni Servis" subtitle="Servis kaydi baslat" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-new-service' }} />
+            <ListRow title="Yeni Musteri" subtitle="Musteri listesi ve kayit akisina git" onPress={() => { closeQuickActions(); navigateToPage('customers') }} buttonProps={{ 'data-testid': 'qa-new-customer' }} />
+            <ListRow title="Yeni Not" subtitle="Siparis detayinda hizli not gir" onPress={() => { closeQuickActions(); navigateToPage('orders') }} buttonProps={{ 'data-testid': 'qa-new-note' }} />
+            <ListRow title="Fotograf Yukle" subtitle="Servis kaydinda kanit ekle" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-upload-photo' }} />
+            <ListRow title="QR Tara" subtitle="Depo veya urun akisini ac" onPress={() => { closeQuickActions(); navigateToPage('warehouse') }} buttonProps={{ 'data-testid': 'qa-qr-scan' }} />
+            <ListRow title="Telefon Ara" subtitle="Ilk uygun musteri ile gorus" onPress={() => openExternalOrFallback(defaultContact.telHref, 'customers')} buttonProps={{ 'data-testid': 'qa-phone-call' }} />
+            <ListRow title="WhatsApp Gonder" subtitle="Ilk uygun musteriye mesaj gonder" onPress={() => openExternalOrFallback(defaultContact.waHref, 'customers')} buttonProps={{ 'data-testid': 'qa-whatsapp' }} />
+          </div>
+        </BottomSheet>
+      </MobileLayout>
 
       {orderModalOpen ? (
         <NewOrderWizard

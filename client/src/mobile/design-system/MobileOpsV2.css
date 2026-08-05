@@ -182,6 +182,8 @@
   --layout-max-home-shell: 430px;
   --offset-fab: 5.35rem;
   --opacity-pulse: 0.72;
+  --z-sheet-backdrop: 122;
+  --z-sheet: 123;
 
   --evm-v4-space-1: var(--space-4);
   --evm-v4-space-2: var(--space-8);
@@ -1462,7 +1464,8 @@
   background: var(--color-overlay-strong);
   display: grid;
   align-items: end;
-  z-index: 122;
+  z-index: var(--z-sheet-backdrop);
+  overflow: hidden;
 }
 
 .evm-v2-sheet {
@@ -1470,7 +1473,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 123;
+  z-index: var(--z-sheet);
+  max-height: 80vh;
+  overflow: hidden;
+  padding-bottom: calc(var(--space-16) + env(safe-area-inset-bottom));
 }
 
 .evm-v2-sheet__handle {
@@ -1507,8 +1513,9 @@
 .evm-v2-sheet-action-list {
   display: grid;
   gap: var(--space-10);
-  max-height: min(68vh, var(--layout-max-sheet));
+  max-height: min(80vh, var(--layout-max-sheet));
   overflow: auto;
+  overflow-x: hidden;
   padding-bottom: var(--space-4);
 }
 

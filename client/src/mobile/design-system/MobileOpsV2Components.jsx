@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { IconBell, IconChevronRight, IconClose, IconDashboard, IconMenu, IconOrders, IconPlus, IconSearch, IconUsers } from '../../components/Icons.jsx'
 
 const PRESS_STYLE = { transition: 'transform var(--evm-v2-motion-base) var(--evm-v2-motion-ease)' }
@@ -517,10 +518,34 @@ export function Toast({ message = 'Bilgi guncellendi', theme = 'light', selected
 
 /** @param {{ open: boolean, title?: string, onClose?: () => void, children?: import('react').ReactNode }} props */
 export function BottomSheet({ open, title, onClose, children, theme = 'light', selected = false, loading = false, pressed = false, hovered = false }) {
+  const panelRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    requestAnimationFrame(() => panelRef.current?.focus())
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose?.()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown, true)
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown, true)
+      document.removeEventListener('keydown', onKeyDown, true)
+    }
+  }, [open, onClose])
+
   if (!open) return null
   return (
     <div className="evm-v2-sheet-backdrop" role="presentation" onClick={() => onClose?.()}>
-      <div className="evm-v2-sheet" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()} {...stateAttrs({ theme, selected, loading, pressed, hovered })}>
+      <div className="evm-v2-sheet" role="dialog" aria-modal="true" tabIndex={-1} ref={panelRef} onClick={(event) => event.stopPropagation()} {...stateAttrs({ theme, selected, loading, pressed, hovered })}>
         <span className="evm-v2-sheet__handle" aria-hidden />
         <div className="evm-v2-sheet__head">
           {title ? <strong className="evm-v2-sheet__title">{title}</strong> : null}
