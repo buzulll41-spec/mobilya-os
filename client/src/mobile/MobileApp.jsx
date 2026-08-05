@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import MobileLayout from './layout/MobileLayout.jsx'
 import HomePage from './HomePage.jsx'
 import OrdersPage from './pages/OrdersPage.jsx'
@@ -12,10 +13,11 @@ import ReportsPage from './pages/ReportsPage.jsx'
 import MenuPage from './pages/MenuPage.jsx'
 import NewOrderWizard from '../features/orders/NewOrderWizard.jsx'
 import OrderOperationPanel from '../features/orders/OrderOperationPanel.jsx'
+import { IconChevronRight, IconClose } from '../components/Icons.jsx'
 import { getApiBaseUrl } from '../config/dataSource.js'
 import { useOrders } from '../state/useOrders.js'
 import { useOrderDrawer, useOrderDrawerDtoSync } from '../state/OrderDrawerProvider.jsx'
-import { BottomSheet, ListRow } from './design-system/MobileOpsV2Components.jsx'
+import './design-system/MobileOpsV2.css'
 
 /** @typedef {'home' | 'orders' | 'customers' | 'menu' | 'collection' | 'shipment' | 'service' | 'ssh' | 'warehouse' | 'reports'} MobilePage */
 
@@ -43,6 +45,94 @@ function toMobileHash(page) {
   if (page === 'ssh') return '#/mobile/ssh'
   if (page === 'warehouse') return '#/mobile/warehouse'
   return `#/mobile/${page}`
+}
+
+function MobileQuickActionSheet({ open, onClose, onAction }) {
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown, true)
+    document.addEventListener('keydown', onKeyDown, true)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown, true)
+      document.removeEventListener('keydown', onKeyDown, true)
+    }
+  }, [open, onClose])
+
+  if (!open) return null
+
+  return createPortal(
+    <div className="mobile-quick-action-overlay" role="presentation" onClick={onClose}>
+      <section
+        className="mobile-quick-action-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Hizli Islem"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="mobile-quick-action-header">
+          <strong>Hizli Islem</strong>
+          <button type="button" className="mobile-quick-action-close" aria-label="Kapat" onClick={onClose}>
+            <IconClose />
+          </button>
+        </header>
+        <div className="mobile-quick-action-list" aria-label="Hizli islem listesi">
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('new-order')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Siparis</strong><small>2 dokunusla siparis ac</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('collection')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Tahsilat</strong><small>Bugunku tahsilat listesine git</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('shipment')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Sevkiyat</strong><small>Sevkiyat planlama ekranina git</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('service')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Servis</strong><small>Servis kaydi baslat</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('customers')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Musteri</strong><small>Musteri listesi ve kayit akisina git</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('orders')}>
+            <span className="mobile-quick-action-copy"><strong>Yeni Not</strong><small>Siparis detayinda hizli not gir</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('service')}>
+            <span className="mobile-quick-action-copy"><strong>Fotograf Yukle</strong><small>Servis kaydinda kanit ekle</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('warehouse')}>
+            <span className="mobile-quick-action-copy"><strong>QR Tara</strong><small>Depo veya urun akisini ac</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('phone')}>
+            <span className="mobile-quick-action-copy"><strong>Telefon Ara</strong><small>Ilk uygun musteri ile gorus</small></span>
+            <IconChevronRight />
+          </button>
+          <button type="button" className="mobile-quick-action-item" onClick={() => onAction('whatsapp')}>
+            <span className="mobile-quick-action-copy"><strong>WhatsApp Gonder</strong><small>Ilk uygun musteriye mesaj gonder</small></span>
+            <IconChevronRight />
+          </button>
+        </div>
+      </section>
+    </div>,
+    document.body,
+  )
 }
 
 export default function MobileApp() {
@@ -126,6 +216,25 @@ export default function MobileApp() {
     navigateToPage(fallbackPage)
   }
 
+  function handleQuickAction(action) {
+    closeQuickActions()
+    if (action === 'new-order') {
+      openOrderModal()
+      return
+    }
+    if (action === 'collection' || action === 'shipment' || action === 'service' || action === 'customers' || action === 'orders' || action === 'warehouse') {
+      navigateToPage(action)
+      return
+    }
+    if (action === 'phone') {
+      openExternalOrFallback(defaultContact.telHref, 'customers')
+      return
+    }
+    if (action === 'whatsapp') {
+      openExternalOrFallback(defaultContact.waHref, 'customers')
+    }
+  }
+
   const content = useMemo(() => {
     if (page === 'collection') {
       return <CollectionsPage onOpenOrderById={handleOpenOrderById} />
@@ -161,22 +270,9 @@ export default function MobileApp() {
     <>
       <MobileLayout page={page} onNavigate={navigateToPage} onOpenOrderModal={openQuickActions}>
         {content}
-
-        <BottomSheet open={quickActionsOpen} title="Hizli Islem" onClose={closeQuickActions}>
-          <div className="evm-v2-sheet-action-list" aria-label="Hizli islem listesi">
-            <ListRow title="Yeni Siparis" subtitle="2 dokunusla siparis ac" onPress={() => { closeQuickActions(); openOrderModal() }} buttonProps={{ 'data-testid': 'qa-new-order' }} />
-            <ListRow title="Yeni Tahsilat" subtitle="Bugunku tahsilat listesine git" onPress={() => { closeQuickActions(); navigateToPage('collection') }} buttonProps={{ 'data-testid': 'qa-new-collection' }} />
-            <ListRow title="Yeni Sevkiyat" subtitle="Sevkiyat planlama ekranina git" onPress={() => { closeQuickActions(); navigateToPage('shipment') }} buttonProps={{ 'data-testid': 'qa-new-shipment' }} />
-            <ListRow title="Yeni Servis" subtitle="Servis kaydi baslat" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-new-service' }} />
-            <ListRow title="Yeni Musteri" subtitle="Musteri listesi ve kayit akisina git" onPress={() => { closeQuickActions(); navigateToPage('customers') }} buttonProps={{ 'data-testid': 'qa-new-customer' }} />
-            <ListRow title="Yeni Not" subtitle="Siparis detayinda hizli not gir" onPress={() => { closeQuickActions(); navigateToPage('orders') }} buttonProps={{ 'data-testid': 'qa-new-note' }} />
-            <ListRow title="Fotograf Yukle" subtitle="Servis kaydinda kanit ekle" onPress={() => { closeQuickActions(); navigateToPage('service') }} buttonProps={{ 'data-testid': 'qa-upload-photo' }} />
-            <ListRow title="QR Tara" subtitle="Depo veya urun akisini ac" onPress={() => { closeQuickActions(); navigateToPage('warehouse') }} buttonProps={{ 'data-testid': 'qa-qr-scan' }} />
-            <ListRow title="Telefon Ara" subtitle="Ilk uygun musteri ile gorus" onPress={() => openExternalOrFallback(defaultContact.telHref, 'customers')} buttonProps={{ 'data-testid': 'qa-phone-call' }} />
-            <ListRow title="WhatsApp Gonder" subtitle="Ilk uygun musteriye mesaj gonder" onPress={() => openExternalOrFallback(defaultContact.waHref, 'customers')} buttonProps={{ 'data-testid': 'qa-whatsapp' }} />
-          </div>
-        </BottomSheet>
       </MobileLayout>
+
+      <MobileQuickActionSheet open={quickActionsOpen} onClose={closeQuickActions} onAction={handleQuickAction} />
 
       {orderModalOpen ? (
         <NewOrderWizard
