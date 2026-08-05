@@ -6,6 +6,7 @@ import { formatCustomerPhonesCompact, parseCustomerExtraFromNotes } from '../new
 import {
   buildCustomerDrawerStats,
   buildCustomerDrawerTimeline,
+  buildCustomerCommandCenterModel,
   findLastPaymentLabel,
   formatAvgOrder,
   inferCustomerTypeLabel,
@@ -65,6 +66,8 @@ function resolveWhatsAppHref(phone) {
  *   phone2?: string | null
  *   addressLine?: string | null
  *   orderDateLabel?: string | null
+ *   onOpenOrder?: (orderId: string) => void
+ *   onOpenOrderModal?: () => void
  * }} props
  */
 export default function OrderCustomerErpDrawer({
@@ -78,10 +81,13 @@ export default function OrderCustomerErpDrawer({
   phone2,
   addressLine,
   orderDateLabel,
+  onOpenOrder,
+  onOpenOrderModal,
 }) {
   const { orders, salesOrderListItemDtos, domainEvents } = useOrders()
   const [noteDraft, setNoteDraft] = useState('')
   const [localNotes, setLocalNotes] = useState(/** @type {string[]} */ ([]))
+  const [mobileActionSheetOpen, setMobileActionSheetOpen] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -140,6 +146,23 @@ export default function OrderCustomerErpDrawer({
     return [...localNotes, ...base.filter((n) => !localNotes.includes(n))]
   }, [localNotes, opsNote])
 
+  const commandCenter = useMemo(
+    () =>
+      buildCustomerCommandCenterModel({
+        customerName: customer,
+        orders,
+        dtos: salesOrderListItemDtos ?? [],
+        domainEvents: domainEvents ?? [],
+        todayIso: new Date().toISOString().slice(0, 10),
+      }),
+    [customer, orders, salesOrderListItemDtos, domainEvents],
+  )
+
+  function scrollToSection(sectionId) {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setMobileActionSheetOpen(false)
+  }
+
   function handleAddNote(e) {
     e.preventDefault()
     const text = noteDraft.trim()
@@ -157,17 +180,21 @@ export default function OrderCustomerErpDrawer({
       <button
         type="button"
         className="cust-erp-drawer__scrim"
-        aria-label="Müşteri kartını kapat"
+        aria-label="Müşteri merkezini kapat"
         onClick={onClose}
       />
       <aside
         className="cust-erp-drawer"
         role="complementary"
-        aria-label={`${customer} müşteri kartı`}
+        aria-label={`${customer} müşteri merkezi`}
       >
-        <header className="cust-erp-drawer__hero">
+        <header className="cust-erp-drawer__hero cust-erp-drawer__hero--command">
           <div className="cust-erp-drawer__head-row">
-            <h2 className="cust-erp-drawer__hero-title">{customer}</h2>
+            <div className="cust-erp-drawer__hero-copy">
+              <p className="cust-erp-drawer__eyebrow">Müşteri Komuta Merkezi</p>
+              <h2 className="cust-erp-drawer__hero-title">{customer}</h2>
+              <p className="cust-erp-drawer__hero-sub">{customerType} · {commandCenter.lastContact.label}</p>
+            </div>
             <button
               type="button"
               className="cust-erp-drawer__close"
@@ -177,222 +204,205 @@ export default function OrderCustomerErpDrawer({
               ×
             </button>
           </div>
-          <dl className="cust-erp-drawer__hero-grid">
+
+          <div className="cust-erp-drawer__quick-actions" aria-label="Hızlı iletişim aksiyonları">
+            {telHref ? (
+              <a className="cust-erp-drawer__action cust-erp-drawer__action--call" href={telHref}>
+                Ara
+              </a>
+            ) : (
+              <span className="cust-erp-drawer__action is-disabled">Ara</span>
+            )}
+            {whatsappHref ? (
+              <a
+                className="cust-erp-drawer__action cust-erp-drawer__action--whatsapp"
+                href={whatsappHref}
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp
+              </a>
+            ) : (
+              <span className="cust-erp-drawer__action is-disabled">WhatsApp</span>
+            )}
+          </div>
+
+          <dl className="cust-erp-drawer__hero-grid cust-erp-drawer__hero-grid--command">
             <div className="cust-erp-drawer__hero-item">
               <dt>Telefon</dt>
               <dd>{phoneDisplay}</dd>
             </div>
             <div className="cust-erp-drawer__hero-item">
-              <dt>Müşteri tipi</dt>
-              <dd>{customerType}</dd>
+              <dt>Son görüşme</dt>
+              <dd>{commandCenter.lastContact.detail}</dd>
             </div>
             <div className="cust-erp-drawer__hero-item">
-              <dt>Risk durumu</dt>
+              <dt>Aktif sipariş</dt>
+              <dd>{commandCenter.stats.activeOrders}</dd>
+            </div>
+            <div className="cust-erp-drawer__hero-item">
+              <dt>Toplam alışveriş</dt>
+              <dd>{formatTry(commandCenter.stats.totalSales)}</dd>
+            </div>
+            <div className="cust-erp-drawer__hero-item">
+              <dt>Borç</dt>
+              <dd className={commandCenter.finance.remaining > 0.009 ? 'cust-erp-drawer__hero-value--due' : undefined}>
+                {commandCenter.finance.remaining > 0.009 ? formatTry(commandCenter.finance.remaining) : 'Kapandı'}
+              </dd>
+            </div>
+            <div className="cust-erp-drawer__hero-item">
+              <dt>Risk</dt>
               <dd>
                 <span className={`cust-erp-drawer__risk ${riskBadgeClass(riskSeverity)}`}>
-                  {riskLabel}
+                  {commandCenter.riskLabel}
                 </span>
               </dd>
-            </div>
-            <div className="cust-erp-drawer__hero-item">
-              <dt>Açık bakiye</dt>
-              <dd
-                className={
-                  stats.openBalance > 0.009 ? 'cust-erp-drawer__hero-value--due' : undefined
-                }
-              >
-                {stats.openBalance > 0.009 ? formatTry(stats.openBalance) : 'Kapandı'}
-              </dd>
-            </div>
-            <div className="cust-erp-drawer__hero-item cust-erp-drawer__hero-item--wide">
-              <dt>Son sipariş tarihi</dt>
-              <dd>{stats.lastOrderDate}</dd>
             </div>
           </dl>
         </header>
 
         <div className="cust-erp-drawer__body">
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--identity"
-            aria-labelledby="cust-sec-identity"
-          >
-            <h3 id="cust-sec-identity" className="cust-erp-drawer__section-title">
-              Müşteri Kimliği
+          <section className="cust-erp-drawer__section cust-erp-drawer__section--ai" aria-labelledby="cust-sec-ai">
+            <h3 id="cust-sec-ai" className="cust-erp-drawer__section-title">
+              EVTREND AI
             </h3>
-            <dl className="cust-erp-drawer__kv">
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Müşteri adı</dt>
-                <dd>{customer}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Müşteri tipi</dt>
-                <dd>{customerType}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Bu sipariş</dt>
-                <dd>
-                  {orderNo}
-                  {orderDateLabel ? ` · ${orderDateLabel}` : ''}
-                </dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Sipariş durumu</dt>
-                <dd>{order.status}</dd>
-              </div>
-              {identityExtra.nationalId ? (
-                <div className="cust-erp-drawer__kv-row">
-                  <dt>TC Kimlik</dt>
-                  <dd>{identityExtra.nationalId}</dd>
-                </div>
-              ) : null}
-              {identityExtra.taxNumber ? (
-                <div className="cust-erp-drawer__kv-row">
-                  <dt>Vergi no</dt>
-                  <dd>{identityExtra.taxNumber}</dd>
-                </div>
-              ) : null}
-            </dl>
-          </section>
-
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--contact"
-            aria-labelledby="cust-sec-contact"
-          >
-            <h3 id="cust-sec-contact" className="cust-erp-drawer__section-title">
-              İletişim Bilgileri
-            </h3>
-            {telHref || whatsappHref ? (
-              <div className="cust-erp-drawer__actions" aria-label="Hızlı iletişim aksiyonları">
-                {telHref ? (
-                  <a className="cust-erp-drawer__action cust-erp-drawer__action--call" href={telHref}>
-                    Ara
+            <article className={`cust-erp-drawer__ai-card is-${commandCenter.aiSignal.tone}`}>
+              <p className="cust-erp-drawer__ai-label">{commandCenter.aiSignal.label}</p>
+              <p className="cust-erp-drawer__ai-detail">{commandCenter.aiSignal.detail}</p>
+              <div className="cust-erp-drawer__ai-actions">
+                {commandCenter.aiSignal.href ? (
+                  <a className="cust-erp-drawer__ai-action" href={commandCenter.aiSignal.href}>
+                    {commandCenter.aiSignal.action}
                   </a>
-                ) : null}
-                {whatsappHref ? (
-                  <a
-                    className="cust-erp-drawer__action cust-erp-drawer__action--whatsapp"
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noreferrer"
+                ) : (
+                  <button
+                    type="button"
+                    className="cust-erp-drawer__ai-action"
+                    onClick={() => scrollToSection(commandCenter.aiSignal.target ?? 'cust-sec-finance')}
                   >
-                    WhatsApp
-                  </a>
-                ) : null}
+                    {commandCenter.aiSignal.action}
+                  </button>
+                )}
               </div>
-            ) : null}
-            <dl className="cust-erp-drawer__kv">
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Telefon</dt>
-                <dd>{phoneDisplay}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>E-posta</dt>
-                <dd>{email ?? '—'}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Adres</dt>
-                <dd>{addressText}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>İl / İlçe</dt>
-                <dd>{cityDistrict}</dd>
-              </div>
-            </dl>
+            </article>
           </section>
 
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--summary"
-            aria-labelledby="cust-sec-summary"
-          >
-            <h3 id="cust-sec-summary" className="cust-erp-drawer__section-title">
-              Sipariş Özeti
+          <section id="cust-sec-active-orders" className="cust-erp-drawer__section cust-erp-drawer__section--orders" aria-labelledby="cust-sec-orders">
+            <h3 id="cust-sec-orders" className="cust-erp-drawer__section-title">
+              Aktif Siparişler
             </h3>
-            <dl className="cust-erp-drawer__kv">
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Toplam sipariş</dt>
-                <dd>{stats.totalOrders}</dd>
+            {commandCenter.activeOrders.length > 0 ? (
+              <div className="cust-erp-drawer__card-list">
+                {commandCenter.activeOrders.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`cust-erp-drawer__order-card is-${item.tone}`}
+                    onClick={() => onOpenOrder?.(item.id)}
+                  >
+                    <div className="cust-erp-drawer__order-card-head">
+                      <strong>{item.orderNo}</strong>
+                      <span>{item.status}</span>
+                    </div>
+                    <dl className="cust-erp-drawer__order-card-grid">
+                      <div>
+                        <dt>Toplam</dt>
+                        <dd>{item.totalLabel}</dd>
+                      </div>
+                      <div>
+                        <dt>Teslim Tarihi</dt>
+                        <dd>{item.deliveryDateLabel}</dd>
+                      </div>
+                      <div>
+                        <dt>Kalan</dt>
+                        <dd>{item.remainingLabel}</dd>
+                      </div>
+                    </dl>
+                  </button>
+                ))}
               </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Aktif sipariş</dt>
-                <dd>{stats.activeOrders}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Teslim edilen</dt>
-                <dd>{stats.deliveredOrders}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Bekleyen sevk</dt>
-                <dd>{stats.pendingShipment}</dd>
-              </div>
-            </dl>
+            ) : (
+              <p className="cust-erp-drawer__muted">Aktif sipariş yok.</p>
+            )}
           </section>
 
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--finance"
-            aria-labelledby="cust-sec-finance"
-          >
-            <h3 id="cust-sec-finance" className="cust-erp-drawer__section-title">
-              Finans Özeti
+          <section id="cust-sec-finance" className="cust-erp-drawer__section cust-erp-drawer__section--finance" aria-labelledby="cust-sec-finance-title">
+            <h3 id="cust-sec-finance-title" className="cust-erp-drawer__section-title">
+              Finans Durumu
             </h3>
-            <dl className="cust-erp-drawer__kv">
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Toplam satış</dt>
-                <dd>{formatTry(stats.totalSales)}</dd>
+            <div className="cust-erp-drawer__finance-badge" data-tone={commandCenter.finance.tone}>
+              {commandCenter.finance.tone === 'critical' ? 'Gecikmiş' : commandCenter.finance.tone === 'warning' ? 'Takip' : 'Temiz'}
+            </div>
+            <dl className="cust-erp-drawer__finance-grid">
+              <div>
+                <dt>Toplam Borç</dt>
+                <dd>{formatTry(commandCenter.finance.totalDebt)}</dd>
               </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Tahsil edilen</dt>
-                <dd>{formatTry(stats.totalPaid)}</dd>
+              <div>
+                <dt>Tahsil Edilen</dt>
+                <dd>{formatTry(commandCenter.finance.collected)}</dd>
               </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Açık bakiye</dt>
-                <dd className={stats.openBalance > 0.009 ? 'cust-erp-drawer__kv-row--due' : undefined}>
-                  {stats.openBalance > 0.009 ? formatTry(stats.openBalance) : 'Kapandı'}
+              <div>
+                <dt>Kalan</dt>
+                <dd>{formatTry(commandCenter.finance.remaining)}</dd>
+              </div>
+              <div>
+                <dt>Vadesi Geçmiş</dt>
+                <dd className={commandCenter.finance.overdue > 0.009 ? 'cust-erp-drawer__kv-row--due' : undefined}>
+                  {formatTry(commandCenter.finance.overdue)}
                 </dd>
               </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Ortalama sipariş</dt>
-                <dd>{formatAvgOrder(stats.avgOrder)}</dd>
-              </div>
-              <div className="cust-erp-drawer__kv-row">
-                <dt>Son ödeme</dt>
-                <dd>{lastPayment}</dd>
-              </div>
             </dl>
           </section>
 
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--moves"
-            aria-labelledby="cust-sec-moves"
-          >
-            <h3 id="cust-sec-moves" className="cust-erp-drawer__section-title">
-              Son Hareketler
+          <section className="cust-erp-drawer__section cust-erp-drawer__section--history" aria-labelledby="cust-sec-history-title">
+            <h3 id="cust-sec-history-title" className="cust-erp-drawer__section-title">
+              İletişim Geçmişi
             </h3>
-            {timeline.length > 0 ? (
-              <ol className="cust-erp-drawer__timeline">
-                {timeline.map((item, idx) => (
-                  <li key={item.id} className="cust-erp-drawer__timeline-item">
-                    <div className="cust-erp-drawer__timeline-track" aria-hidden>
-                      <span className="cust-erp-drawer__timeline-dot" />
-                      {idx < timeline.length - 1 ? (
-                        <span className="cust-erp-drawer__timeline-line" />
-                      ) : null}
-                    </div>
-                    <div className="cust-erp-drawer__timeline-body">
-                      <p className="cust-erp-drawer__timeline-date">{item.dateLabel}</p>
-                      <p className="cust-erp-drawer__timeline-label">{item.label}</p>
+            {commandCenter.history.length > 0 ? (
+              <ol className="cust-erp-drawer__history-list">
+                {commandCenter.history.map((item) => (
+                  <li key={item.id} className="cust-erp-drawer__history-item">
+                    <span className="cust-erp-drawer__history-kind">{item.kind}</span>
+                    <div className="cust-erp-drawer__history-copy">
+                      <strong>{item.detail}</strong>
+                      <span>{item.dateLabel}</span>
                     </div>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="cust-erp-drawer__muted">Kayıtlı hareket yok.</p>
+              <p className="cust-erp-drawer__muted">Kayıtlı iletişim geçmişi yok.</p>
             )}
           </section>
 
-          <section
-            className="cust-erp-drawer__section cust-erp-drawer__section--notes"
-            aria-labelledby="cust-sec-notes"
-          >
+          <section className="cust-erp-drawer__section cust-erp-drawer__section--addresses" aria-labelledby="cust-sec-addresses-title">
+            <h3 id="cust-sec-addresses-title" className="cust-erp-drawer__section-title">
+              Adresler
+            </h3>
+            {commandCenter.addresses.length > 0 ? (
+              <div className="cust-erp-drawer__card-list">
+                {commandCenter.addresses.map((item) => (
+                  <article key={item.id} className="cust-erp-drawer__address-card">
+                    <div className="cust-erp-drawer__address-head">
+                      <strong>Adres</strong>
+                      <span>{item.dueLabel}</span>
+                    </div>
+                    <p>{item.address}</p>
+                    {item.mapsHref ? (
+                      <a className="cust-erp-drawer__address-action" href={item.mapsHref} target="_blank" rel="noreferrer">
+                        Navigasyonu Başlat
+                      </a>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="cust-erp-drawer__muted">Kayıtlı adres yok.</p>
+            )}
+          </section>
+
+          <section className="cust-erp-drawer__section cust-erp-drawer__section--notes" aria-labelledby="cust-sec-notes">
             <h3 id="cust-sec-notes" className="cust-erp-drawer__section-title">
               Notlar
             </h3>
@@ -423,7 +433,86 @@ export default function OrderCustomerErpDrawer({
               <p className="cust-erp-drawer__muted">Henüz not yok.</p>
             )}
           </section>
+
+          <section className="cust-erp-drawer__section cust-erp-drawer__section--docs" aria-labelledby="cust-sec-docs-title">
+            <h3 id="cust-sec-docs-title" className="cust-erp-drawer__section-title">
+              Belgeler
+            </h3>
+            <div className="cust-erp-drawer__card-list cust-erp-drawer__card-list--docs">
+              {commandCenter.documents.map((item) => (
+                <article key={item.id} className={`cust-erp-drawer__doc-card is-${item.tone}`}>
+                  <strong>{item.label}</strong>
+                  <p>{item.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
+
+        <footer className="cust-erp-drawer__footer">
+          {telHref ? (
+            <a className="cust-erp-drawer__footer-btn cust-erp-drawer__footer-btn--primary" href={telHref}>
+              Ara
+            </a>
+          ) : (
+            <span className="cust-erp-drawer__footer-btn cust-erp-drawer__footer-btn--primary is-disabled">Ara</span>
+          )}
+          <button
+            type="button"
+            className="cust-erp-drawer__footer-btn cust-erp-drawer__footer-btn--secondary"
+            onClick={() => setMobileActionSheetOpen((value) => !value)}
+          >
+            İşlem Yap
+          </button>
+        </footer>
+
+        {mobileActionSheetOpen ? (
+          <div className="cust-erp-drawer__action-sheet" role="dialog" aria-label="İşlem menüsü">
+            <button
+              type="button"
+              className="cust-erp-drawer__action-sheet-backdrop"
+              aria-label="Kapat"
+              onClick={() => setMobileActionSheetOpen(false)}
+            />
+            <div className="cust-erp-drawer__action-sheet-panel">
+              {[
+                { id: 'whatsapp', label: 'WhatsApp', href: whatsappHref },
+                { id: 'new-order', label: 'Yeni Sipariş', onClick: () => onOpenOrderModal?.() },
+                { id: 'payments', label: 'Tahsilat', onClick: () => scrollToSection('cust-sec-finance') },
+                { id: 'notes', label: 'Not', onClick: () => scrollToSection('cust-sec-notes') },
+                { id: 'service', label: 'Servis', onClick: () => scrollToSection('cust-sec-history-title') },
+                { id: 'delivery', label: 'Teslimat', onClick: () => scrollToSection('cust-sec-addresses-title') },
+                { id: 'photo', label: 'Fotoğraf', onClick: () => scrollToSection('cust-sec-docs-title') },
+                { id: 'document', label: 'Belge', onClick: () => scrollToSection('cust-sec-docs-title') },
+              ].map((item) =>
+                item.href ? (
+                  <a
+                    key={item.id}
+                    className="cust-erp-drawer__action-sheet-item"
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setMobileActionSheetOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="cust-erp-drawer__action-sheet-item"
+                    onClick={() => {
+                      item.onClick?.()
+                      setMobileActionSheetOpen(false)
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+        ) : null}
       </aside>
     </>
   )

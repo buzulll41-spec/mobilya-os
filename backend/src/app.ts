@@ -1,4 +1,6 @@
 import Fastify, { type FastifyInstance } from 'fastify'
+import net from 'node:net'
+import os from 'node:os'
 import cors from '@fastify/cors'
 import { prisma } from './prisma.js'
 import { normalizeError, AppHttpError } from './errors/apiError.js'
@@ -251,6 +253,59 @@ import {
   patchUser,
   resetUserPassword,
 } from './services/users/manageUser.js'
+import {
+  getCollectionsSummary,
+  getCustomersSummary,
+  getOrdersSummary,
+  getReportsSummary,
+  getServiceOpenSummary,
+  getShipmentsTodaySummary,
+} from './services/mobileHomeSummaries.js'
+import { logOps } from './lib/opsLogger.js'
+
+const REQUEST_START_TIME = Symbol('requestStartTime')
+
+type RuntimeMetricState = {
+  requestCount: number
+  errorCount: number
+  avgResponseMs: number
+  cpuUsageStart: NodeJS.CpuUsage
+  processStartMs: number
+}
+
+function toMb(value: number): number {
+  return Math.round((value / (1024 * 1024)) * 100) / 100
+}
+
+function resolveRedisTarget(redisUrl: string): { host: string; port: number } | null {
+  try {
+    const parsed = new URL(redisUrl)
+    return {
+      host: parsed.hostname,
+      port: Number.parseInt(parsed.port || '6379', 10),
+    }
+  } catch {
+    return null
+  }
+}
+
+async function probeRedis(redisUrl: string | undefined): Promise<'up' | 'down' | null> {
+  if (!redisUrl) return null
+  const target = resolveRedisTarget(redisUrl)
+  if (!target) return 'down'
+
+  return await new Promise((resolve) => {
+    const socket = net.createConnection({ host: target.host, port: target.port })
+    const finish = (status: 'up' | 'down') => {
+      socket.destroy()
+      resolve(status)
+    }
+    socket.setTimeout(1200)
+    socket.once('connect', () => finish('up'))
+    socket.once('timeout', () => finish('down'))
+    socket.once('error', () => finish('down'))
+  })
+}
 
 /** GET handler'ları — Prisma bağlantı hatalarını 503'e çevirir. */
 function safeGet<T>(handler: () => Promise<T>): () => Promise<T> {
@@ -287,10 +342,29 @@ function resolveCorsOrigin():
     .map((s) => s.trim())
     .filter(Boolean)
 
+  const exact = list.filter((entry) => !entry.startsWith('regex:'))
+  const regex = list
+    .filter((entry) => entry.startsWith('regex:'))
+    .map((entry) => entry.slice('regex:'.length))
+    .map((pattern) => {
+      try {
+        return new RegExp(pattern)
+      } catch {
+        return null
+      }
+    })
+    .filter((r): r is RegExp => Boolean(r))
+
+  const isAllowedOrigin = (origin: string | undefined, allowedExact: string[]) => {
+    if (!origin) return true
+    if (allowedExact.includes(origin)) return true
+    return regex.some((r) => r.test(origin))
+  }
+
   if (process.env.NODE_ENV === 'production') {
-    const allowed = [...new Set(list.filter((origin) => !isLoopbackOrigin(origin)))]
+    const allowed = [...new Set(exact.filter((origin) => !isLoopbackOrigin(origin)))]
     return (origin, cb) => {
-      if (!origin || allowed.includes(origin)) {
+      if (isAllowedOrigin(origin, allowed)) {
         cb(null, true)
         return
       }
@@ -314,10 +388,10 @@ function resolveCorsOrigin():
     'http://localhost:4176',
     'http://127.0.0.1:4176',
   ]
-  const allowed = [...new Set([...list, ...defaults])]
+  const allowed = [...new Set([...exact, ...defaults])]
 
   return (origin, cb) => {
-    if (!origin || allowed.includes(origin)) {
+    if (isAllowedOrigin(origin, allowed)) {
       cb(null, true)
       return
     }
@@ -327,6 +401,13 @@ function resolveCorsOrigin():
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' })
+  const metricsState: RuntimeMetricState = {
+    requestCount: 0,
+    errorCount: 0,
+    avgResponseMs: 0,
+    cpuUsageStart: process.cpuUsage(),
+    processStartMs: Date.now(),
+  }
 
   await app.register(cors, {
     origin: resolveCorsOrigin(),
@@ -336,6 +417,28 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   registerAuthHook(app)
   registerEnterpriseRateLimit(app)
+
+  app.addHook('onRequest', (req, _reply, done) => {
+    ;(req as unknown as Record<symbol, number>)[REQUEST_START_TIME] = Date.now()
+    done()
+  })
+
+  app.addHook('onResponse', (req, reply, done) => {
+    const startedAt = (req as unknown as Record<symbol, number>)[REQUEST_START_TIME] ?? Date.now()
+    const durationMs = Date.now() - startedAt
+    metricsState.requestCount += 1
+    if (reply.statusCode >= 500) metricsState.errorCount += 1
+    metricsState.avgResponseMs +=
+      (durationMs - metricsState.avgResponseMs) / Math.max(metricsState.requestCount, 1)
+
+    logOps('api', 'request_completed', 'API request completed', {
+      method: req.method,
+      url: req.url,
+      statusCode: reply.statusCode,
+      durationMs,
+    })
+    done()
+  })
 
   app.setErrorHandler((err, _req, reply) => {
     if (err instanceof AppHttpError) {
@@ -351,21 +454,92 @@ export async function buildApp(): Promise<FastifyInstance> {
       })
     }
     app.log.error(err)
+    logOps('api', 'request_failed', 'API request failed', {
+      error: err instanceof Error ? err.message : String(err),
+    }, 'error')
     const normalized = normalizeError(err)
     return reply.status(normalized.statusCode).send(normalized)
   })
 
-  app.get(
-    '/health',
-    safeGet(async () => {
-      try {
-        await prisma.$queryRaw`SELECT 1`
-        return { ok: true, database: 'up' as const }
-      } catch {
-        return { ok: false, database: 'down' as const }
+  const buildHealthSnapshot = async () => {
+    const startedAt = Date.now()
+    const redisStatus = await probeRedis(process.env.REDIS_URL)
+    const uptimeSeconds = Math.floor(process.uptime())
+    const mem = process.memoryUsage()
+
+    try {
+      await prisma.$queryRaw`SELECT 1`
+      const [ordersCount, domainEventCount, taskStateCount] = await Promise.all([
+        prisma.salesOrder.count(),
+        prisma.domainEvent.count(),
+        prisma.taskState.count(),
+      ])
+
+      return {
+        ok: true,
+        status: 'ok',
+        service: 'mobilya-os-backend',
+        database: 'up',
+        redis: redisStatus ?? 'not_configured',
+        queue: {
+          status: 'up',
+          depth: taskStateCount,
+        },
+        storage: {
+          status: 'up',
+          orders: ordersCount,
+          domainEvents: domainEventCount,
+        },
+        version: process.env.APP_VERSION ?? process.env.npm_package_version ?? 'dev',
+        uptime: {
+          seconds: uptimeSeconds,
+        },
+        memory: {
+          rssMb: toMb(mem.rss),
+          heapUsedMb: toMb(mem.heapUsed),
+          heapTotalMb: toMb(mem.heapTotal),
+        },
+        responseTime: {
+          ms: Date.now() - startedAt,
+        },
       }
-    }),
-  )
+    } catch {
+      return {
+        ok: false,
+        status: 'degraded',
+        service: 'mobilya-os-backend',
+        database: 'down',
+        redis: redisStatus ?? 'down',
+        queue: {
+          status: 'down',
+          depth: null,
+        },
+        storage: {
+          status: 'down',
+          orders: null,
+          domainEvents: null,
+        },
+        version: process.env.APP_VERSION ?? process.env.npm_package_version ?? 'dev',
+        uptime: {
+          seconds: uptimeSeconds,
+        },
+        memory: {
+          rssMb: toMb(mem.rss),
+          heapUsedMb: toMb(mem.heapUsed),
+          heapTotalMb: toMb(mem.heapTotal),
+        },
+        responseTime: {
+          ms: Date.now() - startedAt,
+        },
+      }
+    }
+  }
+
+  app.get('/health', async (_req, reply) => {
+    const snapshot = await buildHealthSnapshot()
+    if (!snapshot.ok) return reply.code(503).send(snapshot)
+    return snapshot
+  })
 
   app.post('/v1/auth/login', async (req, reply) => {
     const body = assertValidLoginRequest(req.body)
@@ -430,6 +604,221 @@ export async function buildApp(): Promise<FastifyInstance> {
   })
 
   app.get('/v1/orders', safeGet(() => listSalesOrderListItems(prisma)))
+
+  app.get('/v1/health', async (_req, reply) => {
+    const snapshot = await buildHealthSnapshot()
+    if (!snapshot.ok) return reply.code(503).send(snapshot)
+    return snapshot
+  })
+
+  app.get('/v1/ops/metrics', async (_req, reply) => {
+    const startedAt = Date.now()
+    const hasLlmProvider = Boolean(
+      process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY,
+    )
+    const redisStatus = await probeRedis(process.env.REDIS_URL)
+
+    try {
+      await prisma.$queryRaw`SELECT 1`
+      const [ordersCount, domainEventCount, taskStateCount] = await Promise.all([
+        prisma.salesOrder.count(),
+        prisma.domainEvent.count(),
+        prisma.taskState.count(),
+      ])
+
+      const mem = process.memoryUsage()
+      const uptimeMs = Math.max(1, Date.now() - metricsState.processStartMs)
+      const cpuUsed = process.cpuUsage(metricsState.cpuUsageStart)
+      const cpuMs = (cpuUsed.user + cpuUsed.system) / 1000
+      const cpuPercent = Number(
+        ((cpuMs / uptimeMs) * (100 / Math.max(1, os.cpus().length))).toFixed(2),
+      )
+
+      return {
+        ok: true,
+        timestamp: new Date().toISOString(),
+        cpu: {
+          processPercent: cpuPercent,
+          loadAverage: os.loadavg(),
+          cores: os.cpus().length,
+        },
+        ram: {
+          rssMb: toMb(mem.rss),
+          heapUsedMb: toMb(mem.heapUsed),
+          heapTotalMb: toMb(mem.heapTotal),
+          externalMb: toMb(mem.external),
+        },
+        database: {
+          status: 'up',
+          responseMs: Date.now() - startedAt,
+          orders: ordersCount,
+          domainEvents: domainEventCount,
+        },
+        redis: {
+          status: redisStatus ?? 'not_configured',
+        },
+        api: {
+          requestCount: metricsState.requestCount,
+          errorCount: metricsState.errorCount,
+          avgResponseMs: Number(metricsState.avgResponseMs.toFixed(2)),
+        },
+        queue: {
+          depth: taskStateCount,
+          status: 'up',
+        },
+        sync: {
+          status: 'up',
+          mode: 'offline-first',
+        },
+        notification: {
+          backlog: domainEventCount,
+          status: 'up',
+        },
+        storage: {
+          status: 'up',
+          orders: ordersCount,
+        },
+        llm: {
+          status: hasLlmProvider ? 'up' : 'down',
+        },
+      }
+    } catch {
+      return reply.code(503).send({
+        ok: false,
+        timestamp: new Date().toISOString(),
+        database: {
+          status: 'down',
+          responseMs: Date.now() - startedAt,
+        },
+        redis: {
+          status: redisStatus ?? 'down',
+        },
+        api: {
+          requestCount: metricsState.requestCount,
+          errorCount: metricsState.errorCount,
+          avgResponseMs: Number(metricsState.avgResponseMs.toFixed(2)),
+        },
+        queue: {
+          depth: null,
+          status: 'down',
+        },
+        sync: {
+          status: 'down',
+          mode: 'offline-first',
+        },
+        notification: {
+          backlog: null,
+          status: 'down',
+        },
+        storage: {
+          status: 'down',
+          orders: null,
+        },
+        llm: {
+          status: hasLlmProvider ? 'up' : 'down',
+        },
+      })
+    }
+  })
+
+  app.get('/system/status', async (_req, reply) => {
+    const startedAt = Date.now()
+    const snapshot = await buildHealthSnapshot()
+    const redisStatus = await probeRedis(process.env.REDIS_URL)
+
+    try {
+      await prisma.$queryRaw`SELECT 1`
+      const [domainEventCount, taskStateCount] = await Promise.all([
+        prisma.domainEvent.count(),
+        prisma.taskState.count(),
+      ])
+
+      const uptimeMs = Math.max(1, Date.now() - metricsState.processStartMs)
+      const cpuUsed = process.cpuUsage(metricsState.cpuUsageStart)
+      const cpuMs = (cpuUsed.user + cpuUsed.system) / 1000
+      const cpuPercent = Number(
+        ((cpuMs / uptimeMs) * (100 / Math.max(1, os.cpus().length))).toFixed(2),
+      )
+
+      return {
+        Application: snapshot.status,
+        Database: 'up',
+        Redis: redisStatus ?? 'not_configured',
+        Queue: {
+          status: 'up',
+          depth: taskStateCount,
+        },
+        Storage: snapshot.storage,
+        Workers: {
+          status: 'up',
+          active: 1,
+        },
+        Notifications: {
+          status: 'up',
+          backlog: domainEventCount,
+        },
+        Version: process.env.npm_package_version ?? 'dev',
+        Build: process.env.BUILD_ID ?? process.env.BUILD_VERSION ?? process.env.npm_package_version ?? 'dev',
+        'Git Commit': process.env.GIT_COMMIT ?? 'unknown',
+        'Migration Version': process.env.MIGRATION_VERSION ?? 'unknown',
+        'Seed Version': process.env.SEED_VERSION ?? 'unknown',
+        Uptime: snapshot.uptime,
+        Memory: snapshot.memory,
+        CPU: {
+          processPercent: cpuPercent,
+          loadAverage: os.loadavg(),
+          cores: os.cpus().length,
+        },
+        'Response Time': {
+          ms: Date.now() - startedAt,
+        },
+      }
+    } catch {
+      return reply.code(503).send({
+        Application: 'degraded',
+        Database: 'down',
+        Redis: redisStatus ?? 'down',
+        Queue: {
+          status: 'down',
+          depth: null,
+        },
+        Storage: {
+          status: 'down',
+        },
+        Workers: {
+          status: 'down',
+          active: 0,
+        },
+        Notifications: {
+          status: 'down',
+          backlog: null,
+        },
+        Version: process.env.npm_package_version ?? 'dev',
+        Build: process.env.BUILD_ID ?? process.env.BUILD_VERSION ?? process.env.npm_package_version ?? 'dev',
+        'Git Commit': process.env.GIT_COMMIT ?? 'unknown',
+        'Migration Version': process.env.MIGRATION_VERSION ?? 'unknown',
+        'Seed Version': process.env.SEED_VERSION ?? 'unknown',
+        Uptime: snapshot.uptime,
+        Memory: snapshot.memory,
+        CPU: {
+          processPercent: null,
+          loadAverage: os.loadavg(),
+          cores: os.cpus().length,
+        },
+        'Response Time': {
+          ms: Date.now() - startedAt,
+        },
+      })
+    }
+  })
+
+  // Sprint 3 mobile home summaries (exact contract routes, no mock).
+  app.get('/collections/summary', safeGet(() => getCollectionsSummary(prisma)))
+  app.get('/shipments/today', safeGet(() => getShipmentsTodaySummary(prisma)))
+  app.get('/service/open', safeGet(() => getServiceOpenSummary(prisma)))
+  app.get('/orders/summary', safeGet(() => getOrdersSummary(prisma)))
+  app.get('/customers/summary', safeGet(() => getCustomersSummary(prisma)))
+  app.get('/reports/summary', safeGet(() => getReportsSummary(prisma)))
 
   app.get('/v1/domain-events', safeGet(() => listDomainEvents(prisma)))
 

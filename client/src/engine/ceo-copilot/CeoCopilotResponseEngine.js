@@ -156,7 +156,7 @@ function buildCompanyHealthReply(ctx) {
 /** @param {import('./CeoCopilotContextEngine.js').CeoCopilotContext} ctx */
 function buildGeneralReply(ctx) {
   const rate = Math.round(ctx.metrics.collectionRate)
-  return `MOBILYA OS özeti: Tahsilat %${rate}, ${ctx.ecc.criticalIssues.length} kritik konu, ${ctx.stats.decisionsToday} AI kararı bugün. "Bugün sorun ne?", "Riskler neler?" veya "Collection ne durumda?" sorabilirsiniz.`
+  return `Evtrend ozeti: Tahsilat %${rate}, ${ctx.ecc.criticalIssues.length} kritik konu, ${ctx.stats.decisionsToday} AI karari bugun. "Bugun sorun ne?", "Riskler neler?" veya "Collection ne durumda?" sorabilirsiniz.`
 }
 
 export async function buildGoLiveScoreSnippet() {

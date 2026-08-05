@@ -260,7 +260,206 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  background: var(--mos-bg);
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 24%),
+    linear-gradient(180deg, #fcfdff 0%, #f7fafc 100%);
+}
+
+.mos-shell-safe-area {
+  min-height: 100svh;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+}
+
+.mos-shell-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  padding-bottom: 0.75rem;
+}
+
+.mos-shell-page {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.mos-shell-page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.25rem 0 1rem;
+}
+
+.mos-shell-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.mos-shell-breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mos-shell-breadcrumb__sep {
+  color: #cbd5e1;
+}
+
+.mos-shell-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.mos-shell-hero,
+.mos-shell-hero__copy,
+.mos-shell-hero__meta,
+.mos-shell-page,
+.mos-shell-page-container {
+  min-width: 0;
+}
+
+.mos-shell-hero__copy,
+.mos-shell-action-area,
+.mos-shell-notification-area {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(16px);
+}
+
+.mos-shell-hero__copy {
+  padding: 1.1rem 1.2rem;
+}
+
+.mos-shell-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+
+.mos-shell-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.mos-shell-subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 52ch;
+  font-size: 0.92rem;
+  color: #64748b;
+}
+
+.mos-shell-hero__meta {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.mos-shell-action-area,
+.mos-shell-notification-area {
+  padding: 1rem 1.05rem;
+}
+
+.mos-shell-action-area {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.mos-shell-action-area__label,
+.mos-shell-notification-area__head span,
+.mos-sidebar-shell-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.mos-shell-action-area strong,
+.mos-shell-notification-area__head strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.mos-shell-action-area > span:last-child,
+.mos-shell-notification-area__body {
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.mos-shell-notification-area__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mos-shell-notification-area__body {
+  margin: 0.45rem 0 0;
+}
+
+.mos-shell-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.mos-shell-page-container {
+  width: min(100%, 1440px);
+  margin: 0 auto;
+}
+
+.mos-app-chrome {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(18px);
+}
+
+.mos-app-chrome-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.mos-app-chrome-heading {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.mos-app-chrome-heading__kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.mos-app-chrome-heading__title {
+  font-size: 0.92rem;
+  line-height: 1.1;
+  color: #0f172a;
 }
 
 .mos-topbar {
@@ -336,6 +535,7 @@
   margin: 0 auto;
   padding: 2rem 1.75rem 2.5rem;
   overflow-x: hidden;
+  padding-bottom: 5.5rem;
 }
 
 @media (max-width: 900px) {
@@ -369,6 +569,88 @@
 
 .mos-dash-intro {
   max-width: 38rem;
+}
+
+.mos-sidebar-shell-label {
+  padding: 0.6rem;
+  margin-top: 0.85rem;
+  border: 1px dashed rgba(203, 213, 225, 0.9);
+  border-radius: 12px;
+}
+
+@media (max-width: 1100px) {
+  .mos-shell-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .mos-shell-safe-area {
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+  }
+
+  .mos-shell-breadcrumb {
+    display: none;
+  }
+
+  .mos-app-chrome-heading {
+    display: none;
+  }
+
+  .mos-shell-page-head {
+    padding-bottom: 0.75rem;
+  }
+
+  .mos-shell-hero__copy,
+  .mos-shell-action-area,
+  .mos-shell-notification-area,
+  .mos-app-chrome {
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mos-shell-hero {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mos-app-chrome {
+    gap: 0.5rem;
+    padding-inline: 0.75rem;
+  }
+
+  .mos-app-chrome-right {
+    gap: 0.35rem;
+  }
+
+  .mos-app-chrome-right > :not(.mos-notif-dd):not(.mos-user-chip) {
+    display: none;
+  }
+
+  .mos-shell-page-head {
+    gap: 0.7rem;
+  }
+
+  .mos-shell-hero__copy,
+  .mos-shell-action-area,
+  .mos-shell-notification-area {
+    padding: 0.9rem;
+  }
+
+  .mos-shell-safe-area {
+    padding-top: max(0.4rem, env(safe-area-inset-top));
+    padding-bottom: max(0.4rem, env(safe-area-inset-bottom));
+  }
+
+  .mos-shell-title {
+    font-size: 1.6rem;
+  }
+
+  .mos-content {
+    padding-bottom: 7.25rem;
+  }
 }
 
 .mos-page-title {
@@ -1357,6 +1639,37 @@
   align-items: center;
   gap: 0.3rem;
   max-width: min(160px, 36vw);
+.mos-app-chrome--compact-mobile {
+  min-height: 56px;
+  padding: 0.45rem 0.65rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+}
+.mos-app-chrome--compact-mobile .mos-app-chrome-left {
+  display: flex;
+  align-items: center;
+}
+.mos-app-chrome-left--compact-brand {
+  min-width: 0;
+}
+.mos-app-chrome-brand-wordmark {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f6c40;
+  text-transform: lowercase;
+}
+.mos-mobile-avatar-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid #d4e6d8;
+  background: linear-gradient(180deg, #ecf7ee 0%, #dff0e3 100%);
+  color: #0b5e37;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
   padding: 0.2rem 0.45rem;
   border-radius: 6px;
   border: 1px solid #eef2f6;

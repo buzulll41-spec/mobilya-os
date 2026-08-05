@@ -8,6 +8,7 @@ import MobileTabBar from '../components/mobile/MobileTabBar.jsx'
 import MobileQuickActions from '../components/mobile/MobileQuickActions.jsx'
 import { isMobileStoreOpsPage } from '../constants/mobileStoreOpsChecklist.js'
 import { dispatchMobileFabIntent } from '../constants/mobileFabActions.js'
+import { PAGE_TITLE } from '../constants/navigation.js'
 import { useViewportTier } from '../hooks/useViewportTier.js'
 import Sidebar from './Sidebar.jsx'
 
@@ -71,9 +72,11 @@ export default function AppLayout({
 }) {
   const viewportTier = useViewportTier()
   const isPhone = viewportTier === 'phone'
+  const isTodayPhoneHome = isPhone && page === 'dashboard'
+  const immersivePhoneHome = isTodayPhoneHome || (isPhone && page === 'orders')
   const isTouchDevice = viewportTier === 'phone' || viewportTier === 'tablet'
-  const showStoreQuickDock = isPhone && isMobileStoreOpsPage(page) && page !== 'dashboard'
-  const showMobileFab = isPhone && !showStoreQuickDock && page !== 'dashboard'
+  const showStoreQuickDock = isPhone && isMobileStoreOpsPage(page) && page !== 'dashboard' && page !== 'orders'
+  const showMobileFab = isPhone && !showStoreQuickDock && page !== 'dashboard' && page !== 'orders'
   const mobileDockMode = suspendMobileDock ? 'none' : showStoreQuickDock ? 'quick-actions' : 'fab'
   const tabletSidebarCollapsed = viewportTier === 'tablet' ? true : sidebarCollapsed
   const viewportClass =
@@ -82,6 +85,13 @@ export default function AppLayout({
       : viewportTier === 'phone'
         ? 'mos-viewport-phone'
         : 'mos-viewport-desktop'
+  const resolvedNavItems = navItems ?? []
+  const activeNav = resolvedNavItems.find((item) => item.id === page) ?? null
+  const pageTitle = PAGE_TITLE[page] ?? activeNav?.label ?? 'Evtrend'
+  const pageSection = activeNav?.indent ? 'Modül' : 'Workspace'
+  const latestNotification = notifications?.[0] ?? null
+  const unreadNotificationCount = Array.isArray(notifications) ? notifications.length : 0
+  const breadcrumbItems = ['Evtrend', pageSection, pageTitle]
 
   function handleFabIntent(intent) {
     if (onMobileFabIntent) {
@@ -116,37 +126,91 @@ export default function AppLayout({
         aria-hidden
       />
 
-      <Sidebar
-        page={page}
-        onNavigate={onNavigate}
-        mobileOpen={sidebarOpen}
-        onMobileClose={() => setSidebarOpen(false)}
-        todayLabel={todayLabel}
-        collapsed={tabletSidebarCollapsed}
-        onToggleCollapsed={onToggleSidebarCollapsed}
-        navItems={navItems}
-      />
+      {!immersivePhoneHome ? (
+        <Sidebar
+          page={page}
+          onNavigate={onNavigate}
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+          todayLabel={todayLabel}
+          collapsed={tabletSidebarCollapsed}
+          onToggleCollapsed={onToggleSidebarCollapsed}
+          navItems={navItems}
+        />
+      ) : null}
 
       <div className="mos-main">
-        <AppChrome
-          page={page}
-          globalSearch={globalSearch}
-          onGlobalSearchChange={onGlobalSearchChange}
-          orders={orders}
-          onSearchSelect={onSearchSelect}
-          onCommitSearch={onCommitSearch}
-          onMobileMenu={() => setSidebarOpen(true)}
-          notifications={notifications}
-          onNotificationNavigate={onNotificationNavigate}
-          onQuickAction={onQuickAction}
-          userName={userName}
-          userRole={userRole}
-          userRoleKey={userRoleKey}
-          userInitials={userInitials}
-          onLogout={onLogout}
-        />
+        <div className="mos-shell-safe-area">
+          {!immersivePhoneHome ? (
+            <div className="mos-shell-topbar">
+              <AppChrome
+                page={page}
+                compactMobileChrome={isTodayPhoneHome}
+                pageTitle={pageTitle}
+                pageSection={pageSection}
+                globalSearch={globalSearch}
+                onGlobalSearchChange={onGlobalSearchChange}
+                orders={orders}
+                onSearchSelect={onSearchSelect}
+                onCommitSearch={onCommitSearch}
+                onMobileMenu={() => setSidebarOpen(true)}
+                notifications={notifications}
+                onNotificationNavigate={onNotificationNavigate}
+                onQuickAction={onQuickAction}
+                userName={userName}
+                userRole={userRole}
+                userRoleKey={userRoleKey}
+                userInitials={userInitials}
+                onLogout={onLogout}
+              />
+            </div>
+          ) : null}
 
-        <div className="mos-content">{content}</div>
+          <div className="mos-shell-page">
+            {!immersivePhoneHome ? (
+            <div className="mos-shell-page-head">
+              <nav className="mos-shell-breadcrumb" aria-label="Breadcrumb">
+                {breadcrumbItems.map((label, index) => (
+                  <span key={`${label}-${index}`} className="mos-shell-breadcrumb__item">
+                    <span>{label}</span>
+                    {index < breadcrumbItems.length - 1 ? <span className="mos-shell-breadcrumb__sep">/</span> : null}
+                  </span>
+                ))}
+              </nav>
+
+              <div className="mos-shell-hero">
+                <div className="mos-shell-hero__copy">
+                  <p className="mos-shell-kicker">{pageSection}</p>
+                  <h1 className="mos-shell-title">{pageTitle}</h1>
+                  <p className="mos-shell-subtitle">Tüm modüller ortak app shell içinde aynı navigasyon ve çalışma ritmini kullanır.</p>
+                </div>
+
+                <div className="mos-shell-hero__meta">
+                  <section className="mos-shell-action-area" aria-label="Action area">
+                    <span className="mos-shell-action-area__label">Action Area</span>
+                    <strong>{todayLabel}</strong>
+                    <span>{viewportTier === 'phone' ? 'Mobile layout' : viewportTier === 'tablet' ? 'Tablet layout' : 'Desktop layout'}</span>
+                  </section>
+
+                  <section className="mos-shell-notification-area" aria-label="Notification area">
+                    <div className="mos-shell-notification-area__head">
+                      <span>Notification Area</span>
+                      <strong>{unreadNotificationCount}</strong>
+                    </div>
+                    <p className="mos-shell-notification-area__body">{latestNotification?.title ?? 'Yeni bildirim yok'}</p>
+                  </section>
+                </div>
+              </div>
+            </div>
+            ) : null}
+
+            <div className="mos-shell-scroll">
+              <div className="mos-shell-page-container">
+                <div className="mos-content">{content}</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {isTouchDevice ? (
           <>

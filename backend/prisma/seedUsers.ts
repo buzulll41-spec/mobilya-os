@@ -54,20 +54,67 @@ const DEMO_USERS = [
   },
 ] as const
 
+type SeedUserInput = {
+  id: string
+  fullName: string
+  email: string
+  password: string
+  role: (typeof USER_ROLE)[keyof typeof USER_ROLE]
+}
+
+function parseProductionUsersFromEnv(): SeedUserInput[] {
+  const raw = process.env.SEED_USERS_JSON?.trim()
+  if (!raw) return []
+
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .map((row) => {
+        if (!row || typeof row !== 'object') return null
+        const r = row as Record<string, unknown>
+        const id = typeof r.id === 'string' ? r.id.trim() : ''
+        const fullName = typeof r.fullName === 'string' ? r.fullName.trim() : ''
+        const email = typeof r.email === 'string' ? r.email.trim().toLowerCase() : ''
+        const password = typeof r.password === 'string' ? r.password : ''
+        const role = typeof r.role === 'string' ? r.role.trim().toUpperCase() : ''
+        if (!id || !fullName || !email || !password) return null
+        if (!Object.values(USER_ROLE).includes(role as (typeof USER_ROLE)[keyof typeof USER_ROLE])) return null
+        return {
+          id,
+          fullName,
+          email,
+          password,
+          role: role as (typeof USER_ROLE)[keyof typeof USER_ROLE],
+        }
+      })
+      .filter((x): x is SeedUserInput => Boolean(x))
+  } catch {
+    return []
+  }
+}
+
 export async function seedUsers(prisma: PrismaClient): Promise<void> {
-  for (const u of DEMO_USERS) {
-    await prisma.user.upsert({
-      where: { email: u.email },
-      create: {
+  const count = await prisma.user.count()
+  if (count > 0) {
+    console.log(`Pilot-safe seed: ${count} kullanıcı mevcut — kullanıcı seed atlandı`)
+    return
+  }
+
+  const isProduction = process.env.NODE_ENV === 'production'
+  const users = isProduction ? parseProductionUsersFromEnv() : [...DEMO_USERS]
+
+  if (isProduction && users.length === 0) {
+    console.log('Pilot-safe seed: production için SEED_USERS_JSON tanımlı değil — kullanıcı seed atlandı')
+    return
+  }
+
+  for (const u of users) {
+    await prisma.user.create({
+      data: {
         id: u.id,
         fullName: u.fullName,
         email: u.email,
-        passwordHash: hashPassword(u.password),
-        role: u.role,
-        isActive: true,
-      },
-      update: {
-        fullName: u.fullName,
         passwordHash: hashPassword(u.password),
         role: u.role,
         isActive: true,

@@ -1,5 +1,9 @@
 import { executeCreateOrderFlow } from '../../application/orderMutationOrchestration.js'
-import { executePostPaymentFlow } from '../../application/orderOperationsOrchestration.js'
+import {
+  executePatchShipmentStatusFlow,
+  executePostOrderShipmentFlow,
+  executePostPaymentFlow,
+} from '../../application/orderOperationsOrchestration.js'
 import {
   OFFLINE_MUTATION_TYPE,
   OFFLINE_SYNC_RETRY_BASE_MS,
@@ -40,6 +44,18 @@ async function executeQueueItem(item) {
     const plan = /** @type {import('../../state/shipmentPlanStore.js').ShipmentPlan} */ (item.payload)
     saveShipmentPlan(plan)
     return { plan }
+  }
+  if (item.type === OFFLINE_MUTATION_TYPE.POST_SHIPMENT) {
+    const payload = /** @type {{ orderId: string; body: { plannedDate: string; crewName?: string; vehicleNote?: string; note?: string } }} */ (
+      item.payload
+    )
+    return executePostOrderShipmentFlow(payload.orderId, payload.body)
+  }
+  if (item.type === OFFLINE_MUTATION_TYPE.PATCH_SHIPMENT_STATUS) {
+    const payload = /** @type {{ orderId: string; shipmentId: string; body: { status: string; issueNote?: string } }} */ (
+      item.payload
+    )
+    return executePatchShipmentStatusFlow(payload.orderId, payload.shipmentId, payload.body)
   }
   if (item.type === OFFLINE_MUTATION_TYPE.PHOTO_CAPTURE) {
     return { stored: true }

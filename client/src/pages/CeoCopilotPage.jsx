@@ -148,7 +148,7 @@ export default function CeoCopilotPage({ orders, dtos, collectionRows = [], ship
         <div className="ceo-copilot__thread">
           {thread.messages.length === 0 ? (
             <div className="ceo-copilot__empty">
-              <p>MOBILYA OS v1.0 — CEO Copilot</p>
+              <p>Evtrend — CEO Copilot</p>
               <p>Şirketinizi doğal dil ile yönetin.</p>
             </div>
           ) : (

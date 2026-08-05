@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DEMO_TODAY, getOperationalToday } from '../data/constants.js'
 import { projectLegacyOrderToListItemDto } from '../services/orderListItemProjection.js'
 import { listItemDtoToLegacyOrder } from '../mappers/listItemDtoToLegacyOrder.js'
@@ -9,19 +9,6 @@ import { OrdersStateContext } from './ordersContext.js'
 import { formatApiErrorMessage } from '../utils/apiErrorMessage.js'
 import { withApiRetry } from '../lib/apiRetry.js'
 import {
-  executeCreateOrderFlow,
-  executeRefreshOrdersFlow,
-  executeRollbackOrdersState,
-  executeUpdateOrderFlow,
-} from '../application/orderMutationOrchestration.js'
-import {
-  executePatchTerminFlow,
-  executePostPaymentFlow,
-  executePatchMissingItemStatusFlow,
-  executeMarkMissingItemReadyForShipmentFlow,
-  executePostMissingItemFlow,
-  executePatchShipmentStatusFlow,
-  executePostOrderShipmentFlow,
   mergeOrderListItemFromMutation,
 } from '../application/orderOperationsOrchestration.js'
 import { DOMAIN_EVENT_TYPE } from '../contracts/v1/domainEventTypes.js'
@@ -32,6 +19,22 @@ import { useOfflineFirst } from './OfflineFirstProvider.jsx'
 import { isOfflineMode, runWithOfflineQueue } from '../services/offline/offlineMutationGate.js'
 import { OFFLINE_MUTATION_TYPE } from '../services/offline/offlineCacheStore.js'
 import { readCachedOrders } from '../services/offline/offlineCacheStore.js'
+import { operationsRepository } from '../repository/operationsRepository.js'
+import { recordOperationAudit } from '../lib/operationAuditLog.js'
+
+const STARTUP_RETRY_INTERVAL_MS = 5000
+const STARTUP_RETRY_MAX_ATTEMPTS = 18
+const STARTUP_MESSAGE = 'Sunucu başlatılıyor, kısa süre sonra yeniden deneyin. İlk açılış ücretsiz pilot sunucuda kısa sürebilir.'
+
+function isStartupWakeError(message) {
+  const text = String(message ?? '').toLowerCase()
+  return text.includes('failed to fetch') ||
+    text.includes('network') ||
+    text.includes('timeout') ||
+    text.includes('503') ||
+    text.includes('sunucu başlatılıyor') ||
+    text.includes('server')
+}
 
 /** @typedef {import('../data/seedOrders.js').Order} Order */
 /** @typedef {import('../contracts/v1/salesOrderListItem.js').SalesOrderListItemDto} SalesOrderListItemDto */
@@ -51,6 +54,7 @@ import { readCachedOrders } from '../services/offline/offlineCacheStore.js'
  * @property {SalesOrderListItemDto[]} salesOrderListItemDtos Wire DTO (foundation)
  * @property {DomainEventDto[]} domainEvents Operasyonel domain event akışı (mock)
  * @property {TaskDto[]} operationalTasks Operasyonel görevler (mock)
+ * @property {{ layer: 'api' | 'cache' | 'mock', hasApiBase: boolean, usedFallback: boolean, fetchedAt: string | null, layerError?: string }} dataPipeline Canlı veri pipeline katmanı
  * @property {boolean} loading İlk yükleme: liste boşken veri çekiliyor
  * @property {boolean} isRefreshing Herhangi bir getOrders çalışıyor
  * @property {boolean} mutating create / update API çağrısı
@@ -82,9 +86,28 @@ export function OrdersProvider({ children }) {
   const [shipmentQueueRows, setShipmentQueueRows] = useState(/** @type {ShipmentRowVM[]} */ ([]))
   const [domainEvents, setDomainEvents] = useState(/** @type {DomainEventDto[]} */ ([]))
   const [operationalTasks, setOperationalTasks] = useState(/** @type {TaskDto[]} */ ([]))
+  const [dataPipeline, setDataPipeline] = useState(
+    /** @type {{ layer: 'api' | 'cache' | 'mock', hasApiBase: boolean, usedFallback: boolean, fetchedAt: string | null, layerError?: string }} */ ({
+      layer: apiMode ? 'api' : 'mock',
+      hasApiBase: apiMode,
+      usedFallback: false,
+      fetchedAt: null,
+    }),
+  )
   const [isRefreshing, setIsRefreshing] = useState(true)
   const [mutating, setMutating] = useState(false)
   const [error, setError] = useState(/** @type {Error | null} */ (null))
+  const startupRetryTimerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null))
+  const startupRetryAttemptRef = useRef(0)
+  const dtoCountRef = useRef(0)
+
+  const clearStartupRetry = useCallback(() => {
+    if (startupRetryTimerRef.current) {
+      clearTimeout(startupRetryTimerRef.current)
+      startupRetryTimerRef.current = null
+    }
+    startupRetryAttemptRef.current = 0
+  }, [])
 
   const orderListRows = useMemo(
     () => salesOrderListItemDtos.map((dto) => mapListItemToRowVM(dto)),
@@ -108,15 +131,49 @@ export function OrdersProvider({ children }) {
 
   const loading = isRefreshing && salesOrderListItemDtos.length === 0
 
+  const auditOperation = useCallback(
+    (
+      /** @type {string} */ action,
+      /** @type {string} */ detail,
+      /** @type {Record<string, unknown>} */ meta = {},
+    ) => {
+      recordOperationAudit({
+        action,
+        actorRole: user?.role ?? 'UNKNOWN',
+        actorName: user?.fullName ?? 'Bilinmeyen Kullanici',
+        detail,
+        meta,
+      })
+    },
+    [user?.role, user?.fullName],
+  )
+
   const refreshOrders = useCallback(
     async (/** @type {{ mergeCreated?: SalesOrderListItemDto, includeDomainEvents?: boolean } | undefined} */ options) => {
       setError(null)
       setIsRefreshing(true)
+      const requestStartedAt = Date.now()
+      let forceReleased = false
+      const forceReleaseTimer = setTimeout(() => {
+        forceReleased = true
+        setError(new Error('Veri alınamadı'))
+        setIsRefreshing(false)
+        console.error('HOME API ERROR', {
+          source: 'OrdersProvider.refreshOrders',
+          durationMs: Date.now() - requestStartedAt,
+          message: 'Request guard timeout (3000ms)',
+        })
+      }, 3000)
+      console.info('HOME API START', {
+        source: 'OrdersProvider.refreshOrders',
+        apiMode,
+        includeDomainEvents: Boolean(options?.includeDomainEvents),
+      })
       try {
         assertProductionDataSource()
         const next = await withApiRetry(
-          () => executeRefreshOrdersFlow({ includeDomainEvents: options?.includeDomainEvents }),
-          { maxAttempts: 3 },
+          () => operationsRepository.loadSnapshot({ includeDomainEvents: options?.includeDomainEvents }),
+          { maxAttempts: 2 },
         )
         let salesOrderListItemDtos = Array.isArray(next.salesOrderListItemDtos)
           ? next.salesOrderListItemDtos
@@ -134,25 +191,93 @@ export function OrdersProvider({ children }) {
         setShipmentQueueRows(Array.isArray(next.shipmentQueueRows) ? next.shipmentQueueRows : [])
         setDomainEvents(next.domainEvents)
         setOperationalTasks(next.operationalTasks)
+        setDataPipeline({
+          layer: next.layer,
+          hasApiBase: next.meta.hasApiBase,
+          usedFallback: next.meta.usedFallback,
+          fetchedAt: next.meta.fetchedAt,
+          layerError: next.meta.layerError,
+        })
+        clearStartupRetry()
         await cacheOrders(salesOrderListItemDtos)
+        console.info('HOME API RESPONSE', {
+          source: 'OrdersProvider.refreshOrders',
+          durationMs: Date.now() - requestStartedAt,
+          layer: next.layer,
+          orders: salesOrderListItemDtos.length,
+          shipments: Array.isArray(next.shipmentQueueRows) ? next.shipmentQueueRows.length : 0,
+          tasks: Array.isArray(next.operationalTasks) ? next.operationalTasks.length : 0,
+        })
       } catch (e) {
         if (isOfflineMode()) {
           try {
             const cached = await readCachedOrders()
-            if (cached.length) setSalesOrderListItemDtos(cached)
+            if (cached.length > 0) {
+              setSalesOrderListItemDtos(cached)
+              setShipmentQueueRows(cached.map((dto) => mapListItemToShipmentRowVM(dto)))
+              setDataPipeline((prev) => ({
+                ...prev,
+                layer: 'cache',
+                usedFallback: true,
+              }))
+            }
           } catch {
             // ignore cache fallback failures
           }
         }
         const message = formatApiErrorMessage(e)
-        if (!message.includes('Backend çalışmıyor') && !message.includes('zaman aşımına')) {
+        const canTryWake =
+          apiMode &&
+          !isOfflineMode() &&
+          dtoCountRef.current === 0 &&
+          isStartupWakeError(message) &&
+          startupRetryAttemptRef.current < STARTUP_RETRY_MAX_ATTEMPTS
+
+        if (canTryWake) {
+          startupRetryAttemptRef.current += 1
+          setError(new Error(STARTUP_MESSAGE))
+          if (!startupRetryTimerRef.current) {
+            startupRetryTimerRef.current = setTimeout(() => {
+              startupRetryTimerRef.current = null
+              void refreshOrders({ includeDomainEvents: false })
+            }, STARTUP_RETRY_INTERVAL_MS)
+          }
+        } else {
           setError(new Error(message))
         }
+        setDataPipeline((prev) => ({
+          ...prev,
+          usedFallback: true,
+          fetchedAt: new Date().toISOString(),
+          layerError: canTryWake ? STARTUP_MESSAGE : message,
+        }))
+        console.error('HOME API ERROR', {
+          source: 'OrdersProvider.refreshOrders',
+          durationMs: Date.now() - requestStartedAt,
+          message: canTryWake ? STARTUP_MESSAGE : message,
+        })
       } finally {
-        setIsRefreshing(false)
+        clearTimeout(forceReleaseTimer)
+        if (!forceReleased) {
+          setIsRefreshing(false)
+        }
       }
     },
-    [cacheOrders],
+    [cacheOrders, apiMode, clearStartupRetry],
+  )
+
+  useEffect(() => {
+    dtoCountRef.current = salesOrderListItemDtos.length
+  }, [salesOrderListItemDtos.length])
+
+  useEffect(
+    () => () => {
+      if (startupRetryTimerRef.current) {
+        clearTimeout(startupRetryTimerRef.current)
+        startupRetryTimerRef.current = null
+      }
+    },
+    [],
   )
 
   useEffect(() => {
@@ -163,7 +288,6 @@ export function OrdersProvider({ children }) {
 
   useEffect(() => {
     if (!apiMode) return
-    if (!user?.id) return
     void refreshOrders({ includeDomainEvents: false })
   }, [apiMode, user?.id, refreshOrders])
 
@@ -178,7 +302,7 @@ export function OrdersProvider({ children }) {
           const queued = await runWithOfflineQueue({
             type: OFFLINE_MUTATION_TYPE.CREATE_ORDER,
             payload: draft,
-            onlineExecutor: () => executeCreateOrderFlow(draft),
+            onlineExecutor: () => operationsRepository.createOrder(draft),
           })
           if ('queued' in queued) {
             const optimistic = projectLegacyOrderToListItemDto(
@@ -190,11 +314,15 @@ export function OrdersProvider({ children }) {
               DEMO_TODAY,
             )
             setSalesOrderListItemDtos((prev) => [optimistic, ...prev])
+            auditOperation('CREATE_ORDER_QUEUED_OFFLINE', `Siparis offline kuyruğa alindi: ${optimistic.id}`, {
+              orderId: optimistic.id,
+              queueId: queued.id,
+            })
             await refreshSnapshot()
             return listItemDtoToLegacyOrder(optimistic)
           }
         }
-        const result = await executeCreateOrderFlow(draft)
+        const result = await operationsRepository.createOrder(draft)
         const createdDto = result.optimisticDto
         setSalesOrderListItemDtos((prev) => [
           createdDto,
@@ -205,6 +333,9 @@ export function OrdersProvider({ children }) {
         } catch {
           /* Sipariş oluşturuldu; kısıtlı rolde kısmi yenileme başarısız olabilir */
         }
+        auditOperation('CREATE_ORDER', `Siparis olusturuldu: ${result.created.id}`, {
+          orderId: result.created.id,
+        })
         return result.created
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -214,14 +345,14 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [refreshOrders, refreshSnapshot],
+    [refreshOrders, refreshSnapshot, auditOperation],
   )
 
   const updateOrder = useCallback(async (/** @type {string} */ id, /** @type {Partial<Order>} */ patch) => {
     setMutating(true)
     setError(null)
     try {
-      const result = await executeUpdateOrderFlow(id, patch)
+      const result = await operationsRepository.updateOrder(id, patch)
       const nextDtos = Array.isArray(result.salesOrderListItemDtos) ? result.salesOrderListItemDtos : []
       setSalesOrderListItemDtos((prev) => {
         const serverDto = nextDtos.find((d) => d.id === id)
@@ -230,11 +361,12 @@ export function OrdersProvider({ children }) {
       })
       setDomainEvents(result.domainEvents)
       setOperationalTasks(result.operationalTasks)
+      auditOperation('UPDATE_ORDER', `Siparis guncellendi: ${id}`, { orderId: id })
     } catch (e) {
       const err = new Error(formatApiErrorMessage(e))
       setError(err)
       try {
-        const rolled = await executeRollbackOrdersState()
+        const rolled = await operationsRepository.rollbackState()
         setSalesOrderListItemDtos(rolled.salesOrderListItemDtos)
         setShipmentQueueRows(rolled.shipmentQueueRows ?? [])
         setDomainEvents(rolled.domainEvents)
@@ -246,7 +378,7 @@ export function OrdersProvider({ children }) {
     } finally {
       setMutating(false)
     }
-  }, [])
+  }, [auditOperation])
 
   const postOrderPayment = useCallback(
     async (/** @type {string} */ orderId, /** @type {{ amount: number, method: string, note?: string }} */ body) => {
@@ -258,17 +390,27 @@ export function OrdersProvider({ children }) {
             type: OFFLINE_MUTATION_TYPE.POST_PAYMENT,
             payload: { orderId, body },
             entityKey: orderId,
-            onlineExecutor: () => executePostPaymentFlow(orderId, body),
+            onlineExecutor: () => operationsRepository.postOrderPayment(orderId, body),
           })
           if ('queued' in queued) {
+            auditOperation('POST_PAYMENT_QUEUED_OFFLINE', `Tahsilat offline kuyruğa alindi: ${orderId}`, {
+              orderId,
+              queueId: queued.id,
+              amount: body.amount,
+            })
             await refreshSnapshot()
             return
           }
         }
-        const result = await executePostPaymentFlow(orderId, body)
+        const result = await operationsRepository.postOrderPayment(orderId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('POST_PAYMENT', `Tahsilat kaydedildi: ${orderId}`, {
+          orderId,
+          amount: body.amount,
+          method: body.method,
+        })
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
         setError(err)
@@ -277,7 +419,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [refreshSnapshot],
+    [refreshSnapshot, auditOperation],
   )
 
   const patchOrderTermin = useCallback(
@@ -288,10 +430,14 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executePatchTerminFlow(orderId, body)
+        const result = await operationsRepository.patchOrderTermin(orderId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('PATCH_TERMIN', `Termin guncellendi: ${orderId}`, {
+          orderId,
+          committedShipBy: body.committedShipBy,
+        })
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
         setError(err)
@@ -300,7 +446,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation],
   )
 
   const postOrderMissingItem = useCallback(
@@ -311,10 +457,14 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executePostMissingItemFlow(orderId, body)
+        const result = await operationsRepository.postOrderMissingItem(orderId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('POST_MISSING_ITEM', `Eksik urun olusturuldu: ${orderId}`, {
+          orderId,
+          missingItemId: result.missingItem.id,
+        })
         return { missingItem: result.missingItem }
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -324,7 +474,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation],
   )
 
   const patchMissingItemStatus = useCallback(
@@ -336,10 +486,15 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executePatchMissingItemStatusFlow(orderId, missingItemId, body)
+        const result = await operationsRepository.patchMissingItemStatus(orderId, missingItemId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('PATCH_MISSING_ITEM_STATUS', `Eksik urun durumu guncellendi: ${orderId}`, {
+          orderId,
+          missingItemId,
+          status: body.status,
+        })
         return { missingItem: result.missingItem }
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -349,7 +504,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation],
   )
 
   const markMissingItemReadyForShipment = useCallback(
@@ -361,10 +516,14 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executeMarkMissingItemReadyForShipmentFlow(orderId, missingItemId, body)
+        const result = await operationsRepository.markMissingItemReadyForShipment(orderId, missingItemId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('MISSING_ITEM_READY_FOR_SHIPMENT', `Eksik urun sevke hazir: ${orderId}`, {
+          orderId,
+          missingItemId,
+        })
         return { missingItem: result.missingItem }
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -374,7 +533,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation],
   )
 
   const postOrderShipment = useCallback(
@@ -385,11 +544,31 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executePostOrderShipmentFlow(orderId, body)
+        if (isOfflineMode()) {
+          const queued = await runWithOfflineQueue({
+            type: OFFLINE_MUTATION_TYPE.POST_SHIPMENT,
+            payload: { orderId, body },
+            entityKey: orderId,
+            onlineExecutor: () => operationsRepository.postOrderShipment(orderId, body),
+          })
+          if ('queued' in queued) {
+            auditOperation('POST_SHIPMENT_QUEUED_OFFLINE', `Sevkiyat plani offline kuyruğa alindi: ${orderId}`, {
+              orderId,
+              queueId: queued.id,
+            })
+            await refreshSnapshot()
+            return { shipment: /** @type {import('../contracts/v1/shipment.js').ShipmentDto} */ ({ id: `offline-${queued.id}` }) }
+          }
+        }
+        const result = await operationsRepository.postOrderShipment(orderId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setShipmentQueueRows(result.shipmentQueueRows)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('POST_SHIPMENT', `Sevkiyat plani olusturuldu: ${orderId}`, {
+          orderId,
+          plannedDate: body.plannedDate,
+        })
         return { shipment: result.shipment }
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -399,7 +578,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation, refreshSnapshot],
   )
 
   const patchShipmentStatus = useCallback(
@@ -411,11 +590,34 @@ export function OrdersProvider({ children }) {
       setMutating(true)
       setError(null)
       try {
-        const result = await executePatchShipmentStatusFlow(orderId, shipmentId, body)
+        if (isOfflineMode()) {
+          const queued = await runWithOfflineQueue({
+            type: OFFLINE_MUTATION_TYPE.PATCH_SHIPMENT_STATUS,
+            payload: { orderId, shipmentId, body },
+            entityKey: orderId,
+            onlineExecutor: () => operationsRepository.patchShipmentStatus(orderId, shipmentId, body),
+          })
+          if ('queued' in queued) {
+            auditOperation('PATCH_SHIPMENT_STATUS_QUEUED_OFFLINE', `Sevkiyat durumu offline kuyruğa alindi: ${orderId}`, {
+              orderId,
+              shipmentId,
+              status: body.status,
+              queueId: queued.id,
+            })
+            await refreshSnapshot()
+            return { shipment: /** @type {import('../contracts/v1/shipment.js').ShipmentDto} */ ({ id: shipmentId, status: body.status }) }
+          }
+        }
+        const result = await operationsRepository.patchShipmentStatus(orderId, shipmentId, body)
         setSalesOrderListItemDtos(result.salesOrderListItemDtos)
         setShipmentQueueRows(result.shipmentQueueRows)
         setDomainEvents(result.domainEvents)
         setOperationalTasks(result.operationalTasks)
+        auditOperation('PATCH_SHIPMENT_STATUS', `Sevkiyat durumu guncellendi: ${orderId}`, {
+          orderId,
+          shipmentId,
+          status: body.status,
+        })
         return { shipment: result.shipment }
       } catch (e) {
         const err = new Error(formatApiErrorMessage(e))
@@ -425,7 +627,7 @@ export function OrdersProvider({ children }) {
         setMutating(false)
       }
     },
-    [],
+    [auditOperation, refreshSnapshot],
   )
 
   const recordContractPrinted = useCallback(
@@ -622,6 +824,7 @@ export function OrdersProvider({ children }) {
       salesOrderListItemDtos,
       domainEvents,
       operationalTasks,
+      dataPipeline,
       loading,
       isRefreshing,
       mutating,
@@ -652,6 +855,7 @@ export function OrdersProvider({ children }) {
       salesOrderListItemDtos,
       domainEvents,
       operationalTasks,
+      dataPipeline,
       loading,
       isRefreshing,
       mutating,

@@ -25,3 +25,22 @@ client/screenshots/
 !.env.example
 !.env.production.example
 !client/.env.test
+.vercel
+.env*
+
+# Explicit local env variants
+.env.local
+.env.production
+.env.*.local
+
+# Database dumps / backups / logs
+*.sql
+*.dump
+*.bak
+backup/
+backups/
+storage/backups/
+logs/
+
+# Common build artifacts
+build/

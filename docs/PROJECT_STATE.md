@@ -258,6 +258,8 @@ cd client && npm run test && npm run lint && npm run build
 - [FOUNDATION_V1.md](./FOUNDATION_V1.md) — Client mimari checkpoint
 - [BACKEND_FOUNDATION_V1.md](./BACKEND_FOUNDATION_V1.md) — Backend READ/mutation checkpoint
 - [FOUNDATION_V1_SMOKE_TEST.md](./FOUNDATION_V1_SMOKE_TEST.md) — Manuel smoke senaryoları
+- [EVTREND_MOBILE_DESIGN_SYSTEM_V1.md](./EVTREND_MOBILE_DESIGN_SYSTEM_V1.md) — EVTREND resmi mobil tasarim standardi (kilitli)
+- [EVTREND_NATIVE_MOBILE_V2_PRODUCT_MANIFESTO.md](./EVTREND_NATIVE_MOBILE_V2_PRODUCT_MANIFESTO.md) — EVTREND Native Mobile V2 urun manifestosu (kilitli)
 - [PILOT_STORE_CHECKLIST.md](./PILOT_STORE_CHECKLIST.md) — 1 günlük pilot hazırlığı
 - [../README.md](../README.md) — Monorepo başlangıç sırası
 

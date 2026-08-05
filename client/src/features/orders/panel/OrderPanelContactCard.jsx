@@ -73,7 +73,7 @@ export default function OrderPanelContactCard({
           className="cust-erp-preview__open"
           onClick={() => onOpenCustomerDrawer?.()}
         >
-          Müşteri kartı
+          Müşteri merkezi
         </button>
       </div>
 

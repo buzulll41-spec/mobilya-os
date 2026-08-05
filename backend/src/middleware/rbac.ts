@@ -162,8 +162,14 @@ const ROLE_PERMISSIONS: Record<UserRole, Set<string>> = {
 type RouteRule = { methods: string[]; pattern: RegExp; permission: Permission }
 
 const ROUTE_RULES: RouteRule[] = [
+  { methods: ['GET'], pattern: /^\/v1\/health$/, permission: PERM.AUTH_SESSION },
   { methods: ['GET'], pattern: /^\/v1\/auth\/me$/, permission: PERM.AUTH_SESSION },
   { methods: ['GET', 'PUT', 'DELETE'], pattern: /^\/v1\/task-states/, permission: PERM.TASK_STATES },
+  {
+    methods: ['GET'],
+    pattern: /^\/(collections\/summary|shipments\/today|service\/open|orders\/summary|customers\/summary|reports\/summary)$/,
+    permission: PERM.AUTH_SESSION,
+  },
 
   { methods: ['GET'], pattern: /^\/v1\/users/, permission: PERM.USERS_MANAGE },
   { methods: ['POST'], pattern: /^\/v1\/users$/, permission: PERM.USERS_MANAGE },

@@ -1,11 +1,11 @@
 /** Mağaza / firma placeholder — yazdırılabilir sözleşme üst bilgisi */
 export const SALES_CONTRACT_STORE = {
-  brand: 'MOBILYA OS',
-  logoText: 'MO',
-  name: 'Mobilya OS Mağaza',
+  brand: 'Evtrend',
+  logoText: 'EV',
+  name: 'Evtrend Magaza',
   address: 'Örnek Mah. Mağaza Cad. No: 1, 34000 İstanbul',
   phone: '0212 000 00 00',
-  email: 'satis@mobilya-os.local',
+  email: 'satis@evtrend.com.tr',
 }
 
 /** Hukuki metin placeholder — mağaza içi kullanım */

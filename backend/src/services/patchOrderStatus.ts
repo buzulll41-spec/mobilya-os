@@ -24,6 +24,7 @@ export type PatchOrderStatusRequest = {
 
 const PATCHABLE_ORDER_STATUSES = new Set<string>([
   'Bekleniyor',
+  'İptal',
   'Kısmi Geldi',
   'Üretimde',
   'Geldi',

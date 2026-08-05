@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+ARG VITE_API_BASE_URL=/api
+ARG VITE_APP_MODE=production
+ARG VITE_ALLOW_RUNTIME_MODE=false
+
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_APP_MODE=$VITE_APP_MODE
+ENV VITE_ALLOW_RUNTIME_MODE=$VITE_ALLOW_RUNTIME_MODE
+
+COPY package*.json ./
+RUN npm install --no-audit --no-fund
+
+COPY . .
+RUN npm run build
+
+EXPOSE 4173
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4173", "--strictPort"]

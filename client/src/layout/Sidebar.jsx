@@ -137,6 +137,8 @@ export default function Sidebar({
         })}
       </nav>
 
+      <div className="mos-sidebar-shell-label mos-sidebar-label-fade">Desktop / Tablet Sidebar</div>
+
       <div className="mos-sidebar-spacer" />
 
       <button

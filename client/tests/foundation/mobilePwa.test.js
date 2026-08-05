@@ -75,7 +75,7 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
     it('manifest ve service worker dosyaları mevcut', () => {
       const manifest = readFileSync(resolve('public/manifest.webmanifest'), 'utf8')
       expect(manifest).toContain('"display": "standalone"')
-      expect(manifest).toContain('MOBILYA OS')
+      expect(manifest).toContain('Evtrend')
       expect(PWA_MANIFEST_PATH).toBe('/manifest.webmanifest')
       expect(PWA_SERVICE_WORKER_PATH).toBe('/sw.js')
 

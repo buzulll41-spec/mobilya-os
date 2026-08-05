@@ -108,4 +108,36 @@ describe.skipIf(!hasDb)('patch order status integration', () => {
     })
     expect(events.some((e) => (e.payload as { to?: string }).to === 'Teslim Edildi')).toBe(true)
   })
+
+  it('İptal status güncellemesi kabul edilir ve kalıcıdır', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/orders',
+      payload: {
+        customerName: 'Iptal Test',
+        productTitle: 'Sandalye',
+        totalAmount: 2500,
+        paidAmount: 0,
+        status: 'Bekleniyor',
+      },
+    })
+    expect(createRes.statusCode).toBe(201)
+    const cancelOrderId = (createRes.json() as { id: string }).id
+
+    const cancelRes = await app.inject({
+      method: 'PATCH',
+      url: `/v1/orders/${cancelOrderId}/status`,
+      payload: { status: 'İptal' },
+    })
+    expect(cancelRes.statusCode).toBe(200)
+    const dto = cancelRes.json() as { displayStatus: string }
+    expect(dto.displayStatus).toBe('İptal')
+
+    const row = await prisma.salesOrder.findUniqueOrThrow({ where: { id: cancelOrderId } })
+    expect(row.displayStatus).toBe('İptal')
+
+    await prisma.domainEvent.deleteMany({ where: { aggregateId: cancelOrderId } })
+    await prisma.orderLine.deleteMany({ where: { salesOrderId: cancelOrderId } })
+    await prisma.salesOrder.delete({ where: { id: cancelOrderId } }).catch(() => undefined)
+  })
 })

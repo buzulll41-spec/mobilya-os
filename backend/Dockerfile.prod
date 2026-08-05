@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY prisma ./prisma
+RUN npm install --no-audit --no-fund
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build && npx prisma generate
+
+ENV NODE_ENV=production
+
+COPY docker/entrypoint.prod.sh /usr/local/bin/backend-entrypoint.sh
+COPY docker/migrate.prod.sh /usr/local/bin/backend-migrate.sh
+COPY docker/seed.prod.sh /usr/local/bin/backend-seed.sh
+RUN chmod +x /usr/local/bin/backend-entrypoint.sh /usr/local/bin/backend-migrate.sh /usr/local/bin/backend-seed.sh
+
+EXPOSE 4000
+CMD ["/usr/local/bin/backend-entrypoint.sh"]

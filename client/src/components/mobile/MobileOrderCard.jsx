@@ -61,16 +61,37 @@ function MobileOrderCard({ card, dense = false, selected = false, onOpen }) {
         ) : (
           <>
             <div>
-              <dt>Bakiye</dt>
-              <dd>{card.balanceLabel}</dd>
+              <dt>Tutar</dt>
+              <dd>{card.amountLabel}</dd>
             </div>
             <div>
-              <dt>Sevk</dt>
-              <dd>{card.shipmentLabel}</dd>
+              <dt>Aktif asama</dt>
+              <dd>{card.activeStage ?? card.statusLabel}</dd>
+            </div>
+            <div>
+              <dt>Risk</dt>
+              <dd data-tone={card.riskTone ?? 'neutral'}>{card.riskLabel}</dd>
+            </div>
+            <div>
+              <dt>Teslim</dt>
+              <dd>{card.deliveryDateLabel ?? card.terminLabel}</dd>
+            </div>
+            <div>
+              <dt>Sonraki adim</dt>
+              <dd>{card.nextStep ?? 'Detayi ac'}</dd>
             </div>
           </>
         )}
       </dl>
+      <div className="evm-order-list-v1__progress-block" style={{ marginTop: '0.4rem' }}>
+        <div className="evm-order-list-v1__progress-labels">
+          <span>Ilerleme</span>
+          <strong>%{Number(card.progressPercent ?? 0)}</strong>
+        </div>
+        <div className="evm-order-list-v1__progress" aria-hidden>
+          <span style={{ width: `${Math.max(0, Math.min(100, Number(card.progressPercent ?? 0)))}%` }} />
+        </div>
+      </div>
       <span className="mos-mobile-order-card__order-no">{card.orderNo}</span>
     </button>
   )

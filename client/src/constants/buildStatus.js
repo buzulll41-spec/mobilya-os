@@ -3,7 +3,7 @@
 const appMode = typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_APP_MODE ?? 'demo' : 'demo'
 
 export const BUILD_STATUS = {
-  edition: 'MOBILYA OS Mobile V1',
+  edition: 'Evtrend Mobil',
   build:
     typeof import.meta.env !== 'undefined'
       ? import.meta.env.VITE_BUILD_ID ?? 'mobile-v1.0.0'
@@ -19,7 +19,7 @@ export const BUILD_STATUS = {
   timestamp:
     typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_BUILD_TIMESTAMP ?? '' : '',
   cacheVersion:
-    typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_SW_CACHE_VERSION ?? 'v3' : 'v3',
+    typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_SW_CACHE_VERSION ?? 'v5' : 'v5',
   mode: appMode,
   label: appMode === 'real-device-test' ? 'MOBILE TEST BUILD' : '',
 }

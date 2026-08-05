@@ -178,7 +178,7 @@ export default function PwaInstallPrompt() {
 
           {deferredPrompt
 
-            ? 'MOBILYA OS’u telefonunuzda uygulama gibi kullanın.'
+            ? 'Evtrend uygulamasini telefonunuzda uygulama gibi kullanin.'
 
             : 'Safari/Chrome menüsünden “Ana Ekrana Ekle” seçeneğini kullanın.'}
 

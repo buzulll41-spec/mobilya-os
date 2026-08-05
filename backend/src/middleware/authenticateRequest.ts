@@ -7,7 +7,7 @@ import { USER_ROLE } from '../constants/userRoles.js'
 import { assertRbac } from './rbac.js'
 import { prisma } from '../prisma.js'
 
-const PUBLIC_PATHS = new Set(['/health', '/v1/auth/login'])
+const PUBLIC_PATHS = new Set(['/health', '/v1/health', '/v1/ops/metrics', '/system/status', '/v1/auth/login'])
 
 /** Integration test bypass */
 export const TEST_AUTH_USER: AuthUserContext = {

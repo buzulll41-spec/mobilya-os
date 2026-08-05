@@ -62,12 +62,23 @@ export class ProductionConfigError extends Error {
 const PLACEHOLDER_SECRETS = new Set([
   'change-me-in-production',
   'change-me',
+  'change_me',
   'changeme',
   'secret',
   'test-jwt-secret-mobilya-os',
 ])
 
 const MIN_SECRET_LENGTH = 16
+
+function isTruthy(value: string | undefined): boolean {
+  const normalized = value?.trim().toLowerCase()
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on'
+}
+
+function containsPlaceholderToken(value: string): boolean {
+  const normalized = value.trim().toLowerCase()
+  return /change[-_]?me|example\.com|replace[-_]?me|your[-_]?password|dummy/.test(normalized)
+}
 
 /**
  * Sorunları toplar (throw etmez) — test edilebilir saf fonksiyon.
@@ -88,8 +99,12 @@ export function collectProductionConfigIssues(
     issues.push({ variable: secretVariable, type: 'too_short' })
   }
 
-  if (env.AUTH_DISABLED === 'true') {
+  if (isTruthy(env.AUTH_DISABLED)) {
     issues.push({ variable: 'AUTH_DISABLED', type: 'unsafe_enabled' })
+  }
+
+  if (isTruthy(env.RUN_SEED_ON_BOOT)) {
+    issues.push({ variable: 'RUN_SEED_ON_BOOT', type: 'unsafe_enabled' })
   }
 
   const db = env.DATABASE_URL?.trim()
@@ -97,6 +112,21 @@ export function collectProductionConfigIssues(
     issues.push({ variable: 'DATABASE_URL', type: 'missing' })
   } else if (!/^postgres(ql)?:\/\//i.test(db)) {
     issues.push({ variable: 'DATABASE_URL', type: 'invalid' })
+  } else {
+    try {
+      const parsed = new URL(db)
+      const host = parsed.hostname.toLowerCase()
+      if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '::1') {
+        issues.push({ variable: 'DATABASE_URL', type: 'invalid' })
+      }
+      const username = decodeURIComponent(parsed.username ?? '')
+      const password = decodeURIComponent(parsed.password ?? '')
+      if (containsPlaceholderToken(username) || containsPlaceholderToken(password)) {
+        issues.push({ variable: 'DATABASE_URL', type: 'placeholder' })
+      }
+    } catch {
+      issues.push({ variable: 'DATABASE_URL', type: 'invalid' })
+    }
   }
 
   const { value: cors, variable: corsVariable } = resolveCorsOrigins(env)
@@ -107,7 +137,8 @@ export function collectProductionConfigIssues(
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean)
-    if (origins.some((origin) => isLoopbackOrigin(origin))) {
+    const exactOrigins = origins.filter((origin) => !origin.startsWith('regex:'))
+    if (exactOrigins.some((origin) => isLoopbackOrigin(origin))) {
       issues.push({ variable: corsVariable, type: 'invalid' })
     }
   }

@@ -5,6 +5,11 @@ import ErpOpsDetailStrip from '../components/erp-ops/ErpOpsDetailStrip.jsx'
 import ErpOpsTable from '../components/erp-ops/ErpOpsTable.jsx'
 import MobileStoreEmptyState from '../components/mobile/MobileStoreEmptyState.jsx'
 import {
+  Badge,
+  Card,
+  SectionHeader,
+} from '../components/design-system/DSComponents.jsx'
+import {
   SSH_QUICK_FILTERS,
   buildSshOpsSummary,
   countSshFilter,
@@ -208,22 +213,22 @@ function ServiceCenterPage({ sshMissingParts, onOpenSsh, highlightOrderId = null
 
   return (
     <div className="mos-page mos-erp-ops mos-erp-ops--ssh">
-      <header className="mos-erp-ops__head">
-        <div className="mos-erp-ops__head-copy">
-          <h1 className="mos-erp-ops__title">SSH / Servis Merkezi</h1>
-          <span className="mos-erp-ops__sub">
-            {scopedCards.length} açık kayıt · {tableRows.length} listede
-          </span>
-        </div>
-        <div className="mos-erp-ops__head-actions">
-          <PilotScopeToggle
-            scope={scope}
-            onScopeChange={setScope}
-            canToggle={canToggle}
-            hint={modeHint}
-          />
-        </div>
-      </header>
+      <SectionHeader
+        className="mos-erp-ops__head"
+        eyebrow="SSH / Servis Merkezi"
+        title="Eksik Parca Operasyonlari"
+        body={`${scopedCards.length} acik kayit · ${tableRows.length} listede`}
+        action={(
+          <div className="mos-erp-ops__head-actions">
+            <PilotScopeToggle
+              scope={scope}
+              onScopeChange={setScope}
+              canToggle={canToggle}
+              hint={modeHint}
+            />
+          </div>
+        )}
+      />
 
       <ErpOpsSummaryStrip
         metrics={summaryMetrics}
@@ -248,7 +253,7 @@ function ServiceCenterPage({ sshMissingParts, onOpenSsh, highlightOrderId = null
               onSecondary={() => setActiveFilter('locked')}
             />
           ) : (
-            <div className="ssh-mobile-page__cards" aria-label="Eksik parça kart listesi">
+            <Card className="ssh-mobile-page__cards" aria-label="Eksik parça kart listesi">
               {filteredCards.map((card) => (
                 <details
                   key={card.id}
@@ -264,9 +269,9 @@ function ServiceCenterPage({ sshMissingParts, onOpenSsh, highlightOrderId = null
                         <p className="ssh-mobile-page__customer">{card.customer}</p>
                         <span className="ssh-mobile-page__order">{card.orderNumber}</span>
                       </div>
-                      <span className="ssh-mobile-page__status-pill">
+                      <Badge tone={card.locksShipment ? 'danger' : 'warning'}>
                         {card.locksShipment ? 'Kritik' : 'Normal'}
-                      </span>
+                      </Badge>
                     </div>
                   </summary>
                   <div className="ssh-mobile-page__rows">
@@ -308,7 +313,7 @@ function ServiceCenterPage({ sshMissingParts, onOpenSsh, highlightOrderId = null
                   </button>
                 </details>
               ))}
-            </div>
+            </Card>
           )}
           <SshMobileActionSheet
             open={Boolean(sheetCardId) && !sheetLoading}
@@ -337,14 +342,14 @@ function ServiceCenterPage({ sshMissingParts, onOpenSsh, highlightOrderId = null
               onOpen={() => selectedRow && openRow(selectedRow)}
             />
 
-            <section className="mos-erp-ops__table-panel" aria-label="SSH listesi">
+            <Card className="mos-erp-ops__table-panel" aria-label="SSH listesi">
               <ErpOpsTable
                 rows={tableRows}
                 selectedRowId={selectedRow?.id ?? null}
                 onSelectRow={(row) => setSelectedRowId(row.id)}
                 onOpenRow={openRow}
               />
-            </section>
+            </Card>
           </div>
         </div>
       )}

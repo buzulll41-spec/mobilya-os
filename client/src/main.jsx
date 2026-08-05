@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './styles/design-system.css'
 import App from './App.jsx'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
 import ProductionShieldScreen from './components/ProductionShieldScreen.jsx'
@@ -13,6 +14,29 @@ import { OfflineFirstProvider } from './state/OfflineFirstProvider.jsx'
 import { ToastProvider } from './state/ToastProvider.jsx'
 import { dismissSplashScreen, registerServiceWorker } from './pwa/registerServiceWorker.js'
 import { evaluateProductionShield, logProductionShield } from './config/productionShield.js'
+import { getApiBaseUrl } from './config/dataSource.js'
+
+async function probeBackendAvailability() {
+  const apiBase = getApiBaseUrl()
+  if (!apiBase) {
+    window.__MOBILYA_BACKEND_AVAILABLE__ = false
+    return
+  }
+
+  const controller = new AbortController()
+  const timer = window.setTimeout(() => controller.abort(), 1500)
+  try {
+    const res = await fetch(`${apiBase.replace(/\/+$/, '')}/health`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+    window.__MOBILYA_BACKEND_AVAILABLE__ = res.ok
+  } catch {
+    window.__MOBILYA_BACKEND_AVAILABLE__ = false
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
 
 const root = createRoot(document.getElementById('root'))
 
@@ -48,7 +72,11 @@ function renderShieldError() {
   )
 }
 
-function boot() {
+async function boot() {
+  if ((import.meta.env.VITE_APP_MODE ?? '').toLowerCase() === 'auto') {
+    await probeBackendAvailability()
+  }
+
   const shield = evaluateProductionShield()
 
   if (!shield.ok) {
@@ -66,4 +94,4 @@ function boot() {
   dismissSplashScreen(document.getElementById('mos-splash'))
 }
 
-boot()
+void boot()

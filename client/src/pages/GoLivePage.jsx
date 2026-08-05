@@ -92,9 +92,7 @@ export default function GoLivePage({ onNavigate }) {
       <header className="mos-go-live__head">
         <div>
           <h1 className="mos-go-live__title">GO LIVE</h1>
-          <p className="mos-go-live__sub">
-            MOBILYA OS canlı mağaza hazırlık kontrol listesi — yeni özellik yok, sadece production readiness.
-          </p>
+          <p className="mos-go-live__sub">Evtrend canli magaza hazirlik kontrol listesi.</p>
         </div>
         <div className="mos-go-live__score-ring">
           <span className="mos-go-live__score-value">{score?.totalScore ?? 0}</span>

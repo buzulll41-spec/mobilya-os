@@ -14,6 +14,10 @@ export default function MobileTabBar({ page, sidebarOpen = false, onNavigate, on
       onOpenMenu?.()
       return
     }
+    if (item.action === 'customers') {
+      onNavigate('orders')
+      return
+    }
     onNavigate(item.id)
   }
 

@@ -42,7 +42,7 @@ describe('FAZ 111 Sprint 1 quality', () => {
 
   describe('Build Status', () => {
     it('Mobile V1 build sabitleri', () => {
-      expect(BUILD_STATUS.edition).toBe('MOBILYA OS Mobile V1')
+      expect(BUILD_STATUS.edition).toBe('Evtrend Mobil')
       expect(BUILD_STATUS.build).toBe('mobile-v1.0.0')
     })
 

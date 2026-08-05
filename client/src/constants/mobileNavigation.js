@@ -1,12 +1,12 @@
-/** FAZ 112 — telefon alt navigasyon (max 4 sekme). */
+/** FAZ 112 — telefon alt navigasyon (4 sekme). */
 
-/** @typedef {{ id: string; label: string; shortLabel: string; icon: string; action?: 'menu' }} MobileTabItem */
+/** @typedef {{ id: string; label: string; shortLabel: string; icon: string; action?: 'menu' | 'customers' }} MobileTabItem */
 
 /** @type {MobileTabItem[]} */
 export const MOBILE_TAB_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', shortLabel: 'Ana Sayfa', icon: '🏠' },
+  { id: 'dashboard', label: 'Bugün', shortLabel: 'Bugün', icon: '🏠' },
   { id: 'orders', label: 'Siparişler', shortLabel: 'Sipariş', icon: '🧾' },
-  { id: 'shipment-ops', label: 'Sevk Operasyonu', shortLabel: 'Sevk', icon: '🚚' },
+  { id: 'shipment-ops', label: 'Sevk', shortLabel: 'Sevk', icon: '🚚' },
   { id: 'collection', label: 'Tahsilat', shortLabel: 'Tahsilat', icon: '💳' },
 ]
 

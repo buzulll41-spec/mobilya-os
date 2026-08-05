@@ -4,6 +4,7 @@ import { computeOperationalKpis } from '../../domain/kpi/operationalKpiService.j
 import { isTerminOverdue } from '../../utils/orderFinance.js'
 import { formatShortDate } from '../../utils/dates.js'
 import { filterCollectionRows } from '../collection/collectionCommandCenterModel.js'
+import { buildSshMissingPartsQueue } from '../ssh/sshMissingPartsModel.js'
 import {
   buildCollectionLabel,
   buildOrdersOpsTableRow,
@@ -52,11 +53,24 @@ import {
  */
 
 export const MOBILE_STORE_HOME_CARDS = /** @type {const} */ ([
-  'today-orders',
-  'pending-collection',
-  'today-shipments',
-  'critical-alerts',
+  'collection',
+  'shipment',
+  'service',
+  'orders',
+  'customers',
+  'reports',
 ])
+
+/** @param {number} amount */
+function formatCompactTry(amount) {
+  const safeAmount = Number.isFinite(amount) ? Math.max(0, amount) : 0
+  if (safeAmount === 0) return '₺0'
+  const compact = new Intl.NumberFormat('tr-TR', {
+    notation: 'compact',
+    maximumFractionDigits: 0,
+  }).format(safeAmount)
+  return `₺${compact}`
+}
 
 export const MOBILE_STORE_QUICK_ACTIONS = /** @type {const} */ ([
   { id: 'new-order', label: 'Yeni Sipariş', icon: '➕', actionKind: 'new-order' },
@@ -111,6 +125,8 @@ export function buildMobileStoreHomeCards(input) {
 
   const pendingCollection = openCollections.length
   const todayOrders = activeOrders.filter((o) => o.orderDate === todayIso)
+  const activeCustomerCount = new Set(activeOrders.map((row) => row.customer?.trim()).filter(Boolean)).size
+  const dailyRevenue = Number(kpis.todaySalesTotal ?? 0)
 
   const criticalOrders = activeOrders.filter((row) => {
     const dto = dtoById.get(row.id)
@@ -121,44 +137,70 @@ export function buildMobileStoreHomeCards(input) {
     )
   })
 
+  const sshQueue = buildSshMissingPartsQueue({
+    orders,
+    listItemDtos,
+    todayIso,
+  })
+  const openSsh = sshQueue.filter((card) => card.locksShipment !== false)
+  const lockedSsh = sshQueue.filter((card) => card.locksShipment)
+  const waitingParts = sshQueue.filter((card) => card.uiStatus === 'waiting')
+
   const criticalAlerts = criticalCollections.length + criticalOrders.length + delayedShipments
 
   return [
     {
-      id: 'today-orders',
-      label: 'Bugünkü Siparişler',
-      value: String(todayOrders.length || kpis.todayOrderCount || 0),
-      hint: 'Yeni ve açık siparişler',
-      tone: todayOrders.length > 0 ? 'success' : 'neutral',
-      navTarget: 'orders',
-      navFilter: 'new',
-    },
-    {
-      id: 'pending-collection',
-      label: 'Bekleyen Tahsilatlar',
+      id: 'collection',
+      label: 'Tahsilat',
       value: String(pendingCollection),
-      hint: overdueCollections.length > 0 ? `${overdueCollections.length} gecikmiş` : 'Açık bakiye',
+      hint: overdueCollections.length > 0 ? `${overdueCollections.length} gecikmis` : 'Acik bakiye',
       tone: overdueCollections.length > 0 ? 'warning' : pendingCollection > 0 ? 'neutral' : 'success',
       navTarget: 'collection',
       navFilter: overdueCollections.length > 0 ? 'overdue' : 'all',
     },
     {
-      id: 'today-shipments',
-      label: 'Bugünkü Sevkler',
+      id: 'shipment',
+      label: 'Sevkiyat',
       value: String(todayShipments.length),
-      hint: 'Planlanan teslimatlar',
-      tone: todayShipments.length > 0 ? 'warning' : 'neutral',
+      hint: delayedShipments > 0 ? `${delayedShipments} gecikmis` : 'Gunluk plan',
+      tone: delayedShipments > 0 ? 'critical' : todayShipments.length > 0 ? 'warning' : 'neutral',
       navTarget: 'shipment-ops',
       navFilter: 'today',
     },
     {
-      id: 'critical-alerts',
-      label: 'Kritik Uyarılar',
-      value: String(criticalAlerts),
-      hint: 'Risk, tahsilat, sevk',
-      tone: criticalAlerts > 0 ? 'critical' : 'success',
+      id: 'service',
+      label: 'Servis',
+      value: String(openSsh.length),
+      hint: waitingParts.length > 0 ? `${waitingParts.length} parca bekliyor` : 'Acik servis isi',
+      tone: lockedSsh.length > 0 ? 'warning' : openSsh.length > 0 ? 'neutral' : 'success',
+      navTarget: 'ssh-service',
+      navFilter: waitingParts.length > 0 ? 'waiting' : 'all',
+    },
+    {
+      id: 'orders',
+      label: 'Siparis',
+      value: String(todayOrders.length || kpis.todayOrderCount || 0),
+      hint: criticalAlerts > 0 ? `${criticalAlerts} kritik` : 'Yeni kayit',
+      tone: criticalAlerts > 0 ? 'critical' : todayOrders.length > 0 ? 'success' : 'neutral',
       navTarget: 'orders',
-      navFilter: 'critical',
+      navFilter: criticalAlerts > 0 ? 'critical' : 'new',
+    },
+    {
+      id: 'customers',
+      label: 'Musteriler',
+      value: String(activeCustomerCount),
+      hint: 'Aktif musteri',
+      tone: activeCustomerCount > 0 ? 'neutral' : 'success',
+      navTarget: 'orders',
+      navFilter: 'all',
+    },
+    {
+      id: 'reports',
+      label: 'Raporlar',
+      value: formatCompactTry(dailyRevenue),
+      hint: dailyRevenue > 0 ? 'Gunluk ciro' : 'Canli gosterge',
+      tone: dailyRevenue > 0 ? 'success' : 'neutral',
+      navTarget: 'executive-center',
     },
   ]
 }

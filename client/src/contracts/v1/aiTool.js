@@ -9,12 +9,12 @@ export {
   AI_TOOL_DOMAIN_EVENT,
   WORKER_TOOL_PERMISSIONS,
   isAiToolExecutionLiveEnabled,
-} from '../../../../shared/ai-tool-engine/contracts.js'
+} from '../../shared/ai-tool-engine/contracts.js'
 
-export { AI_TOOL_CATALOG, listToolsForWorker, getToolMeta } from '../../../../shared/ai-tool-engine/catalog.js'
+export { AI_TOOL_CATALOG, listToolsForWorker, getToolMeta } from '../../shared/ai-tool-engine/catalog.js'
 
 /**
- * @typedef {import('../../../shared/ai-tool-engine/contracts.js').TOOL_EXECUTION_STATUS[keyof import('../../../shared/ai-tool-engine/contracts.js').TOOL_EXECUTION_STATUS]} ToolExecutionStatus
+ * @typedef {import('../../shared/ai-tool-engine/contracts.js').TOOL_EXECUTION_STATUS[keyof import('../../shared/ai-tool-engine/contracts.js').TOOL_EXECUTION_STATUS]} ToolExecutionStatus
  * @typedef {{
  *   id: string
  *   workerId: string

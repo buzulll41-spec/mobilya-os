@@ -371,10 +371,12 @@ export function computeOrderBusinessSnapshot(input) {
  * @returns {Map<string, OrderBusinessSnapshot>}
  */
 export function computeOrderBusinessSnapshots(orders, listItemDtos, todayIso = DEMO_TODAY) {
-  const dtoById = new Map(listItemDtos.map((d) => [d.id, d]))
+  const safeOrders = Array.isArray(orders) ? orders : []
+  const safeDtos = Array.isArray(listItemDtos) ? listItemDtos : []
+  const dtoById = new Map(safeDtos.map((d) => [d.id, d]))
   /** @type {Map<string, OrderBusinessSnapshot>} */
   const out = new Map()
-  for (const order of orders) {
+  for (const order of safeOrders) {
     out.set(order.id, computeOrderBusinessSnapshot({
       order,
       dto: dtoById.get(order.id),

@@ -53,19 +53,21 @@ describe('FAZ 115 — Mobile Store Operation', () => {
   })
 
   describe('Mobile home + quick actions', () => {
-    it('4 ana kart üretir', () => {
+    it('6 ana modül kartı üretir', () => {
       const rows = initialOrders
       const cards = buildMobileStoreHomeCards({
         orders: rows,
         listItemDtos: [],
         collectionRows: rows,
       })
-      expect(cards).toHaveLength(4)
+      expect(cards).toHaveLength(6)
       expect(cards.map((c) => c.id)).toEqual([
-        'today-orders',
-        'pending-collection',
-        'today-shipments',
-        'critical-alerts',
+        'collection',
+        'shipment',
+        'service',
+        'orders',
+        'customers',
+        'reports',
       ])
     })
 

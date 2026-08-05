@@ -10,5 +10,8 @@ export function useOrders() {
     ...ctx,
     domainEvents: ctx.domainEvents ?? [],
     operationalTasks: ctx.operationalTasks ?? [],
+    dataPipeline:
+      ctx.dataPipeline ??
+      ({ layer: 'mock', hasApiBase: false, usedFallback: true, fetchedAt: null }),
   }
 }

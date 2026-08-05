@@ -9,6 +9,7 @@
     "dev:real-device-test": "vite --host 0.0.0.0 --port 5173 --strictPort --mode real-device-test",
     "build": "vite build",
     "build:real-device-test": "vite build --mode real-device-test",
+    "audit:stabilization": "node scripts/enterprise-stabilization-audit.mjs",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview",
@@ -29,7 +30,9 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "pixelmatch": "^7.2.0",
     "playwright": "^1.60.0",
+    "pngjs": "^7.0.0",
     "vite": "^8.0.12",
     "vitest": "^3.2.4"
   }

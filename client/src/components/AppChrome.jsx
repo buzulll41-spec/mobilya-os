@@ -12,6 +12,9 @@ import { STORE_NAME } from '../constants/app.js'
 /**
  * @param {{
  *   page: string
+ *   compactMobileChrome?: boolean
+ *   pageTitle?: string
+ *   pageSection?: string
  *   globalSearch: string
  *   onGlobalSearchChange: (v: string) => void
  *   orders?: import('../data/seedOrders.js').Order[]
@@ -30,6 +33,9 @@ import { STORE_NAME } from '../constants/app.js'
  */
 export default function AppChrome({
   page,
+  compactMobileChrome = false,
+  pageTitle,
+  pageSection,
   globalSearch,
   onGlobalSearchChange,
   orders = [],
@@ -45,6 +51,27 @@ export default function AppChrome({
   userInitials = 'K',
   onLogout,
 }) {
+  if (compactMobileChrome) {
+    return (
+      <header className="mos-app-chrome mos-app-chrome--compact-mobile" data-compact-mobile="true">
+        <div className="mos-app-chrome-left mos-app-chrome-left--compact-brand" aria-label="Evtrend">
+          <span className="mos-app-chrome-brand-wordmark">evtrend</span>
+        </div>
+        <div className="mos-app-chrome-right">
+          <NotificationDropdown items={notifications} onNavigate={onNotificationNavigate} />
+          <button
+            type="button"
+            className="mos-mobile-avatar-btn mos-user-chip"
+            aria-label="Profil menüsü"
+            onClick={onMobileMenu}
+          >
+            {userInitials}
+          </button>
+        </div>
+      </header>
+    )
+  }
+
   return (
     <header className="mos-app-chrome">
       <div className="mos-app-chrome-left">
@@ -56,6 +83,10 @@ export default function AppChrome({
         >
           <IconMenu />
         </button>
+        <div className="mos-app-chrome-heading" aria-label="Page title">
+          <span className="mos-app-chrome-heading__kicker">{pageSection ?? 'Workspace'}</span>
+          <strong className="mos-app-chrome-heading__title">{pageTitle ?? page}</strong>
+        </div>
       </div>
 
       <GlobalSearchInput

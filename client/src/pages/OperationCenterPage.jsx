@@ -13,6 +13,13 @@ import { applyPilotScope, getEffectivePilotScope, getOrderPilotKind, getProductP
 import { useOrders } from '../state/useOrders.js'
 import { useAuth } from '../state/AuthProvider.jsx'
 import { formatApiErrorMessage } from '../utils/apiErrorMessage.js'
+import {
+  ActionCard,
+  Badge,
+  Card,
+  PrimaryButton,
+  SectionHeader,
+} from '../components/design-system/DSComponents.jsx'
 import '../styles/mos-erp-ops.css'
 import '../styles/operation-center.css'
 
@@ -171,32 +178,35 @@ export default function OperationCenterPage({ onNavigate }) {
     <div className="mos-operation-center mos-erp-ops">
       <header className="mos-operation-center__hero">
         <div>
-          <p className="mos-operation-center__eyebrow">Sabah brifingi · {DEMO_TODAY}</p>
-          <h1 className="mos-operation-center__title">{view.briefing.greeting}</h1>
-          <p className="mos-operation-center__subtitle">Bugün:</p>
+          <SectionHeader
+            eyebrow={`Sabah brifingi · ${DEMO_TODAY}`}
+            title={view.briefing.greeting}
+            body="Bugun:"
+          />
           <ul className="mos-operation-center__brief-list">
             {view.briefing.items.map((item) => (
               <li key={item.text} className={toneClass(item.tone)}>
-                <span aria-hidden="true">{toneDot(item.tone)}</span> {item.text}
+                <Badge tone={item.tone === 'critical' ? 'danger' : item.tone}>
+                  {toneDot(item.tone)} {item.text}
+                </Badge>
               </li>
             ))}
           </ul>
         </div>
-        <div className="mos-operation-center__first-action">
+        <Card className="mos-operation-center__first-action">
           <p className="mos-operation-center__first-action-label">Önerilen ilk aksiyon</p>
-          <button
-            type="button"
+          <PrimaryButton
             className="mos-operation-center__cta"
             onClick={() =>
               go(view.briefing.recommendedAction.navTarget, view.briefing.recommendedAction.navFilter)
             }
           >
             {view.briefing.recommendedAction.label}
-          </button>
+          </PrimaryButton>
           <p className={`mos-operation-center__score ${toneClass(view.generalScoreTone)}`}>
             Operasyon skoru: <strong>{view.generalScore}</strong>/100
           </p>
-        </div>
+        </Card>
       </header>
 
       <div className="mos-operation-center__grid">
@@ -208,15 +218,12 @@ export default function OperationCenterPage({ onNavigate }) {
             ) : (
               view.todayTasks.map((task) => (
                 <li key={task.id}>
-                  <button
-                    type="button"
+                  <ActionCard
                     className={`mos-operation-center__task ${toneClass(task.tone)}`}
+                    title={`${task.displayRank}. ${task.title}`}
+                    body={`→ ${task.detail}`}
                     onClick={() => go(task.navTarget, task.navFilter)}
-                  >
-                    <span className="mos-operation-center__task-rank">{task.displayRank}.</span>
-                    <span className="mos-operation-center__task-title">{task.title}</span>
-                    <span className="mos-operation-center__task-detail">→ {task.detail}</span>
-                  </button>
+                  />
                 </li>
               ))
             )}

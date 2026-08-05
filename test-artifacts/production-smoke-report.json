@@ -1,0 +1,118 @@
+{
+  "startedAt": "2026-08-05T06:46:17.525Z",
+  "base": "http://localhost",
+  "results": {
+    "Login": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Dashboard": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Orders": {
+      "status": "PASS",
+      "detail": "S-1785912377732"
+    },
+    "Revision": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Cancel": {
+      "status": "PASS",
+      "detail": "S-1785912377789"
+    },
+    "Collections": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Shipments": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Delivery": {
+      "status": "PASS",
+      "detail": "S-1785912377907"
+    },
+    "Customers": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Service": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Notifications": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "Logout": {
+      "status": "PASS",
+      "detail": "ok"
+    }
+  },
+  "steps": [
+    {
+      "step": "login",
+      "status": "ok"
+    },
+    {
+      "step": "dashboard",
+      "status": "ok"
+    },
+    {
+      "step": "orders",
+      "status": "ok",
+      "orderId": "S-1785912377732"
+    },
+    {
+      "step": "revision",
+      "status": "ok"
+    },
+    {
+      "step": "cancel",
+      "status": "ok",
+      "orderId": "S-1785912377789"
+    },
+    {
+      "step": "collections",
+      "status": "ok"
+    },
+    {
+      "step": "customers",
+      "status": "ok"
+    },
+    {
+      "step": "collections_payment",
+      "status": "ok"
+    },
+    {
+      "step": "service",
+      "status": "ok"
+    },
+    {
+      "step": "shipments",
+      "status": "ok"
+    },
+    {
+      "step": "delivery",
+      "status": "ok",
+      "orderId": "S-1785912377907",
+      "shipmentId": "SHP-S-1785912377907-1785912377932"
+    },
+    {
+      "step": "menu",
+      "status": "ok"
+    },
+    {
+      "step": "notification",
+      "status": "ok"
+    },
+    {
+      "step": "logout",
+      "status": "ok"
+    }
+  ],
+  "finishedAt": "2026-08-05T06:46:18.022Z",
+  "status": "ok"
+}

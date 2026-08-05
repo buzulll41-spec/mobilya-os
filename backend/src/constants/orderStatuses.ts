@@ -1,6 +1,7 @@
 /** Client `ORDER_STATUSES` ile uyumlu operasyon durumları */
 export const ORDER_DISPLAY_STATUSES = [
   'Bekleniyor',
+  'İptal',
   'Kısmi Geldi',
   'Üretimde',
   'Geldi',

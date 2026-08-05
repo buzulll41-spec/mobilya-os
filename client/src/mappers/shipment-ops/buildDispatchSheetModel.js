@@ -198,7 +198,7 @@ export async function buildDispatchSheetModel(input) {
 
   return {
     header: {
-      brand: 'MOBILYA OS',
+      brand: 'Evtrend',
       title: 'ARAÇ ÇIKIŞ FİŞİ',
       date: formatShortDate(plannedDate),
       vehicle,

@@ -50,6 +50,22 @@ describe('collectProductionConfigIssues', () => {
     expect(r).toContainEqual({ variable: 'DATABASE_URL', type: 'invalid' })
   })
 
+  it('production + loopback DATABASE_URL host → invalid', () => {
+    const r = collectProductionConfigIssues({
+      ...baseProd,
+      DATABASE_URL: 'postgresql://user:pass@localhost:5432/app',
+    })
+    expect(r).toContainEqual({ variable: 'DATABASE_URL', type: 'invalid' })
+  })
+
+  it('production + placeholder DATABASE_URL credentials → placeholder', () => {
+    const r = collectProductionConfigIssues({
+      ...baseProd,
+      DATABASE_URL: 'postgresql://mobilya:prod_change_me@db-host:5432/app',
+    })
+    expect(r).toContainEqual({ variable: 'DATABASE_URL', type: 'placeholder' })
+  })
+
   it('production + eksik CORS_ALLOWED_ORIGINS → missing', () => {
     const r = collectProductionConfigIssues({ ...baseProd, CORS_ALLOWED_ORIGINS: '' })
     expect(r).toContainEqual({ variable: 'CORS_ALLOWED_ORIGINS', type: 'missing' })
@@ -72,6 +88,11 @@ describe('collectProductionConfigIssues', () => {
       JWT_SECRET: '',
     })
     expect(r).toEqual([])
+  })
+
+  it('production + RUN_SEED_ON_BOOT=true → unsafe_enabled', () => {
+    const r = collectProductionConfigIssues({ ...baseProd, RUN_SEED_ON_BOOT: 'true' })
+    expect(r).toContainEqual({ variable: 'RUN_SEED_ON_BOOT', type: 'unsafe_enabled' })
   })
 })
 

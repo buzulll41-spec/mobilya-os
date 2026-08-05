@@ -182,7 +182,7 @@ export function normalizePublishStatus(value, options = {}) {
   return PUBLISH_STATUS.DRAFT
 }
 
-const BRAND_FALLBACK = 'Mobilya OS'
+const BRAND_FALLBACK = 'Evtrend'
 
 /**
  * @param {string} seed
@@ -492,7 +492,7 @@ export function mapProductToMasterCenterRow(row) {
   const longDescription =
     'description' in row && row.description
       ? row.description
-      : `${brand} ${row.category} ürünü — MOBILYA OS tek kaynak ürün kartı. EVTREND, mobil uygulama ve CRM bu kayıttan beslenir.`
+      : `${brand} ${row.category} urunu - Evtrend tek kaynak urun karti. Mobil uygulama ve CRM bu kayittan beslenir.`
   const shortDescription = longDescription.length > 120 ? `${longDescription.slice(0, 117)}…` : longDescription
   const media = buildMedia(row)
   const { profitAmount, profitPercent } = computeProfit(row)

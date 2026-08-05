@@ -6,6 +6,7 @@ import {
 
 export const ORDER_FULFILLMENT_DISPLAY_STATUS = {
   WAITING: 'Bekleniyor',
+  CANCELED: 'İptal',
   PARTIAL_ARRIVED: 'Kısmi Geldi',
   ARRIVED: 'Geldi',
   SHIPMENT_READY: 'Sevke Hazır',
@@ -36,6 +37,10 @@ export function deriveOrderDisplayStatusFromLines(
   storedDisplayStatus?: string | null,
   autoReadyContext?: AutoShipmentReadyContext,
 ): string {
+  if (storedDisplayStatus === ORDER_FULFILLMENT_DISPLAY_STATUS.CANCELED) {
+    return ORDER_FULFILLMENT_DISPLAY_STATUS.CANCELED
+  }
+
   if (storedDisplayStatus === ORDER_FULFILLMENT_DISPLAY_STATUS.DELIVERED) {
     return ORDER_FULFILLMENT_DISPLAY_STATUS.DELIVERED
   }

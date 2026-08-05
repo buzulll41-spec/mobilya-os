@@ -4,6 +4,7 @@ import { APP_RUNTIME_MODE } from '../contracts/v1/goLive.js'
 
 export const APP_MODE = APP_RUNTIME_MODE
 const REAL_DEVICE_TEST_MODE = 'real-device-test'
+const AUTO_MODE = 'auto'
 
 const RUNTIME_KEY = 'mobilya-os.runtime-mode'
 
@@ -50,6 +51,17 @@ export function getEnvAppMode() {
   const raw = typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_APP_MODE : undefined
   if (typeof raw === 'string') {
     const lower = raw.trim().toLowerCase()
+    if (lower === AUTO_MODE) {
+      const probe =
+        typeof window !== 'undefined' ? window.__MOBILYA_BACKEND_AVAILABLE__ : undefined
+      if (probe === false) return APP_MODE.DEMO
+      if (probe === true) return APP_MODE.PRODUCTION
+      const apiBaseRaw =
+        typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_API_BASE_URL : undefined
+      return typeof apiBaseRaw === 'string' && apiBaseRaw.trim().length > 0
+        ? APP_MODE.PRODUCTION
+        : APP_MODE.DEMO
+    }
     if (lower === APP_MODE.PRODUCTION) return APP_MODE.PRODUCTION
     if (lower === APP_MODE.DEVELOPMENT) return APP_MODE.DEVELOPMENT
     if (lower === REAL_DEVICE_TEST_MODE) return REAL_DEVICE_TEST_MODE

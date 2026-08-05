@@ -44,14 +44,38 @@
   bottom: 0;
   z-index: 40;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.98);
   border-top: 1px solid var(--mos-line, #e2e6ed);
   /* P2-11: fallback 0px — env() desteklemeyen tarayicida deklarasyon dusmez. */
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   backdrop-filter: blur(12px);
-  box-shadow: 0 -10px 20px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 -14px 32px rgba(15, 23, 42, 0.1);
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] {
+  --mos-mobile-tabbar-height: 72px;
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-mobile-tabbar {
+  display: block;
+  z-index: 70;
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(var(--mos-mobile-tabbar-height) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+.mos-mobile-pwa[data-mobile-shell='true'] .mos-shell-page-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
 
 .mos-mobile-tabbar__list {
@@ -83,15 +107,17 @@
   padding: 0.35rem 0.25rem;
   border: none;
   background: transparent;
-  color: var(--mos-muted, #64748b);
-  font-size: 0.6rem;
-  font-weight: 600;
+  color: #8a97a8;
+  font-size: 0.62rem;
+  font-weight: 640;
   cursor: pointer;
-  transition: color 180ms ease, transform 140ms ease;
+  transition: color 180ms cubic-bezier(0.22, 1, 0.36, 1), transform 180ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.9;
 }
 
 .mos-mobile-tabbar__btn[data-active='true'] {
   color: #0f172a;
+  opacity: 1;
 }
 
 .mos-mobile-tabbar__icon {
@@ -101,16 +127,18 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 999px;
-  background: #eef2f6;
+  background: #f2f5f9;
   font-size: 0.75rem;
   font-weight: 700;
-  transition: transform 160ms ease, background-color 180ms ease, color 180ms ease;
+  color: #94a3b8;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms cubic-bezier(0.22, 1, 0.36, 1), color 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mos-mobile-tabbar__btn[data-active='true'] .mos-mobile-tabbar__icon {
   background: #0f172a;
   color: #fff;
-  transform: translateY(-1px);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
 }
 
 /* ——— PWA install prompt ——— */
@@ -284,6 +312,18 @@
   .mos-mobile-pwa .cc-v2-input {
     scroll-margin-top: 4.75rem;
     scroll-margin-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mos-mobile-pwa[data-mobile-shell='true'] .mos-mobile-tabbar {
+    display: block;
+  }
+
+  .mos-mobile-pwa[data-mobile-shell='true'] .mos-content {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-bottom: calc(var(--mos-mobile-tabbar-height) + env(safe-area-inset-bottom, 0px) + 20px);
   }
 }
 
