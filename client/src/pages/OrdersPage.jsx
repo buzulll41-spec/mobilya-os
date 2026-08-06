@@ -631,7 +631,7 @@ export default function OrdersPage({
                 <SearchBar
                   value={globalSearch}
                   onValueChange={(value) => onGlobalSearchChange?.(value)}
-                  placeholder="Müşteri, ürün grubu veya sipariş no ara"
+                  placeholder="Siparis ara"
                   onRefresh={async () => {
                     await refreshOrders()
                     setLastRefresh(new Date().toLocaleTimeString('tr-TR'))

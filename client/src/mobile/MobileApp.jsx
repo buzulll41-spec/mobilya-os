@@ -211,6 +211,22 @@ export default function MobileApp() {
     navigateToPage('service')
   }
 
+  function handleCreateCollection() {
+    navigateToPage('collection')
+  }
+
+  function handleCreateShipment() {
+    navigateToPage('shipment')
+  }
+
+  function handleCreateSsh() {
+    navigateToPage('ssh')
+  }
+
+  function handleCreateCustomer() {
+    navigateToPage('customers')
+  }
+
   function openExternalOrFallback(href, fallbackPage) {
     closeQuickActions()
     if (href) {
@@ -245,16 +261,16 @@ export default function MobileApp() {
 
   const content = useMemo(() => {
     if (page === 'collection') {
-      return <CollectionsPage onOpenOrderById={handleOpenOrderById} />
+      return <CollectionsPage onOpenOrderById={handleOpenOrderById} onCreateCollection={handleCreateCollection} />
     }
     if (page === 'shipment') {
-      return <ShipmentsPage onOpenOrderById={handleOpenOrderById} />
+      return <ShipmentsPage onOpenOrderById={handleOpenOrderById} onCreateShipment={handleCreateShipment} />
     }
     if (page === 'service') {
       return <ServicePage onOpenOrderById={handleOpenOrderById} onCreateService={handleCreateService} />
     }
     if (page === 'ssh') {
-      return <SshPage onOpenOrderById={handleOpenOrderById} />
+      return <SshPage onOpenOrderById={handleOpenOrderById} onCreateSsh={handleCreateSsh} />
     }
     if (page === 'warehouse') {
       return <WarehousePage onOpenOrderById={handleOpenOrderById} />
@@ -266,7 +282,7 @@ export default function MobileApp() {
       return <OrdersPage onOpenOrderModal={openOrderModal} onOpenOrderById={handleOpenOrderById} />
     }
     if (page === 'customers') {
-      return <CustomersPage onOpenOrderById={handleOpenOrderById} />
+      return <CustomersPage onOpenOrderById={handleOpenOrderById} onCreateCustomer={handleCreateCustomer} />
     }
     if (page === 'menu') {
       return <MenuPage onNavigate={navigateToPage} onOpenOrderModal={openOrderModal} />

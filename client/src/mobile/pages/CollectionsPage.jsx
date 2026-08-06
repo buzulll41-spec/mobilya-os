@@ -10,6 +10,7 @@ import {
   Badge,
   EmptyState,
   FilterChips,
+  FloatingActionButton,
   LoadingSkeleton,
   MobileScreenShell,
   PrimaryButton,
@@ -119,9 +120,10 @@ function matchesFilter(row, filter, todayIso) {
 /**
  * @param {{
  *   onOpenOrderById: (orderId: string, options?: import('../../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onCreateCollection?: () => void
  * }} props
  */
-export default function CollectionsPage({ onOpenOrderById }) {
+export default function CollectionsPage({ onOpenOrderById, onCreateCollection }) {
   const { user } = useAuth()
   const { collectionRowVMs, postOrderPayment, mutating, loading } = useOrders()
   const [query, setQuery] = useState('')
@@ -234,7 +236,7 @@ export default function CollectionsPage({ onOpenOrderById }) {
           <SearchBar
             value={query}
             onValueChange={setQuery}
-            placeholder="Musteri, telefon veya siparis no ara"
+            placeholder="Tahsilat ara"
           />
         }
         filter={
@@ -297,6 +299,7 @@ export default function CollectionsPage({ onOpenOrderById }) {
             )}
           </ul>
         }
+        fab={<FloatingActionButton label="Yeni Tahsilat" onPress={onCreateCollection} />}
       />
     </section>
   )

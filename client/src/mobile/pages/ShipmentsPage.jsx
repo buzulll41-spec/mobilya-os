@@ -8,6 +8,7 @@ import {
   AppHeader,
   EmptyState,
   FilterChips,
+  FloatingActionButton,
   LoadingSkeleton,
   MobileScreenShell,
   PrimaryButton,
@@ -87,9 +88,10 @@ function matchesFilter(row, filter, todayIso) {
 /**
  * @param {{
  *   onOpenOrderById: (orderId: string, options?: import('../../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onCreateShipment?: () => void
  * }} props
  */
-export default function ShipmentsPage({ onOpenOrderById }) {
+export default function ShipmentsPage({ onOpenOrderById, onCreateShipment }) {
   const { user } = useAuth()
   const { orders, shipmentQueueRows, shipmentRowVMs, postOrderShipment, patchShipmentStatus, mutating, loading } = useOrders()
   const [activeFilter, setActiveFilter] = useState(/** @type {ShipmentFilterId} */ (toShipmentFilter(readShipmentHashParams().filter)))
@@ -196,7 +198,7 @@ export default function ShipmentsPage({ onOpenOrderById }) {
     <section className="mos-page evm-order-list-v1 evm-orders-v2" aria-label="Mobile Shipments">
       <MobileScreenShell
         header={<AppHeader eyebrow="Bugun nereye gidecegim" title="Sevkiyat" subtitle="Bugunku sevkiyatlar ve plan bekleyenler" meta={`${userRoleLabel} • Merkez Magaza`} unreadCount={counts['in-transit']} initials={userInitials} onOpenMenu={() => { window.location.hash = '#/mobile/menu' }} />}
-        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Musteri, bolge veya siparis no ara" />}
+        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Sevkiyat ara" />}
         filter={<FilterChips items={FILTERS.map((filter) => ({ id: filter.id, label: filter.label, count: counts[filter.id] }))} activeId={activeFilter} onSelect={(id) => setActiveFilter(/** @type {ShipmentFilterId} */ (id))} ariaLabel="Sevkiyat filtreleri" />}
         primary={
           <ul className="evm-order-list-v1__cards" aria-label="Sevkiyat kartlari">
@@ -227,6 +229,7 @@ export default function ShipmentsPage({ onOpenOrderById }) {
             )}
           </ul>
         }
+        fab={<FloatingActionButton label="Yeni Sevkiyat" onPress={onCreateShipment} />}
       />
     </section>
   )

@@ -6,6 +6,7 @@ import {
   AppHeader,
   EmptyState,
   FilterChips,
+  FloatingActionButton,
   LoadingSkeleton,
   MobileScreenShell,
   PrimaryButton,
@@ -45,9 +46,10 @@ function matchesFilter(row, filter) {
 /**
  * @param {{
  *   onOpenOrderById: (orderId: string, options?: import('../../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onCreateSsh?: () => void
  * }} props
  */
-export default function SshPage({ onOpenOrderById }) {
+export default function SshPage({ onOpenOrderById, onCreateSsh }) {
   const { user } = useAuth()
   const { salesOrderListItemDtos, loading } = useOrders()
   const [query, setQuery] = useState('')
@@ -94,7 +96,7 @@ export default function SshPage({ onOpenOrderById }) {
     <section className="mos-page evm-order-list-v1 evm-orders-v2" aria-label="Mobile SSH">
       <MobileScreenShell
         header={<AppHeader eyebrow="Hangi musteri bekliyor" title="SSH" subtitle={`${rows.length} acik takip kaydi`} meta={`${userRoleLabel} • Merkez Magaza`} unreadCount={counts.urgent} initials={userInitials} onOpenMenu={() => { window.location.hash = '#/mobile/menu' }} />}
-        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Musteri, siparis no veya issue ara" />}
+        search={<SearchBar value={query} onValueChange={setQuery} placeholder="SSH ara" />}
         filter={<FilterChips items={FILTERS.map((filter) => ({ id: filter.id, label: filter.label, count: counts[filter.id] }))} activeId={activeFilter} onSelect={(id) => setActiveFilter(/** @type {SshFilterId} */ (id))} ariaLabel="SSH filtreleri" />}
         primary={
           <ul className="evm-order-list-v1__cards" aria-label="SSH listesi">
@@ -123,6 +125,7 @@ export default function SshPage({ onOpenOrderById }) {
             )}
           </ul>
         }
+        fab={<FloatingActionButton label="Yeni SSH" onPress={onCreateSsh} />}
       />
     </section>
   )

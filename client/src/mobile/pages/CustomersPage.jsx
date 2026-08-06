@@ -7,6 +7,7 @@ import { useOrders } from '../../state/useOrders.js'
 import {
   AppHeader,
   EmptyState,
+  FloatingActionButton,
   LoadingSkeleton,
   MobileScreenShell,
   PrimaryListItem,
@@ -45,9 +46,10 @@ function whatsappHref(phone) {
 /**
  * @param {{
  *   onOpenOrderById: (orderId: string, options?: import('../../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onCreateCustomer?: () => void
  * }} props
  */
-export default function CustomersPage({ onOpenOrderById }) {
+export default function CustomersPage({ onOpenOrderById, onCreateCustomer }) {
   const { user } = useAuth()
   const { orders, salesOrderListItemDtos, loading } = useOrders()
   const [query, setQuery] = useState('')
@@ -140,7 +142,7 @@ export default function CustomersPage({ onOpenOrderById }) {
     <section className="mos-page evm-order-list-v1 evm-orders-v2" aria-label="Mobile Customers">
       <MobileScreenShell
         header={<AppHeader eyebrow="Hangi musteri bekliyor" title="Musteriler" subtitle={`${customerCards.length} musteri · canli siparis verisi`} meta={`${userRoleLabel} • Merkez Magaza`} initials={userInitials} onOpenMenu={() => { window.location.hash = '#/mobile/menu' }} />}
-        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Musteri, telefon veya siparis no ara..." />}
+        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Musteri ara" />}
         primary={
           <ul className="evm-order-list-v1__cards" aria-label="Musteri kartlari">
             {loading ? (
@@ -202,6 +204,7 @@ export default function CustomersPage({ onOpenOrderById }) {
             )}
           </ul>
         }
+        fab={<FloatingActionButton label="Yeni Musteri" onPress={onCreateCustomer} />}
       />
 
       {selectedCustomer ? (

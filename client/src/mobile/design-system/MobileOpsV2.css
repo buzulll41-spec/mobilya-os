@@ -1234,16 +1234,16 @@
   border-radius: var(--space-18);
   background: var(--evm-v2-surface);
   box-shadow: var(--evm-v2-shadow-soft);
-  padding: var(--space-18) var(--space-14);
+  padding: var(--space-12);
   display: grid;
   justify-items: center;
-  gap: var(--space-10);
+  gap: var(--space-6);
   text-align: center;
 }
 
 .evm-v2-empty__icon {
-  width: var(--space-46);
-  height: var(--space-46);
+  width: var(--space-40);
+  height: var(--space-40);
   border-radius: var(--evm-v4-radius-pill);
   border: var(--size-1) solid var(--evm-v2-line);
   display: inline-flex;
@@ -1293,23 +1293,6 @@
   color: var(--color-neutral-100);
   font-size: var(--font-80);
   font-weight: 700;
-}
-
-.evm-service-page .evm-order-list-v1__empty {
-  border: none;
-  background: transparent;
-  padding: 0;
-}
-
-.evm-service-page .evm-v2-empty {
-  padding: var(--space-12);
-  gap: var(--space-6);
-  border-radius: var(--space-14);
-}
-
-.evm-service-page .evm-v2-empty__icon {
-  width: var(--space-40);
-  height: var(--space-40);
 }
 
 .evm-v2-error-card {

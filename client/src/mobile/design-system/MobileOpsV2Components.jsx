@@ -170,6 +170,24 @@ export function UserHeader(props) {
   return <AppHeader {...props} />
 }
 
+/** @param {string} label */
+function compactFilterLabel(label) {
+  const text = String(label ?? '').trim()
+  if (!text) return ''
+  const normalized = text.toLowerCase()
+  if (normalized === 'bekleyen parca') return 'Parca Bek.'
+  if (normalized === 'tamamlanan' || normalized === 'tamamlandi') return 'Tamam'
+  if (normalized === 'planlanmamis') return 'Plansiz'
+  if (text.length <= 12) return text
+  const words = text.split(/\s+/).filter(Boolean)
+  if (words.length >= 2) {
+    const head = words[0]
+    const tail = words[1].slice(0, 3)
+    return `${head} ${tail}.`
+  }
+  return `${text.slice(0, 9)}...`
+}
+
 /** @param {{ items: Array<{ id: string, label: string, count?: number }>, activeId: string, onSelect?: (id: string) => void, ariaLabel?: string }} props */
 export function FilterChips({ items, activeId, onSelect, ariaLabel = 'Filtreler' }) {
   const railRef = useRef(/** @type {HTMLDivElement | null} */ (null))
@@ -187,6 +205,7 @@ export function FilterChips({ items, activeId, onSelect, ariaLabel = 'Filtreler'
     <div ref={railRef} className="evm-v2-chip-bar" role="tablist" aria-label={ariaLabel}>
       {items.map((item) => {
         const active = item.id === activeId
+        const chipLabel = compactFilterLabel(item.label)
         return (
           <button
             key={item.id}
@@ -196,7 +215,7 @@ export function FilterChips({ items, activeId, onSelect, ariaLabel = 'Filtreler'
             className={`evm-v2-chip${active ? ' is-active' : ''}`}
             onClick={() => onSelect?.(item.id)}
           >
-            <span>{item.label}</span>
+            <span title={item.label}>{chipLabel}</span>
             {Number.isFinite(item.count) ? <small>{Math.round(Number(item.count))}</small> : null}
           </button>
         )
