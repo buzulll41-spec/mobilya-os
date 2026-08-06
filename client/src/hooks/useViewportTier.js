@@ -18,10 +18,6 @@ export function isTabletViewport() {
 /** @returns {'phone' | 'tablet' | 'desktop'} */
 export function resolveViewportTier() {
   if (typeof window === 'undefined') return 'desktop'
-  const path = String(window.location?.pathname ?? '').toLowerCase()
-  if (path === '/mobile' || path.startsWith('/mobile/') || path === '/m' || path.startsWith('/m/')) {
-    return 'phone'
-  }
   const w = window.innerWidth
   if (w <= MOBILE_BREAKPOINTS.PHONE_MAX) return 'phone'
   if (w <= MOBILE_BREAKPOINTS.TABLET_MAX) return 'tablet'

@@ -186,7 +186,7 @@
 }
 
 /* ——— Touch UX ——— */
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   .mos-mobile-pwa .mos-btn,
   .mos-mobile-pwa .mos-erp-detail__action,
   .mos-mobile-pwa .mos-erp-tbl-op,
@@ -315,7 +315,7 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .mos-mobile-pwa[data-mobile-shell='true'] .mos-mobile-tabbar {
     display: block;
   }
@@ -328,9 +328,9 @@
 }
 
 /* ——— P2-10 Tablet gorunumu: store-home / hizli islem konfor yuksekligi ———
-   Tablet (768-1024) dashboard kart ve hizli islem butonlari daha dengeli yukseklik
+  Tablet (768-1023) dashboard kart ve hizli islem butonlari daha dengeli yukseklik
    alir; dokunma konforu artar. Telefon/desktop degismez; grid/logic degismez. */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .mos-mobile-pwa.mos-viewport-tablet .mos-mobile-store-home__card {
     min-height: 8.5rem;
   }
@@ -341,7 +341,7 @@
 }
 
 /* ——— Tablet: iki kolon liste + detay ——— */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops--orders .mos-erp-detail,
   .mos-mobile-pwa.mos-viewport-tablet .mos-erp-ops .mos-erp-detail,
   .mos-mobile-pwa.mos-viewport-tablet .coll-ops-center--store-tablet .coll-ops-customer {
@@ -409,10 +409,10 @@
 }
 
 /* ——— P0-4 Touch target ≥44px: mevcut kurallarda kapsanmayan tiklanabilir alanlar ———
-   Touch cihaz genisligi (max-width:1024) esas alinir — bu dosyadaki mevcut touch
-   kurali (satir 250) ile ayni konvansiyon. Desktop (>1024) etkilenmez;
+  Touch cihaz genisligi (max-width:1023) esas alinir — bu dosyadaki mevcut touch
+  kurali (satir 250) ile ayni konvansiyon. Desktop (>=1024) etkilenmez;
    layout/logic/API degismez, yalnizca min boyut buyutulur. */
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   .mos-mobile-pwa .mos-icon-btn,
   .mos-mobile-pwa .mos-quick-action-btn,
   .mos-mobile-pwa .mos-sidebar-close,
@@ -428,7 +428,7 @@
    Ic scroll panellerinde iOS momentum scroll ve overscroll zincirleme engeli;
    panel scroll'u sayfayi/pull-to-refresh'i kazara tetiklemez. Yalnizca scroll
    hissi; layout/logic/API degismez. */
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   .mos-mobile-pwa .mos-erp-filters,
   .mos-mobile-pwa .coll-ops-left,
   .mos-mobile-pwa .mos-erp-detail,

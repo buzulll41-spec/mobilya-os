@@ -50,14 +50,14 @@ describe('MOBILYA OS Mobile & Tablet PWA (FAZ 111)', () => {
       expect(MOBILE_BREAKPOINTS.COMPACT_PHONE_MAX).toBe(479)
       expect(MOBILE_BREAKPOINTS.PHONE_MAX).toBe(767)
       expect(MOBILE_BREAKPOINTS.TABLET_MIN).toBe(768)
-      expect(MOBILE_BREAKPOINTS.TABLET_MAX).toBe(1024)
-      expect(MOBILE_BREAKPOINTS.DESKTOP_MIN).toBe(1025)
+      expect(MOBILE_BREAKPOINTS.TABLET_MAX).toBe(1023)
+      expect(MOBILE_BREAKPOINTS.DESKTOP_MIN).toBe(1024)
     })
 
     it('mobile-pwa.css responsive katmanları tanımlı', () => {
       const css = readFileSync(resolve('src/styles/mobile-pwa.css'), 'utf8')
       expect(css).toContain('@media (max-width: 767px)')
-      expect(css).toContain('@media (min-width: 768px) and (max-width: 1024px)')
+      expect(css).toContain('@media (min-width: 768px) and (max-width: 1023px)')
       expect(css).toContain('@media (min-width: 1280px)')
       expect(css).toContain('.mos-mobile-tabbar')
       expect(css).toContain('.mos-mobile-pwa')

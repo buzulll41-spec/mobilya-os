@@ -26,8 +26,8 @@ export const MOBILE_BREAKPOINTS = {
   COMPACT_PHONE_MAX: 479,
   PHONE_MAX: 767,
   TABLET_MIN: 768,
-  TABLET_MAX: 1024,
-  DESKTOP_MIN: 1025,
+  TABLET_MAX: 1023,
+  DESKTOP_MIN: 1024,
 }
 
 /** WCAG / Apple HIG minimum dokunma alanı. */
