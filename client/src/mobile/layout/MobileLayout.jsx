@@ -116,6 +116,16 @@ export default function MobileLayout({ page, onNavigate, onOpenOrderModal, child
       ) : null}
       <div className="mos-main">
         <div className="mos-shell-safe-area">
+          {isTablet && !showCompactChrome ? (
+            <button
+              type="button"
+              className="evm-v2-responsive-sidebar-toggle evm-v2-responsive-sidebar-toggle--floating"
+              aria-label="Sidebar ac"
+              onClick={() => setSidebarOpen((value) => !value)}
+            >
+              <IconMenu />
+            </button>
+          ) : null}
           {showCompactChrome ? (
             <header className="mos-app-chrome mos-app-chrome--compact-mobile" data-compact-mobile="true">
               <div className="mos-app-chrome-left mos-app-chrome-left--compact-brand" aria-label="Evtrend Mobile">

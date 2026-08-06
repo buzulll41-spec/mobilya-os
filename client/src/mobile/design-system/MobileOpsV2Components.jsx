@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { IconBell, IconChevronRight, IconClose, IconDashboard, IconMenu, IconOrders, IconPlus, IconSearch, IconUsers } from '../../components/Icons.jsx'
+import { useViewportTier } from '../../hooks/useViewportTier.js'
 
 const PRESS_STYLE = { transition: 'transform var(--evm-v2-motion-base) var(--evm-v2-motion-ease)' }
 
@@ -503,6 +504,9 @@ export function FloatingActionButton({ label, icon, onPress, ariaLabel }) {
  *  children?: import('react').ReactNode,
  * }} props */
 export function MobileScreenShell({ className = '', header, search, filter, primary, secondary, fab, children }) {
+  const viewportTier = useViewportTier()
+  const showFab = viewportTier !== 'desktop'
+
   return (
     <section className={`evm-v2-screen-shell ${className}`.trim()}>
       {header ? <div className="evm-v2-screen-shell__header">{header}</div> : null}
@@ -511,7 +515,7 @@ export function MobileScreenShell({ className = '', header, search, filter, prim
       {primary ? <div className="evm-v2-screen-shell__primary">{primary}</div> : null}
       {secondary ? <div className="evm-v2-screen-shell__secondary">{secondary}</div> : null}
       {children}
-      {fab}
+      {showFab ? fab : null}
     </section>
   )
 }
