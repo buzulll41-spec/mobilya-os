@@ -194,10 +194,10 @@ export default function ServicePage({ onOpenOrderById, onCreateService }) {
   }, [rows, onOpenOrderById])
 
   return (
-    <section className="mos-page evm-order-list-v1 evm-orders-v2" aria-label="Mobile Service">
+    <section className="mos-page evm-order-list-v1 evm-orders-v2 evm-service-page" aria-label="Mobile Service">
       <MobileScreenShell
         header={<AppHeader eyebrow="Bugun hangi servisler var" title="Servis" subtitle="Acik servis kayitlari ve takip aksiyonlari" meta={`${userRoleLabel} • Merkez Magaza`} unreadCount={counts.open} initials={userInitials} onOpenMenu={() => { window.location.hash = '#/mobile/menu' }} />}
-        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Musteri, sorun veya atanan kisi ara" />}
+        search={<SearchBar value={query} onValueChange={setQuery} placeholder="Servis ara" />}
         filter={<FilterChips items={FILTERS.map((filter) => ({ id: filter.id, label: filter.label, count: counts[filter.id] }))} activeId={activeFilter} onSelect={(id) => setActiveFilter(/** @type {ServiceFilterId} */ (id))} ariaLabel="Servis filtreleri" />}
         primary={
           <ul className="evm-order-list-v1__cards" aria-label="Servis kartlari">

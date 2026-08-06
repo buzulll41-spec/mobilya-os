@@ -353,7 +353,7 @@
 }
 
 .evm-v2-search-head__field {
-  min-height: var(--space-50);
+  min-height: var(--space-44);
   border: var(--size-1) solid var(--evm-v2-line);
   border-radius: var(--space-18);
   display: grid;
@@ -378,10 +378,13 @@
 }
 
 .evm-v2-search-head input {
+  min-width: 0;
+  width: 100%;
   border: none;
   outline: none;
   font-size: var(--font-92);
   font-weight: 560;
+  line-height: var(--line-height-body);
   color: var(--evm-v2-ink);
   background: transparent;
 }
@@ -435,8 +438,14 @@
 }
 
 .evm-v2-screen-head__identity {
+  flex: 1 1 auto;
+  min-width: 0;
   display: grid;
   gap: var(--size-5);
+}
+
+.evm-v2-screen-head__aside {
+  flex: 0 0 auto;
 }
 
 .evm-v2-screen-head__eyebrow {
@@ -470,6 +479,9 @@
   font-size: var(--font-80);
   font-weight: 560;
   color: var(--evm-v2-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .evm-v2-screen-head__actions {
@@ -540,8 +552,10 @@
   display: flex;
   gap: var(--space-8);
   overflow-x: auto;
-  padding: var(--size-2);
+  overflow-y: hidden;
+  padding: var(--size-2) var(--space-4);
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .evm-v2-chip-bar::-webkit-scrollbar {
@@ -549,6 +563,8 @@
 }
 
 .evm-v2-chip {
+  flex: 0 0 auto;
+  min-width: max-content;
   border: var(--size-1) solid var(--evm-v2-line);
   background: var(--color-surface-alpha-92);
   color: var(--color-neutral-700);
@@ -568,6 +584,7 @@
 .evm-v2-chip small {
   min-width: var(--font-title);
   height: var(--font-title);
+  padding: 0 var(--size-4);
   border-radius: var(--radius-pill);
   background: var(--color-neutral-350);
   color: var(--color-neutral-650);
@@ -1276,6 +1293,23 @@
   color: var(--color-neutral-100);
   font-size: var(--font-80);
   font-weight: 700;
+}
+
+.evm-service-page .evm-order-list-v1__empty {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.evm-service-page .evm-v2-empty {
+  padding: var(--space-12);
+  gap: var(--space-6);
+  border-radius: var(--space-14);
+}
+
+.evm-service-page .evm-v2-empty__icon {
+  width: var(--space-40);
+  height: var(--space-40);
 }
 
 .evm-v2-error-card {

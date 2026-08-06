@@ -172,8 +172,19 @@ export function UserHeader(props) {
 
 /** @param {{ items: Array<{ id: string, label: string, count?: number }>, activeId: string, onSelect?: (id: string) => void, ariaLabel?: string }} props */
 export function FilterChips({ items, activeId, onSelect, ariaLabel = 'Filtreler' }) {
+  const railRef = useRef(/** @type {HTMLDivElement | null} */ (null))
+
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail) return
+    const activeNode = rail.querySelector('[role="tab"][aria-selected="true"]')
+    if (activeNode instanceof HTMLElement) {
+      activeNode.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    }
+  }, [activeId, items.length])
+
   return (
-    <div className="evm-v2-chip-bar" role="tablist" aria-label={ariaLabel}>
+    <div ref={railRef} className="evm-v2-chip-bar" role="tablist" aria-label={ariaLabel}>
       {items.map((item) => {
         const active = item.id === activeId
         return (
@@ -640,6 +651,10 @@ export const StatusPill = Badge
  *   onPrimaryAction?: () => void
  * }} props */
 export function BottomNavigation({ page, onNavigate, onPrimaryAction }) {
+  const activeRootPage = page === 'home' || page === 'orders' || page === 'customers' || page === 'menu'
+    ? page
+    : null
+
   const items = [
     { id: 'home', label: 'Ana Sayfa', icon: IconDashboard, action: 'home' },
     { id: 'orders', label: 'Siparişler', icon: IconOrders, action: 'orders' },
@@ -653,18 +668,7 @@ export function BottomNavigation({ page, onNavigate, onPrimaryAction }) {
       <ul className="mos-mobile-tabbar__list">
         {items.map((item) => {
           const Icon = item.icon
-          const ordersScopeActive =
-            page === 'orders' || page === 'collection' || page === 'shipment' || page === 'service' || page === 'reports'
-          const active =
-            item.id === 'home'
-              ? page === 'home'
-              : item.id === 'orders'
-                ? ordersScopeActive || page === 'ssh'
-                : item.id === 'customers'
-                  ? page === 'customers'
-                  : item.id === 'menu'
-                    ? page === 'menu'
-                    : false
+          const active = activeRootPage ? item.id === activeRootPage : false
           return (
             <li key={item.id} className={`mos-mobile-tabbar__item ${item.action === 'create' ? 'mos-mobile-tabbar__item--create' : ''}`}>
               <button
