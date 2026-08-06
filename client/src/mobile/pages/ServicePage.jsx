@@ -8,6 +8,7 @@ import {
   AppHeader,
   EmptyState,
   FilterChips,
+  FloatingActionButton,
   LoadingSkeleton,
   MobileScreenShell,
   PrimaryButton,
@@ -16,6 +17,7 @@ import {
   SecondaryButton,
   Badge,
 } from '../design-system/MobileOpsV2Components.jsx'
+import { STORE_ACTION, canPerformStoreAction } from '../../constants/roleActions.js'
 import { initialsFrom, roleLabel } from '../utils/mobileIdentity.js'
 import '../../styles/orders-mobile-v1.css'
 
@@ -80,9 +82,10 @@ function matchesFilter({ filterId, task, openMissingItemsCount }) {
 /**
  * @param {{
  *   onOpenOrderById: (orderId: string, options?: import('../../contracts/orderDrawer.js').OpenOrderDrawerOptions) => void
+ *   onCreateService?: () => void
  * }} props
  */
-export default function ServicePage({ onOpenOrderById }) {
+export default function ServicePage({ onOpenOrderById, onCreateService }) {
   const { user } = useAuth()
   const { salesOrderListItemDtos, collectionRowVMs, operationalTasks, setTaskOverlay, loading } = useOrders()
   const [query, setQuery] = useState('')
@@ -167,6 +170,11 @@ export default function ServicePage({ onOpenOrderById }) {
     return roleLabel(user.role)
   }, [user?.role])
 
+  const canCreateService = useMemo(
+    () => canPerformStoreAction(user?.role, STORE_ACTION.CREATE_SSH),
+    [user?.role],
+  )
+
   useEffect(() => {
     function onHashChange() {
       const next = toServiceFilter(readServiceHashParams().filter)
@@ -196,7 +204,14 @@ export default function ServicePage({ onOpenOrderById }) {
             {loading ? (
               <li className="evm-order-list-v1__skeleton-wrap"><LoadingSkeleton rows={6} /></li>
             ) : rows.length === 0 ? (
-              <li className="evm-order-list-v1__empty"><EmptyState title="Servis kaydi yok" description="Bu filtrede gosterilecek servis kaydi bulunamadi." /></li>
+              <li className="evm-order-list-v1__empty">
+                <EmptyState
+                  title="Servis kaydi yok"
+                  description="Bu filtrede gosterilecek servis kaydi bulunamadi."
+                  actionLabel="Yeni Servis Kaydi Ac"
+                  onAction={canCreateService ? onCreateService : undefined}
+                />
+              </li>
             ) : (
               rows.map((row) => (
                 <li key={row.id} className="evm-collection-v2__item">
@@ -229,6 +244,7 @@ export default function ServicePage({ onOpenOrderById }) {
             )}
           </ul>
         }
+        fab={canCreateService ? <FloatingActionButton label="Yeni Servis" onPress={onCreateService} /> : null}
       />
     </section>
   )

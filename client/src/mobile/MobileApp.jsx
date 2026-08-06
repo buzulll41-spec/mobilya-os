@@ -207,6 +207,10 @@ export default function MobileApp() {
     openOrderDrawer(order.id, options)
   }
 
+  function handleCreateService() {
+    navigateToPage('service')
+  }
+
   function openExternalOrFallback(href, fallbackPage) {
     closeQuickActions()
     if (href) {
@@ -223,6 +227,10 @@ export default function MobileApp() {
       return
     }
     if (action === 'collection' || action === 'shipment' || action === 'service' || action === 'customers' || action === 'orders' || action === 'warehouse') {
+      if (action === 'service') {
+        handleCreateService()
+        return
+      }
       navigateToPage(action)
       return
     }
@@ -243,7 +251,7 @@ export default function MobileApp() {
       return <ShipmentsPage onOpenOrderById={handleOpenOrderById} />
     }
     if (page === 'service') {
-      return <ServicePage onOpenOrderById={handleOpenOrderById} />
+      return <ServicePage onOpenOrderById={handleOpenOrderById} onCreateService={handleCreateService} />
     }
     if (page === 'ssh') {
       return <SshPage onOpenOrderById={handleOpenOrderById} />
