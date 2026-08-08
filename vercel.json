@@ -14,6 +14,18 @@
   ],
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://mobilya-os-backend.onrender.com/$1"
+    },
+    {
+      "source": "/desktop",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/desktop/(.*)",
+      "destination": "/index.html"
+    },
+    {
       "source": "/mobile",
       "destination": "/index.html"
     },
