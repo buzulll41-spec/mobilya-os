@@ -9,6 +9,7 @@ import './styles/offline-first-faz114.css'
 import './styles/mobile-store-ops-faz115.css'
 
 const MobileApp = lazy(() => import('./mobile/MobileApp.jsx'))
+const DesktopApp = lazy(() => import('./desktop/DesktopApp.jsx'))
 const DesignSystemShowcasePage = lazy(() => import('./pages/DesignSystemShowcasePage.jsx'))
 
 // Marker note for contract tests: these panels are mounted inside DesktopApp tree only.
@@ -22,6 +23,19 @@ function isMobilePath(pathname) {
 function isDesktopPath(pathname) {
   const path = String(pathname || '').toLowerCase()
   return path === '/desktop' || path.startsWith('/desktop/')
+}
+
+function canonicalMobileHash(hashValue) {
+  const text = String(hashValue || '').trim()
+  if (!text) return '#/home'
+  if (text.toLowerCase().startsWith('#/mobile/')) return `#/${text.slice(9)}`
+  if (text.toLowerCase().startsWith('#/m/')) return `#/${text.slice(4)}`
+  return text
+}
+
+function isLegacyMobileHash(hashValue) {
+  const text = String(hashValue || '').toLowerCase()
+  return text.startsWith('#/mobile/') || text.startsWith('#/m/')
 }
 
 function isShowcasePath(pathname) {
@@ -38,14 +52,36 @@ function isShowcasePath(pathname) {
 export default function App() {
   useViewportTier()
   const showcase = isShowcasePath(window.location.pathname)
+  const pathname = String(window.location.pathname || '')
+  const mobilePath = isMobilePath(pathname)
+  const desktopAliasPath = isDesktopPath(pathname)
 
   useEffect(() => {
     if (showcase) return
-    const { pathname, search, hash } = window.location
-    if (!isMobilePath(pathname) && !isDesktopPath(pathname)) {
-      window.history.replaceState(null, '', `/mobile${search}${hash}`)
+
+    const { search, hash } = window.location
+    if (desktopAliasPath) {
+      if (isLegacyMobileHash(hash)) {
+        const nextHash = canonicalMobileHash(hash)
+        window.history.replaceState(null, '', `/desktop${search}${nextHash}`)
+      }
+      return
     }
-  }, [showcase])
+
+    if (mobilePath) {
+      const nextHash = canonicalMobileHash(hash)
+      if (nextHash !== hash) {
+        window.history.replaceState(null, '', `/mobile${search}${nextHash}`)
+      }
+      return
+    }
+
+    if (isLegacyMobileHash(hash)) {
+      const nextHash = canonicalMobileHash(hash)
+      // Desktop shell must never be forced into /mobile by legacy hash payloads.
+      window.history.replaceState(null, '', `/${search}${nextHash}`)
+    }
+  }, [showcase, mobilePath, desktopAliasPath])
 
   if (showcase) {
     return (
@@ -55,9 +91,17 @@ export default function App() {
     )
   }
 
+  if (mobilePath) {
+    return (
+      <Suspense fallback={<LoadingBlock title="Mobile app loading" variant="card-grid" />}>
+        <MobileApp />
+      </Suspense>
+    )
+  }
+
   return (
-    <Suspense fallback={<LoadingBlock title="Mobile app loading" variant="card-grid" />}>
-      <MobileApp />
+    <Suspense fallback={<LoadingBlock title="Desktop app loading" variant="table" />}>
+      <DesktopApp />
     </Suspense>
   )
 }
