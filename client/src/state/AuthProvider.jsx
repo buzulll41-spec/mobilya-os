@@ -44,8 +44,9 @@ export function AuthProvider({ children }) {
     ;(async () => {
       const session = loadAuthSession()
       if (!session) {
+        const ensured = await authClient.ensureDemoSession()
         if (!cancelled) {
-          setUser(null)
+          setUser(ensured?.user ?? null)
           setLoading(false)
         }
         return

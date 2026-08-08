@@ -74,7 +74,7 @@ export async function fetchDomainEventsForOrderFromApi(baseUrl, orderId) {
 /**
  * @param {string} baseUrl
  * @param {string} orderId
- * @param {{ amount: number, method: string, note?: string }} body
+ * @param {{ amount: number, method: string, note?: string, idempotencyKey?: string }} body
  */
 export async function postOrderPaymentInApi(baseUrl, orderId, body) {
   const client = ordersApiClient(baseUrl)

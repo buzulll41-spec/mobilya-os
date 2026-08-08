@@ -1,4 +1,6 @@
 import { getApiBaseUrl } from '../config/dataSource.js'
+import { canChangeOrderStatus } from '../constants/orderDrawerPermissions.js'
+import { getCurrentAuthUser } from '../lib/operationActor.js'
 
 import * as mockApi from './mockApi.js'
 
@@ -52,6 +54,30 @@ export async function createOrder(draft) {
 }
 
 /**
+ * @param {string} orderId
+ * @param {{ reason: string, softDelete?: boolean }} body
+ */
+export async function cancelOrder(orderId, body) {
+  const base = apiBase()
+  if (base) throw new Error('Cancel order API henüz tanımlı değil')
+  return mockApi.cancelOrder(orderId, body)
+}
+
+/** @param {string} orderId */
+export async function reopenOrder(orderId) {
+  const base = apiBase()
+  if (base) throw new Error('Reopen order API henüz tanımlı değil')
+  return mockApi.reopenOrder(orderId)
+}
+
+/** @param {string} orderId */
+export async function deleteOrder(orderId) {
+  const base = apiBase()
+  if (base) throw new Error('Delete order API henüz tanımlı değil')
+  return mockApi.deleteOrder(orderId)
+}
+
+/**
  * @param {import('../contracts/v1/createOrderRequest.js').CreateOrderRequest} body
  * @returns {Promise<import('../contracts/v1/salesOrderListItem.js').SalesOrderListItemDto>}
  */
@@ -68,6 +94,10 @@ export async function createSalesOrderViaApi(body) {
 export async function patchOrderStatus(orderId, body) {
   const base = apiBase()
   if (base) return patchOrderStatusInApi(base, orderId, body)
+
+  if (!canChangeOrderStatus(getCurrentAuthUser()?.role)) {
+    throw new Error('Bu işlem için yetkiniz yok')
+  }
 
   const { evaluateOrderStatusChangePolicies, assertPolicyAllowsProceed } = await import(
     '../policy/evaluateOrderPolicies.js'

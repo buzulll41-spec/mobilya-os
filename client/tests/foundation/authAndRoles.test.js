@@ -5,6 +5,7 @@ import { USER_ROLE } from '../../src/contracts/v1/user.js'
 import { clearAuthSession, saveAuthSession } from '../../src/services/authSessionStore.js'
 import { loadTaskStateMap, setTaskOverlayState } from '../../src/services/taskStateStore.js'
 import { buildOperationActorPayload } from '../../src/lib/operationActor.js'
+import { shouldRefreshOrdersForAuth } from '../../src/state/ordersAuthGuard.js'
 
 describe('auth & role foundation', () => {
   beforeEach(() => {
@@ -88,6 +89,34 @@ describe('auth & role foundation', () => {
     })
     expect(handler).not.toHaveBeenCalled()
     globalThis.removeEventListener?.('mobilya:auth-expired', handler)
+  })
+
+  it('ensureDemoSession yoksa otomatik demo login yapar', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'http://api.test')
+    const originalFetch = globalThis.fetch
+    const fetchSpy = vi.fn(async () =>
+      new Response(JSON.stringify({ token: 'demo-token', user: { id: 'u-demo', fullName: 'Demo User', email: 'admin@mobilya.local', role: USER_ROLE.ADMIN, isActive: true, createdAt: '2026-01-01T00:00:00.000Z' } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    globalThis.fetch = fetchSpy
+
+    try {
+      const { ensureDemoSession } = await import('../../src/services/authClient.js')
+      const session = await ensureDemoSession()
+      expect(session?.token).toBe('demo-token')
+      expect(session?.user.email).toBe('admin@mobilya.local')
+      expect(fetchSpy).toHaveBeenCalled()
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
+  it('orders refresh sadece auth bootstrap tamamlanınca başlar', () => {
+    expect(shouldRefreshOrdersForAuth({ apiMode: true, authLoading: true, user: null })).toBe(false)
+    expect(shouldRefreshOrdersForAuth({ apiMode: true, authLoading: false, user: null })).toBe(false)
+    expect(shouldRefreshOrdersForAuth({ apiMode: true, authLoading: false, user: { id: 'u-1' } })).toBe(true)
   })
 
   it('mock login başarılı', async () => {

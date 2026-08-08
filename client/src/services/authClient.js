@@ -101,6 +101,37 @@ export function logout() {
 }
 
 /**
+ * @param {{ email?: string, password?: string }} [credentials]
+ * @returns {Promise<AuthSession | null>}
+ */
+export async function ensureDemoSession(credentials = {}) {
+  const existing = loadAuthSession()
+  if (existing?.token && existing?.user) return existing
+
+  const base = getApiBaseUrl()
+  if (!base) return null
+
+  const fallbackEmail = credentials.email?.trim().toLowerCase() || 'admin@mobilya.local'
+  const fallbackPassword = credentials.password || 'admin123'
+
+  try {
+    const client = createApiClient(base)
+    const res = await client.post('/v1/auth/login', {
+      email: fallbackEmail,
+      password: fallbackPassword,
+    })
+    const session = /** @type {AuthSession} */ ({
+      token: res.token,
+      user: res.user,
+    })
+    saveAuthSession(session)
+    return session
+  } catch {
+    return null
+  }
+}
+
+/**
  * @returns {Promise<UserDto | null>}
  */
 export async function fetchCurrentUser() {

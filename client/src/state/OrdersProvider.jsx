@@ -21,6 +21,8 @@ import { OFFLINE_MUTATION_TYPE } from '../services/offline/offlineCacheStore.js'
 import { readCachedOrders } from '../services/offline/offlineCacheStore.js'
 import { operationsRepository } from '../repository/operationsRepository.js'
 import { recordOperationAudit } from '../lib/operationAuditLog.js'
+import { shouldRefreshOrdersForAuth } from './ordersAuthGuard.js'
+import { ensureDemoSession } from '../services/authClient.js'
 
 const STARTUP_RETRY_INTERVAL_MS = 5000
 const STARTUP_RETRY_MAX_ATTEMPTS = 18
@@ -79,7 +81,7 @@ function isStartupWakeError(message) {
 
 /** @param {{ children: import('react').ReactNode }} props */
 export function OrdersProvider({ children }) {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { cacheOrders, refreshSnapshot } = useOfflineFirst()
   const apiMode = Boolean(getApiBaseUrl())
   const [salesOrderListItemDtos, setSalesOrderListItemDtos] = useState(/** @type {SalesOrderListItemDto[]} */ ([]))
@@ -149,7 +151,9 @@ export function OrdersProvider({ children }) {
   )
 
   const refreshOrders = useCallback(
-    async (/** @type {{ mergeCreated?: SalesOrderListItemDto, includeDomainEvents?: boolean } | undefined} */ options) => {
+    async function refreshOrdersCallback(
+      /** @type {{ mergeCreated?: SalesOrderListItemDto, includeDomainEvents?: boolean } | undefined} */ options,
+    ) {
       setError(null)
       setIsRefreshing(true)
       const requestStartedAt = Date.now()
@@ -239,7 +243,7 @@ export function OrdersProvider({ children }) {
           if (!startupRetryTimerRef.current) {
             startupRetryTimerRef.current = setTimeout(() => {
               startupRetryTimerRef.current = null
-              void refreshOrders({ includeDomainEvents: false })
+              void refreshOrdersCallback({ includeDomainEvents: false })
             }, STARTUP_RETRY_INTERVAL_MS)
           }
         } else {
@@ -282,14 +286,28 @@ export function OrdersProvider({ children }) {
 
   useEffect(() => {
     if (apiMode) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- bootstrap: mock getOrders
     void refreshOrders({ includeDomainEvents: false })
   }, [apiMode, refreshOrders])
 
   useEffect(() => {
     if (!apiMode) return
-    void refreshOrders({ includeDomainEvents: false })
-  }, [apiMode, user?.id, refreshOrders])
+    if (authLoading) return
+
+    let cancelled = false
+    void (async () => {
+      if (!user?.id) {
+        const ensured = await ensureDemoSession()
+        if (cancelled || !ensured?.user?.id) return
+      }
+      if (!cancelled && shouldRefreshOrdersForAuth({ apiMode, authLoading: false, user })) {
+        void refreshOrders({ includeDomainEvents: false })
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [apiMode, authLoading, user?.id, refreshOrders])
 
   const createOrder = useCallback(
     async (
