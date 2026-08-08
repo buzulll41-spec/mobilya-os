@@ -12,6 +12,11 @@ import { isIsoDateString, parseIsoDateOnly, toIsoDateString } from '../lib/isoDa
 import { loadSupplierBalanceSnapshot } from './supplierBalance.js'
 import { domainEventCreateInput } from '../lib/auditedDomainEvent.js'
 import type { AuthUserContext } from '../lib/authUser.js'
+import {
+  buildDeterministicTransactionId,
+  isPrismaUniqueViolation,
+  normalizeIdempotencyKey,
+} from '../lib/idempotency.js'
 
 const SUPPLIER_PAYMENT_POSTED_EVENT = 'supplier.payment_posted'
 
@@ -21,6 +26,7 @@ export type PostSupplierPaymentRequest = {
   occurredAt?: string
   description?: string
   documentNo?: string
+  idempotencyKey?: string
 }
 
 export type PostSupplierPaymentResult = {
@@ -42,6 +48,7 @@ export function assertValidPostSupplierPaymentRequest(body: unknown): PostSuppli
   const occurredAt = typeof o.occurredAt === 'string' ? o.occurredAt.trim() : undefined
   const description = optString(o.description)
   const documentNo = optString(o.documentNo)
+  const idempotencyKey = normalizeIdempotencyKey(o.idempotencyKey)
 
   const details: Record<string, string> = {}
   if (!Number.isFinite(amount) || amount <= 0) details.amount = 'Must be > 0'
@@ -58,6 +65,7 @@ export function assertValidPostSupplierPaymentRequest(body: unknown): PostSuppli
     ...(occurredAt ? { occurredAt } : {}),
     ...(description ? { description } : {}),
     ...(documentNo ? { documentNo } : {}),
+    ...(idempotencyKey ? { idempotencyKey } : {}),
   }
 }
 
@@ -85,51 +93,81 @@ export async function postSupplierPayment(
     body.description?.trim() ||
     `Ödeme — ${body.method}${body.documentNo ? ` (${body.documentNo})` : ''}`
 
-  const entry = await prisma.$transaction(async (tx) => {
-    const snap = await loadSupplierBalanceSnapshot(tx, supplierId)
-    const balanceBefore = snap.openBalance
-    if (body.amount > balanceBefore + 0.009) {
-      throw new AppHttpError(400, 'Ödeme tutarı açık bakiyeyi aşamaz', 'Bad Request', {
-        amount: 'Exceeds open balance',
-      })
-    }
+  const paymentIdempotencyKey =
+    body.idempotencyKey ??
+    buildDeterministicTransactionId(
+      'IDK',
+      supplierId,
+      [body.amount, body.method, body.occurredAt ?? '', body.description ?? '', body.documentNo ?? ''].join('|'),
+    )
+  const paymentTransactionId = buildDeterministicTransactionId('SPAY', supplierId, paymentIdempotencyKey)
 
-    const balanceAfter = balanceBefore - body.amount
+  let entry
+  try {
+    entry = await prisma.$transaction(async (tx) => {
+      const snap = await loadSupplierBalanceSnapshot(tx, supplierId)
+      const balanceBefore = snap.openBalance
+      if (body.amount > balanceBefore + 0.009) {
+        throw new AppHttpError(400, 'Ödeme tutarı açık bakiyeyi aşamaz', 'Bad Request', {
+          amount: 'Exceeds open balance',
+        })
+      }
 
-    const entry = await tx.supplierLedgerEntry.create({
-      data: {
-        supplierId,
-        entryType: SUPPLIER_LEDGER_ENTRY_TYPE.PAYMENT,
-        occurredAt,
-        description,
-        debitAmount: new Prisma.Decimal(body.amount),
-        creditAmount: new Prisma.Decimal(0),
-        balanceAfter: new Prisma.Decimal(balanceAfter),
-        currency: 'TRY',
-        paymentMethod: body.method,
-        documentNo: body.documentNo ?? null,
-      },
-    })
+      const balanceAfter = balanceBefore - body.amount
 
-    await tx.domainEvent.create({
-      data: domainEventCreateInput(
-        supplierId,
-        'Supplier',
-        SUPPLIER_PAYMENT_POSTED_EVENT,
-        `corr-supplier-pay-${entry.id}`,
-        occurredAt,
-        {
-          ledgerEntryId: entry.id,
-          amount: body.amount,
-          method: body.method,
+      const created = await tx.supplierLedgerEntry.create({
+        data: {
+          supplierId,
+          entryType: SUPPLIER_LEDGER_ENTRY_TYPE.PAYMENT,
+          occurredAt,
+          description,
+          debitAmount: new Prisma.Decimal(body.amount),
+          creditAmount: new Prisma.Decimal(0),
+          balanceAfter: new Prisma.Decimal(balanceAfter),
+          currency: 'TRY',
+          paymentMethod: body.method,
           documentNo: body.documentNo ?? null,
+          paymentTransactionId,
+          idempotencyKey: paymentIdempotencyKey,
         },
-        options?.authUser,
-      ),
-    })
+      })
 
-    return entry
-  })
+      await tx.domainEvent.create({
+        data: domainEventCreateInput(
+          supplierId,
+          'Supplier',
+          SUPPLIER_PAYMENT_POSTED_EVENT,
+          `corr-supplier-pay-${created.id}`,
+          occurredAt,
+          {
+            ledgerEntryId: created.id,
+            amount: body.amount,
+            method: body.method,
+            documentNo: body.documentNo ?? null,
+            paymentTransactionId,
+          },
+          options?.authUser,
+        ),
+      })
+
+      return created
+    })
+  } catch (err) {
+    if (isPrismaUniqueViolation(err)) {
+      const existingEntry = await prisma.supplierLedgerEntry.findFirst({
+        where: { supplierId, idempotencyKey: paymentIdempotencyKey },
+      })
+      if (existingEntry && existingEntry.supplierId === supplierId) {
+        const updatedSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: supplierId } })
+        const snap = await loadSupplierBalanceSnapshot(prisma, supplierId)
+        return {
+          entry: mapSupplierLedgerEntryDto(existingEntry),
+          supplier: mapSupplierDetailDto(updatedSupplier, snap.openBalance, snap.lastMovementAt),
+        }
+      }
+    }
+    throw err
+  }
 
   const updatedSupplier = await prisma.supplier.findUniqueOrThrow({ where: { id: supplierId } })
   const snap = await loadSupplierBalanceSnapshot(prisma, supplierId)

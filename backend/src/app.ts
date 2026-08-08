@@ -48,6 +48,10 @@ import {
   rejectOrderPayment,
 } from './services/rejectOrderPayment.js'
 import {
+  assertValidReverseOrderPaymentRequest,
+  reverseOrderPayment,
+} from './services/reverseOrderPayment.js'
+import {
   assertValidPatchOrderTerminRequest,
   patchOrderTermin,
 } from './services/patchOrderTermin.js'
@@ -895,6 +899,15 @@ export async function buildApp(): Promise<FastifyInstance> {
     const { orderId, paymentId } = req.params as { orderId: string; paymentId: string }
     const body = assertValidRejectOrderPaymentRequest(req.body)
     const dto = await rejectOrderPayment(prisma, orderId, paymentId, body, {
+      authUser: requireAuthUser(req),
+    })
+    return reply.status(200).send(dto)
+  })
+
+  app.post('/v1/orders/:orderId/payments/:paymentId/reverse', async (req, reply) => {
+    const { orderId, paymentId } = req.params as { orderId: string; paymentId: string }
+    const body = assertValidReverseOrderPaymentRequest(req.body)
+    const dto = await reverseOrderPayment(prisma, orderId, paymentId, body, {
       authUser: requireAuthUser(req),
     })
     return reply.status(200).send(dto)

@@ -193,6 +193,11 @@ const ROUTE_RULES: RouteRule[] = [
     pattern: /^\/v1\/orders\/[^/]+\/payments\/[^/]+\/reject$/,
     permission: PERM.PAYMENTS_APPROVE,
   },
+  {
+    methods: ['POST'],
+    pattern: /^\/v1\/orders\/[^/]+\/payments\/[^/]+\/reverse$/,
+    permission: PERM.PAYMENTS_APPROVE,
+  },
   { methods: ['PATCH'], pattern: /^\/v1\/orders\/[^/]+\/status$/, permission: PERM.ORDERS_STATUS },
   { methods: ['PATCH'], pattern: /^\/v1\/orders\/[^/]+\/termin$/, permission: PERM.ORDERS_TERMIN },
   { methods: ['GET'], pattern: /^\/v1\/orders\/[^/]+\/missing-items$/, permission: PERM.MISSING_READ },

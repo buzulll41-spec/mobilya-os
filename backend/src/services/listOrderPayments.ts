@@ -46,7 +46,7 @@ export async function listOrderPayments(
     status: p.status,
     amount: numberToMoney(decimalToNumber(p.amount), p.currency || DEFAULT_CURRENCY),
     occurredAt: p.occurredAt.toISOString(),
-    idempotencyKey: p.id,
+    idempotencyKey: p.idempotencyKey ?? p.id,
     externalRef: null,
     mailOrderSupplierId: p.mailOrderSupplierId,
     mailOrderSupplierName: p.mailOrderSupplierNameSnapshot,

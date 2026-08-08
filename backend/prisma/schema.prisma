@@ -241,6 +241,10 @@ model PaymentTransaction {
   amount       Decimal  @db.Decimal(14, 2)
   currency     String   @default("TRY")
   occurredAt   DateTime
+  idempotencyKey String?
+  reversalSourcePaymentId String? @unique
+  reversalSourcePayment   PaymentTransaction? @relation("PaymentReversal", fields: [reversalSourcePaymentId], references: [id], onDelete: SetNull)
+  reversedByPayment       PaymentTransaction? @relation("PaymentReversal")
   mailOrderSupplierId String?
   mailOrderSupplierNameSnapshot String?
   mailOrderSupplier Supplier? @relation(fields: [mailOrderSupplierId], references: [id], onDelete: SetNull)
@@ -249,6 +253,7 @@ model PaymentTransaction {
   fieldOperationLinks FieldOperationPaymentLink[]
 
   @@index([salesOrderId])
+  @@unique([salesOrderId, idempotencyKey])
   @@index([mailOrderSupplierId])
   @@map("payment_transactions")
 }
@@ -411,6 +416,7 @@ model SupplierLedgerEntry {
   paymentMethod String?
   documentNo  String?
   paymentTransactionId String? @unique
+  idempotencyKey String?
   salesOrderId String?
   customerNameSnapshot String?
   productTitleSnapshot String?
@@ -425,6 +431,7 @@ model SupplierLedgerEntry {
   @@index([supplierId, occurredAt])
   @@index([supplierId, createdAt])
   @@index([supplierId, status])
+  @@unique([supplierId, idempotencyKey])
   @@index([salesOrderId])
   @@map("supplier_ledger_entries")
 }
