@@ -216,7 +216,7 @@ const HOME_V5_DEV_RECENT_ROWS = [
  */
 export default function RoleHomePage({ onNavigate, onOpenOrderModal, onDashboardInteract }) {
   const { user } = useAuth()
-  const { orders, salesOrderListItemDtos, collectionRowVMs, refreshOrders, isRefreshing } = useOrders()
+  const { orders, salesOrderListItemDtos, collectionRowVMs, refreshOrders, isRefreshing, dataPipeline } = useOrders()
   const { plans, refreshPlans } = useShipmentPlans()
   const viewportTier = useViewportTier()
   const isPhone = viewportTier === 'phone'
